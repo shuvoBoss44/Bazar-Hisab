@@ -30,10 +30,12 @@ function ShoppingDetails() {
       setLoading(true);
       const [transactionResponse, usersResponse] = await Promise.all([
         axios.get(
-          `http://localhost:8000/api/transactions?page=${page}&limit=${limit}`,
+          `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
           { withCredentials: true }
         ),
-        axios.get("http://localhost:8000/api/users", { withCredentials: true }),
+        axios.get("https://bazar-hisab-backend.onrender.com/api/users", {
+          withCredentials: true,
+        }),
       ]);
       setTransactions(transactionResponse.data.data.transactions);
       setCentralBalance(transactionResponse.data.data.centralBalance || 0);
@@ -55,9 +57,12 @@ function ShoppingDetails() {
   const handleDelete = async id => {
     try {
       setLoading(true);
-      await axios.delete(`http://localhost:8000/api/transactions/${id}`, {
-        withCredentials: true,
-      });
+      await axios.delete(
+        `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
+        {
+          withCredentials: true,
+        }
+      );
       setSuccess("Transaction deleted successfully!");
       fetchData();
       setTimeout(() => setSuccess(null), 3000);

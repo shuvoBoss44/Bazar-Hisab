@@ -34,7 +34,7 @@ function Register() {
     try {
       setLoading(true);
       await axios.post(
-        "http://localhost:8000/api/users/signup",
+        "https://bazar-hisab-backend.onrender.com/api/users/signup",
         {
           name: formData.name.trim(),
           email: formData.email.trim().toLowerCase(),

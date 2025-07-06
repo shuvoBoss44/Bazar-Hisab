@@ -41,12 +41,15 @@ function EditTransaction() {
 
       // Fetch all users and the specific transaction concurrently using Promise.all
       const [usersRes, transRes] = await Promise.all([
-        axios.get("http://localhost:8000/api/users", {
+        axios.get("https://bazar-hisab-backend.onrender.com/api/users", {
           withCredentials: true,
         }),
-        axios.get(`http://localhost:8000/api/transactions/${transactionId}`, {
-          withCredentials: true,
-        }),
+        axios.get(
+          `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
+          {
+            withCredentials: true,
+          }
+        ),
       ]);
 
       const allUsers = usersRes.data.data || [];
@@ -223,7 +226,7 @@ function EditTransaction() {
       // Send the PATCH request to update the transaction document
       // The backend will differentiate the transaction type and handle balance adjustments.
       const response = await axios.patch(
-        `http://localhost:8000/api/transactions/${transactionId}`,
+        `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
         payload,
         { withCredentials: true }
       );

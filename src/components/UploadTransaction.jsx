@@ -12,9 +12,12 @@ function useUsers() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/users", {
-          withCredentials: true,
-        });
+        const response = await axios.get(
+          "https://bazar-hisab-backend.onrender.com/api/users",
+          {
+            withCredentials: true,
+          }
+        );
         const validUsers = response.data.data.map(user => ({
           ...user,
           _id: user.id,
@@ -111,9 +114,13 @@ function UploadTransaction() {
         sharedUserIds,
         createdBy: user.id, // Using user.id from AuthContext
       };
-      await axios.post("http://localhost:8000/api/transactions", payload, {
-        withCredentials: true,
-      });
+      await axios.post(
+        "https://bazar-hisab-backend.onrender.com/api/transactions",
+        payload,
+        {
+          withCredentials: true,
+        }
+      );
       setSuccess("Transaction created successfully!");
       setItems([{ itemName: "", price: "" }]);
       setSharedUserIds([]);

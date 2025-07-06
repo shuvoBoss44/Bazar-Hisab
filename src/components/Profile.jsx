@@ -15,9 +15,12 @@ const Profile = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const userRes = await axios.get("http://localhost:8000/api/users/me", {
-          withCredentials: true,
-        });
+        const userRes = await axios.get(
+          "https://bazar-hisab-backend.onrender.com/api/users/me",
+          {
+            withCredentials: true,
+          }
+        );
         setUser(userRes.data.data.user);
         setName(userRes.data.data.user.name);
         setEmail(userRes.data.data.user.email);
@@ -33,7 +36,7 @@ const Profile = () => {
   const handleUpdateProfile = async () => {
     try {
       const res = await axios.put(
-        "http://localhost:8000/api/users/me",
+        "https://bazar-hisab-backend.onrender.com/api/users/me",
         { name, email },
         { withCredentials: true }
       );
@@ -48,7 +51,7 @@ const Profile = () => {
   const handleChangePassword = async () => {
     try {
       await axios.put(
-        "http://localhost:8000/api/users/change-password",
+        "https://bazar-hisab-backend.onrender.com/api/users/change-password",
         { currentPassword, newPassword },
         { withCredentials: true }
       );
@@ -63,7 +66,7 @@ const Profile = () => {
   const handleAddBalance = async () => {
     try {
       const res = await axios.patch(
-        `http://localhost:8000/api/users/add-balance/${user?.id}`,
+        `https://bazar-hisab-backend.onrender.com/api/users/add-balance/${user?.id}`,
         { amount: balanceAmount },
         { withCredentials: true }
       );
@@ -78,7 +81,7 @@ const Profile = () => {
   const handleRemoveBalance = async () => {
     try {
       const res = await axios.patch(
-        `http://localhost:8000/api/users/remove-balance/${user?.id}`,
+        `https://bazar-hisab-backend.onrender.com/api/users/remove-balance/${user?.id}`,
         { amount: balanceAmount },
         { withCredentials: true }
       );
