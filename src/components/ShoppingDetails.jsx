@@ -40,9 +40,10 @@ function ShoppingDetails() {
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
       );
-      setTransactions(transactionResponse.data.data.transactions);
-      setCentralBalance(transactionResponse.data.data.centralBalance || 0);
-      setTotalPages(transactionResponse.data.data.totalPages || 1);
+      const data = transactionResponse.data.data || {};
+      setTransactions(data.transactions || []);
+      setCentralBalance(data.centralBalance || 0);
+      setTotalPages(data.totalPages || 1);
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
@@ -58,58 +59,57 @@ function ShoppingDetails() {
 
   const handleDelete = async id => {
     try {
-      setLoadingTransactions(true); // Indicate that an action is in progress
+      setLoadingTransactions(true);
 
-      // Find the transaction to be deleted to get its total price
+      // Find the transaction to be deleted
       const transactionToDelete = transactions.find(t => t._id === id);
       if (!transactionToDelete) {
         throw new Error("Transaction not found in local state for deletion.");
       }
 
+      // Perform the deletion on the backend
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      setSuccess("Transaction deleted successfully!");
 
+      // Instantly update local state
       const updatedTransactions = transactions.filter(
         transaction => transaction._id !== id
       );
       setTransactions(updatedTransactions);
+
+      // Update centralBalance locally based on transaction type
       let newCentralBalance = centralBalance;
       if (transactionToDelete.items[0]?.itemName === "Balance Addition") {
-        newCentralBalance -= transactionToDelete.totalPrice;
+        newCentralBalance -= transactionToDelete.totalPrice || 0;
       } else if (transactionToDelete.items[0]?.itemName === "Balance Removal") {
-        newCentralBalance += Math.abs(transactionToDelete.totalPrice); // total price for removal is negative, so add absolute value
+        newCentralBalance += Math.abs(transactionToDelete.totalPrice || 0);
       } else {
-        // Regular shopping transaction
-        newCentralBalance += transactionToDelete.totalPrice; // Shopping increases central balance, so deleting decreases it
+        newCentralBalance += transactionToDelete.totalPrice || 0;
       }
       setCentralBalance(newCentralBalance);
 
+      // Handle pagination logic
       if (updatedTransactions.length === 0 && page > 1) {
-        setPage(prevPage => prevPage - 1);
-        // The useEffect for `page` will then trigger `fetchData` for the previous page.
+        setPage(prevPage => prevPage - 1); // Move to previous page
       } else if (
         updatedTransactions.length < limit &&
         page === totalPages &&
-        page > 1
-      ) {
-        fetchData(); // This re-fetches current page data and updates totalPages/centralBalance
-      } else if (
-        page === 1 &&
-        updatedTransactions.length < limit &&
         totalPages > 1
       ) {
-        // If we delete the last item on page 1, and there were other pages,
-        // we might still need to update totalPages.
-        fetchData();
+        // If last item on the last page is deleted, re-fetch to update totalPages
+        await fetchData();
+      } else if (
+        page === 1 &&
+        updatedTransactions.length === 0 &&
+        totalPages > 1
+      ) {
+        // If last item on page 1 is deleted, re-fetch to update totalPages
+        await fetchData();
       }
 
-      // --- END: Truly Instant UI Update ---
-
+      setSuccess("Transaction deleted successfully!");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error(
@@ -169,7 +169,6 @@ function ShoppingDetails() {
               Current Central Balance
             </h3>
             <p className="text-4xl md:text-6xl font-extrabold mt-2 text-center">
-              {/* Ensure centralBalance is a number before toFixed */}
               {centralBalance?.toFixed(2) ?? "0.00"}{" "}
               <span className="text-blue-200 text-3xl md:text-4xl">tk</span>
             </p>
@@ -256,7 +255,6 @@ function ShoppingDetails() {
                             </span>{" "}
                             added{" "}
                             <span className="text-emerald-600 font-bold">
-                              {/* Add optional chaining and nullish coalescing */}
                               {transaction.totalPrice?.toFixed(2) ?? "0.00"} tk
                             </span>{" "}
                             to their balance.
@@ -289,7 +287,6 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.userBalanceBeforeTransaction?.toFixed(
                                         2
                                       ) ?? "0.00"}{" "}
@@ -297,7 +294,6 @@ function ShoppingDetails() {
                                     </td>
                                     <td className="py-2 pr-4 text-right text-emerald-600 font-semibold whitespace-nowrap">
                                       +{" "}
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.totalPrice?.toFixed(2) ??
                                         "0.00"}{" "}
                                       tk
@@ -306,13 +302,11 @@ function ShoppingDetails() {
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          // Add optional chaining
                                           transaction.createdBy?.balance < 0
-                                            ? "rgb(220 38 38)" // rose-600
-                                            : "rgb(5 150 105)", // emerald-600
+                                            ? "rgb(220 38 38)"
+                                            : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.createdBy?.balance?.toFixed(
                                         2
                                       ) ?? "0.00"}{" "}
@@ -332,7 +326,6 @@ function ShoppingDetails() {
                             </span>{" "}
                             removed{" "}
                             <span className="text-rose-600 font-bold">
-                              {/* Add optional chaining and nullish coalescing */}
                               {Math.abs(transaction.totalPrice ?? 0)?.toFixed(
                                 2
                               ) ?? "0.00"}{" "}
@@ -368,7 +361,6 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.userBalanceBeforeTransaction?.toFixed(
                                         2
                                       ) ?? "0.00"}{" "}
@@ -376,7 +368,6 @@ function ShoppingDetails() {
                                     </td>
                                     <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
                                       −{" "}
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {Math.abs(
                                         transaction.totalPrice ?? 0
                                       )?.toFixed(2) ?? "0.00"}{" "}
@@ -386,13 +377,11 @@ function ShoppingDetails() {
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          // Add optional chaining
                                           transaction.createdBy?.balance < 0
                                             ? "rgb(220 38 38)"
                                             : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.createdBy?.balance?.toFixed(
                                         2
                                       ) ?? "0.00"}{" "}
@@ -435,7 +424,6 @@ function ShoppingDetails() {
                                         {item.itemName}
                                       </td>
                                       <td className="py-2 text-right text-gray-800 font-medium whitespace-nowrap">
-                                        {/* Add optional chaining and nullish coalescing */}
                                         {item.price?.toFixed(2) ?? "0.00"}
                                       </td>
                                     </tr>
@@ -447,7 +435,6 @@ function ShoppingDetails() {
                                       Total
                                     </td>
                                     <td className="pt-3 text-right font-bold text-gray-800 text-base whitespace-nowrap">
-                                      {/* Add optional chaining and nullish coalescing */}
                                       {transaction.totalPrice?.toFixed(2) ??
                                         "0.00"}
                                     </td>
@@ -485,9 +472,9 @@ function ShoppingDetails() {
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
                                       const currentBalance =
-                                        sharedUserObj.balance ?? 0; // Use ?? for default 0 if null/undefined
+                                        sharedUserObj.balance ?? 0;
                                       const individualDeduction =
-                                        transaction.individualDeduction ?? 0; // Use ?? for default 0
+                                        transaction.individualDeduction ?? 0;
                                       const balanceBefore =
                                         currentBalance + individualDeduction;
                                       return (
@@ -499,14 +486,12 @@ function ShoppingDetails() {
                                             {sharedUserObj.name}
                                           </td>
                                           <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                            {/* Add optional chaining and nullish coalescing */}
                                             {balanceBefore?.toFixed(2) ??
                                               "0.00"}{" "}
                                             tk
                                           </td>
                                           <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
                                             −{" "}
-                                            {/* Add optional chaining and nullish coalescing */}
                                             {individualDeduction?.toFixed(2) ??
                                               "0.00"}{" "}
                                             tk
@@ -557,13 +542,11 @@ function ShoppingDetails() {
                                   </span>
                                   <span
                                     className={`font-semibold text-base ${
-                                      // Add optional chaining and nullish coalescing for comparison
                                       (u.balanceAtTime ?? 0) < 0
                                         ? "text-rose-600"
                                         : "text-emerald-600"
                                     }`}
                                   >
-                                    {/* THIS IS THE MOST LIKELY CULPRIT: Add optional chaining and nullish coalescing */}
                                     {u.balanceAtTime?.toFixed(2) ?? "0.00"} tk
                                   </span>
                                 </div>
