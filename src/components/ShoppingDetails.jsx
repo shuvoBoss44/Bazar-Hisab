@@ -382,7 +382,6 @@ function ShoppingDetails() {
                                             : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {/* Corrected "After" balance calculation */}
                                       {(
                                         (transaction.userBalanceBeforeTransaction ||
                                           0) -
@@ -461,30 +460,46 @@ function ShoppingDetails() {
                                       User
                                     </th>
                                     <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                      Before
+                                      Balance Before
                                     </th>
                                     <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
                                       Deduction
                                     </th>
                                     <th className="py-2 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                      After
+                                      Balance After
                                     </th>
                                   </tr>
                                 </thead>
                                 <tbody>
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
-                                      // Correctly get balance before transaction from the sharedUserObj if available
-                                      // Otherwise, calculate it based on the current balance and deduction
-                                      const balanceBefore =
-                                        sharedUserObj.balanceBeforeTransaction ?? // Check if your backend *could* send this
-                                        (sharedUserObj.balance ?? 0) +
-                                          (transaction.individualDeduction ??
-                                            0);
+                                      // Find the user's balance at transaction time from usersBalancesAtTransactionTime
+                                      const balanceAtTimeObj =
+                                        transaction.usersBalancesAtTransactionTime?.find(
+                                          u =>
+                                            u._id.toString() ===
+                                            sharedUserObj._id.toString()
+                                        );
+                                      const balanceBefore = balanceAtTimeObj
+                                        ? balanceAtTimeObj.balanceAtTime +
+                                          (transaction.individualDeduction ?? 0)
+                                        : sharedUserObj.balanceBeforeTransaction ??
+                                          null;
 
-                                      // Calculate the "After" balance based on "Before" and "Deduction"
+                                      // If no historical data, fall back to current balance with a caveat
+                                      const hasHistoricalData =
+                                        balanceAtTimeObj ||
+                                        sharedUserObj.balanceBeforeTransaction !==
+                                          undefined;
+                                      const fallbackBalanceBefore =
+                                        (sharedUserObj.balance ?? 0) +
+                                        (transaction.individualDeduction ?? 0);
+                                      const displayBalanceBefore =
+                                        hasHistoricalData
+                                          ? balanceBefore
+                                          : fallbackBalanceBefore;
                                       const afterBalance =
-                                        balanceBefore -
+                                        displayBalanceBefore -
                                         (transaction.individualDeduction ?? 0);
 
                                       return (
@@ -496,9 +511,15 @@ function ShoppingDetails() {
                                             {sharedUserObj.name}
                                           </td>
                                           <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                            {balanceBefore?.toFixed(2) ??
+                                            {displayBalanceBefore?.toFixed(2) ??
                                               "0.00"}{" "}
                                             tk
+                                            {!hasHistoricalData && (
+                                              <span className="text-xs text-gray-500">
+                                                {" "}
+                                                (est.)
+                                              </span>
+                                            )}
                                           </td>
                                           <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
                                             −{" "}
@@ -518,6 +539,12 @@ function ShoppingDetails() {
                                           >
                                             {afterBalance?.toFixed(2) ?? "0.00"}{" "}
                                             tk
+                                            {!hasHistoricalData && (
+                                              <span className="text-xs text-gray-500">
+                                                {" "}
+                                                (est.)
+                                              </span>
+                                            )}
                                           </td>
                                         </tr>
                                       );
@@ -526,6 +553,13 @@ function ShoppingDetails() {
                                 </tbody>
                               </table>
                             </div>
+                            {!transaction.usersBalancesAtTransactionTime
+                              ?.length && (
+                              <p className="text-xs text-gray-500 mt-2">
+                                Note: Balances are estimated from current values
+                                as historical data is unavailable.
+                              </p>
+                            )}
                           </div>
                         </div>
                       </div>
