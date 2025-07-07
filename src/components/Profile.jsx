@@ -11,7 +11,9 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
-  const [balanceLoading, setBalanceLoading] = useState(false); // State for balance operations
+  // Separate states for each balance operation
+  const [addingBalance, setAddingBalance] = useState(false);
+  const [removingBalance, setRemovingBalance] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -66,7 +68,7 @@ const Profile = () => {
 
   const handleAddBalance = async () => {
     try {
-      setBalanceLoading(true); // Start balance loading
+      setAddingBalance(true); // Start loading for add balance
       const res = await axios.patch(
         `https://bazar-hisab-backend.onrender.com/api/users/add-balance/${user?.id}`,
         { amount: balanceAmount },
@@ -78,13 +80,13 @@ const Profile = () => {
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to add balance");
     } finally {
-      setBalanceLoading(false); // End balance loading
+      setAddingBalance(false); // End loading for add balance
     }
   };
 
   const handleRemoveBalance = async () => {
     try {
-      setBalanceLoading(true); // Start balance loading
+      setRemovingBalance(true); // Start loading for remove balance
       const res = await axios.patch(
         `https://bazar-hisab-backend.onrender.com/api/users/remove-balance/${user?.id}`,
         { amount: balanceAmount },
@@ -96,7 +98,7 @@ const Profile = () => {
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to remove balance");
     } finally {
-      setBalanceLoading(false); // End balance loading
+      setRemovingBalance(false); // End loading for remove balance
     }
   };
 
@@ -267,10 +269,11 @@ const Profile = () => {
       <div className="flex space-x-4">
         <button
           onClick={handleAddBalance}
-          disabled={balanceLoading} // Disable button during loading
+          // Disable if adding or removing balance is in progress
+          disabled={addingBalance || removingBalance}
           className="flex-1 bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {balanceLoading ? (
+          {addingBalance ? (
             <>
               <svg
                 className="animate-spin h-5 w-5 text-white mr-2"
@@ -300,10 +303,11 @@ const Profile = () => {
         </button>
         <button
           onClick={handleRemoveBalance}
-          disabled={balanceLoading} // Disable button during loading
+          // Disable if adding or removing balance is in progress
+          disabled={addingBalance || removingBalance}
           className="flex-1 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {balanceLoading ? (
+          {removingBalance ? (
             <>
               <svg
                 className="animate-spin h-5 w-5 text-white mr-2"
