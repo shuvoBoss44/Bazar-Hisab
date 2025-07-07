@@ -9,16 +9,26 @@ function ShoppingDetails() {
   const [centralBalance, setCentralBalance] = useState(0);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loadingTransactions, setLoadingTransactions] = useState(false); // Renamed for clarity
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const limit = 10;
 
+  // Use a separate loading state specifically for transactions data fetching
+  // and only trigger fetch when user is available and not already loading auth or transactions
   useEffect(() => {
-    if (authLoading || !user) return;
-    fetchData();
-  }, [page, user, authLoading]);
+    if (!user || authLoading) {
+      // If user is not authenticated or auth is still loading, do nothing
+      // (The initial check in fetchData will handle redirection if user is null)
+      return;
+    }
+    // Only fetch data if we are not already loading transactions
+    if (!loadingTransactions) {
+      // Added this check
+      fetchData();
+    }
+  }, [page, user, authLoading, loadingTransactions]); // Added loadingTransactions to dependencies
 
   const fetchData = async () => {
     if (!user) {
@@ -26,7 +36,7 @@ function ShoppingDetails() {
       return;
     }
     try {
-      setLoading(true);
+      setLoadingTransactions(true); // Use the specific loading state
       const transactionResponse = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
@@ -43,13 +53,13 @@ function ShoppingDetails() {
         setTimeout(() => setError(null), 3000);
       }
     } finally {
-      setLoading(false);
+      setLoadingTransactions(false); // Ensure loading is set to false in finally
     }
   };
 
   const handleDelete = async id => {
     try {
-      setLoading(true);
+      setLoadingTransactions(true); // Use the specific loading state
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
         {
@@ -57,7 +67,9 @@ function ShoppingDetails() {
         }
       );
       setSuccess("Transaction deleted successfully!");
-      fetchData();
+      // Reset page to 1 after deletion to ensure consistent state and re-fetch from start
+      setPage(1); // Added this line to reset page after delete
+      // fetchData(); // fetchData will be called by useEffect due to page change
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error(
@@ -67,7 +79,7 @@ function ShoppingDetails() {
       setError(err.response?.data?.message || "Failed to delete transaction");
       setTimeout(() => setError(null), 3000);
     } finally {
-      setLoading(false);
+      setLoadingTransactions(false); // Ensure loading is set to false in finally
     }
   };
 
@@ -89,7 +101,8 @@ function ShoppingDetails() {
     return "Shopping Transaction";
   };
 
-  if (authLoading || loading) {
+  if (authLoading || loadingTransactions) {
+    // Use the correct loading state here
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl">
@@ -131,13 +144,14 @@ function ShoppingDetails() {
             </div>
           )}
 
-          {!loading && transactions.length === 0 && (
-            <div className="bg-white rounded-xl p-8 shadow-md text-center border border-gray-200">
-              <p className="text-gray-600 text-lg font-medium">
-                No transactions recorded yet.
-              </p>
-            </div>
-          )}
+          {!loadingTransactions &&
+            transactions.length === 0 && ( // Use the correct loading state here
+              <div className="bg-white rounded-xl p-8 shadow-md text-center border border-gray-200">
+                <p className="text-gray-600 text-lg font-medium">
+                  No transactions recorded yet.
+                </p>
+              </div>
+            )}
 
           <div className="space-y-6 lg:space-y-8">
             {transactions.map(transaction => {
@@ -192,146 +206,156 @@ function ShoppingDetails() {
                   </div>
 
                   <div className="p-4 md:p-6">
-                    {isBalanceAddition && (
-                      <div className="space-y-5">
-                        <p className="text-lg font-medium text-gray-800 leading-relaxed">
-                          <span className="font-semibold">
-                            {transaction.createdBy.name}
-                          </span>{" "}
-                          added{" "}
-                          <span className="text-emerald-600 font-bold">
-                            {transaction.totalPrice.toFixed(2)} tk
-                          </span>{" "}
-                          to their balance.
-                        </p>
-                        <div className="bg-gray-50 rounded-lg p-4 shadow-inner border border-gray-100">
-                          <h4 className="font-semibold text-gray-800 mb-3 text-base">
-                            Balance Update Summary
-                          </h4>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm min-w-[300px]">
-                              <thead>
-                                <tr className="border-b border-gray-200">
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-left whitespace-nowrap">
-                                    User
-                                  </th>
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    Before
-                                  </th>
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    Addition
-                                  </th>
-                                  <th className="py-2 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    After
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td className="py-2 pr-4 text-gray-700 whitespace-nowrap">
-                                    {transaction.createdBy.name}
-                                  </td>
-                                  <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                    {transaction.userBalanceBeforeTransaction.toFixed(
-                                      2
-                                    )}{" "}
-                                    tk
-                                  </td>
-                                  <td className="py-2 pr-4 text-right text-emerald-600 font-semibold whitespace-nowrap">
-                                    + {transaction.totalPrice.toFixed(2)} tk
-                                  </td>
-                                  <td
-                                    className="py-2 text-right font-bold whitespace-nowrap"
-                                    style={{
-                                      color:
-                                        transaction.createdBy.balance < 0
-                                          ? "rgb(220 38 38)" // rose-600
-                                          : "rgb(5 150 105)", // emerald-600
-                                    }}
-                                  >
-                                    {transaction.createdBy.balance.toFixed(2)}{" "}
-                                    tk
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
+                    {/* The Balance Update Summary and Items Purchased sections remain as they were */}
+                    {/* Only the `usersBalancesAtTransactionTime` block needs to be outside the !isBalanceAddition && !isBalanceRemoval */}
+                    {(isBalanceAddition || isBalanceRemoval) &&
+                      // This is for the 'Balance Update Summary' table specific to balance transactions
+                      // This condition (isBalanceAddition || isBalanceRemoval) already wraps the summary table HTML
+                      // based on your original code, so no changes needed here.
+                      // Make sure the structure for balance additions/removals is as it was
+                      // including the <div className="space-y-5"> and the internal tables.
+                      // I am simply adding a placeholder to indicate where the previous HTML was.
+                      // Previous HTML for Balance Update Summary (Addition)
+                      (isBalanceAddition ? (
+                        <div className="space-y-5">
+                          <p className="text-lg font-medium text-gray-800 leading-relaxed">
+                            <span className="font-semibold">
+                              {transaction.createdBy.name}
+                            </span>{" "}
+                            added{" "}
+                            <span className="text-emerald-600 font-bold">
+                              {transaction.totalPrice.toFixed(2)} tk
+                            </span>{" "}
+                            to their balance.
+                          </p>
+                          <div className="bg-gray-50 rounded-lg p-4 shadow-inner border border-gray-100">
+                            <h4 className="font-semibold text-gray-800 mb-3 text-base">
+                              Balance Update Summary
+                            </h4>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm min-w-[300px]">
+                                <thead>
+                                  <tr className="border-b border-gray-200">
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-left whitespace-nowrap">
+                                      User
+                                    </th>
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      Before
+                                    </th>
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      Addition
+                                    </th>
+                                    <th className="py-2 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      After
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td className="py-2 pr-4 text-gray-700 whitespace-nowrap">
+                                      {transaction.createdBy.name}
+                                    </td>
+                                    <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
+                                      {transaction.userBalanceBeforeTransaction.toFixed(
+                                        2
+                                      )}{" "}
+                                      tk
+                                    </td>
+                                    <td className="py-2 pr-4 text-right text-emerald-600 font-semibold whitespace-nowrap">
+                                      + {transaction.totalPrice.toFixed(2)} tk
+                                    </td>
+                                    <td
+                                      className="py-2 text-right font-bold whitespace-nowrap"
+                                      style={{
+                                        color:
+                                          transaction.createdBy.balance < 0
+                                            ? "rgb(220 38 38)" // rose-600
+                                            : "rgb(5 150 105)", // emerald-600
+                                      }}
+                                    >
+                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      tk
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-
-                    {isBalanceRemoval && (
-                      <div className="space-y-5">
-                        <p className="text-lg font-medium text-gray-800 leading-relaxed">
-                          <span className="font-semibold">
-                            {transaction.createdBy.name}
-                          </span>{" "}
-                          removed{" "}
-                          <span className="text-rose-600 font-bold">
-                            {Math.abs(transaction.totalPrice).toFixed(2)} tk
-                          </span>{" "}
-                          from their balance.
-                        </p>
-                        <div className="bg-gray-50 rounded-lg p-4 shadow-inner border border-gray-100">
-                          <h4 className="font-semibold text-gray-800 mb-3 text-base">
-                            Balance Update Summary
-                          </h4>
-                          <div className="overflow-x-auto">
-                            <table className="w-full text-sm min-w-[300px]">
-                              <thead>
-                                <tr className="border-b border-gray-200">
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-left whitespace-nowrap">
-                                    User
-                                  </th>
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    Before
-                                  </th>
-                                  <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    Removal
-                                  </th>
-                                  <th className="py-2 font-semibold text-gray-700 text-right whitespace-nowrap">
-                                    After
-                                  </th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                <tr>
-                                  <td className="py-2 pr-4 text-gray-700 whitespace-nowrap">
-                                    {transaction.createdBy.name}
-                                  </td>
-                                  <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                    {transaction.userBalanceBeforeTransaction.toFixed(
-                                      2
-                                    )}{" "}
-                                    tk
-                                  </td>
-                                  <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
-                                    −{" "}
-                                    {Math.abs(transaction.totalPrice).toFixed(
-                                      2
-                                    )}{" "}
-                                    tk
-                                  </td>
-                                  <td
-                                    className="py-2 text-right font-bold whitespace-nowrap"
-                                    style={{
-                                      color:
-                                        transaction.createdBy.balance < 0
-                                          ? "rgb(220 38 38)"
-                                          : "rgb(5 150 105)",
-                                    }}
-                                  >
-                                    {transaction.createdBy.balance.toFixed(2)}{" "}
-                                    tk
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
+                      ) : (
+                        // Previous HTML for Balance Update Summary (Removal)
+                        <div className="space-y-5">
+                          <p className="text-lg font-medium text-gray-800 leading-relaxed">
+                            <span className="font-semibold">
+                              {transaction.createdBy.name}
+                            </span>{" "}
+                            removed{" "}
+                            <span className="text-rose-600 font-bold">
+                              {Math.abs(transaction.totalPrice).toFixed(2)} tk
+                            </span>{" "}
+                            from their balance.
+                          </p>
+                          <div className="bg-gray-50 rounded-lg p-4 shadow-inner border border-gray-100">
+                            <h4 className="font-semibold text-gray-800 mb-3 text-base">
+                              Balance Update Summary
+                            </h4>
+                            <div className="overflow-x-auto">
+                              <table className="w-full text-sm min-w-[300px]">
+                                <thead>
+                                  <tr className="border-b border-gray-200">
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-left whitespace-nowrap">
+                                      User
+                                    </th>
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      Before
+                                    </th>
+                                    <th className="py-2 pr-4 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      Removal
+                                    </th>
+                                    <th className="py-2 font-semibold text-gray-700 text-right whitespace-nowrap">
+                                      After
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr>
+                                    <td className="py-2 pr-4 text-gray-700 whitespace-nowrap">
+                                      {transaction.createdBy.name}
+                                    </td>
+                                    <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
+                                      {transaction.userBalanceBeforeTransaction.toFixed(
+                                        2
+                                      )}{" "}
+                                      tk
+                                    </td>
+                                    <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
+                                      −{" "}
+                                      {Math.abs(transaction.totalPrice).toFixed(
+                                        2
+                                      )}{" "}
+                                      tk
+                                    </td>
+                                    <td
+                                      className="py-2 text-right font-bold whitespace-nowrap"
+                                      style={{
+                                        color:
+                                          transaction.createdBy.balance < 0
+                                            ? "rgb(220 38 38)"
+                                            : "rgb(5 150 105)",
+                                      }}
+                                    >
+                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      tk
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
+                      ))}
 
+                    {/* Original shopping transaction details */}
                     {!isBalanceAddition && !isBalanceRemoval && (
                       <div className="space-y-6">
                         <div>
