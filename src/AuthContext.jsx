@@ -2,7 +2,7 @@ import { createContext, useState, useEffect, useMemo } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export const AuthContext = createContext({});
+export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -17,24 +17,27 @@ export const AuthProvider = ({ children }) => {
       const response = await axios.get(`${API_URL}/api/users/check-auth`, {
         withCredentials: true,
       });
+      console.log(response);
       if (response.data?.data?.isAuthenticated) {
         setIsAuthenticated(true);
         setUser(response.data.data.user);
       } else {
-        setIsAuthenticated(false);
-        setUser(null);
+        throw new Error("Authentication check failed");
       }
     } catch (err) {
-      console.error("Authentication check failed:", err);
-      setIsAuthenticated(false);
-      setUser(null);
       setError(
         err.response?.data?.message || "Failed to verify authentication"
       );
+      setIsAuthenticated(false);
+      setUser(null);
     } finally {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   const logout = async () => {
     try {
