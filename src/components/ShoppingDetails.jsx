@@ -59,6 +59,13 @@ function ShoppingDetails() {
   const handleDelete = async id => {
     try {
       setLoadingTransactions(true); // Indicate that an action is in progress
+
+      // Find the transaction to be deleted to get its total price
+      const transactionToDelete = transactions.find(t => t._id === id);
+      if (!transactionToDelete) {
+        throw new Error("Transaction not found in local state for deletion.");
+      }
+
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
         {
@@ -67,33 +74,52 @@ function ShoppingDetails() {
       );
       setSuccess("Transaction deleted successfully!");
 
-      // --- START: Instant UI Update ---
-      // Filter out the deleted transaction from the current state
-      setTransactions(prevTransactions =>
-        prevTransactions.filter(transaction => transaction._id !== id)
+      const updatedTransactions = transactions.filter(
+        transaction => transaction._id !== id
       );
-
-      // Re-fetch data to update pagination, central balance, and ensure consistency
-      // This will also handle cases where the last item on a page was deleted.
-      // If the current page becomes empty, it will automatically go to the previous page.
-      if (transactions.length === 1 && page > 1) {
-        // If deleting the last item on the current page and not on page 1
-        setPage(prevPage => prevPage - 1); // Go to previous page
+      setTransactions(updatedTransactions);
+      let newCentralBalance = centralBalance;
+      if (transactionToDelete.items[0]?.itemName === "Balance Addition") {
+        newCentralBalance -= transactionToDelete.totalPrice;
+      } else if (transactionToDelete.items[0]?.itemName === "Balance Removal") {
+        newCentralBalance += Math.abs(transactionToDelete.totalPrice); // total price for removal is negative, so add absolute value
       } else {
-        fetchData(); // Otherwise, re-fetch current page data
+        // Regular shopping transaction
+        newCentralBalance += transactionToDelete.totalPrice; // Shopping increases central balance, so deleting decreases it
       }
-      // --- END: Instant UI Update ---
+      setCentralBalance(newCentralBalance);
 
-      setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
+      if (updatedTransactions.length === 0 && page > 1) {
+        setPage(prevPage => prevPage - 1);
+        // The useEffect for `page` will then trigger `fetchData` for the previous page.
+      } else if (
+        updatedTransactions.length < limit &&
+        page === totalPages &&
+        page > 1
+      ) {
+        fetchData(); // This re-fetches current page data and updates totalPages/centralBalance
+      } else if (
+        page === 1 &&
+        updatedTransactions.length < limit &&
+        totalPages > 1
+      ) {
+        // If we delete the last item on page 1, and there were other pages,
+        // we might still need to update totalPages.
+        fetchData();
+      }
+
+      // --- END: Truly Instant UI Update ---
+
+      setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error(
         "Error deleting transaction:",
         err.response?.data || err.message
       );
       setError(err.response?.data?.message || "Failed to delete transaction");
-      setTimeout(() => setError(null), 3000); // Clear error message after 3 seconds
+      setTimeout(() => setError(null), 3000);
     } finally {
-      setLoadingTransactions(false); // Reset loading state
+      setLoadingTransactions(false);
     }
   };
 
