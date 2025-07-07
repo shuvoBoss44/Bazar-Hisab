@@ -15,22 +15,34 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
+  // Effect for fetching transactions data
   useEffect(() => {
-    // Only fetch data if the user is authenticated and auth loading is complete
+    // Only attempt to fetch data if user is defined AND authLoading is false
+    // This ensures we wait for authentication status to be known
     if (user && !authLoading) {
       fetchData();
     }
-    // If user is null and authLoading is false, it means they are not logged in,
-    // so we should redirect them. This typically handles initial load scenarios
-    // where user might be null before AuthContext fully loads or if not logged in.
+  }, [page, user, authLoading]); // Dependencies: page for pagination, user/authLoading for initial/re-auth fetch
+
+  // Effect for handling redirection if user becomes null after authLoading completes
+  useEffect(() => {
     if (!user && !authLoading) {
+      // If auth has finished loading and user is still null, redirect to login
       navigate("/login");
     }
-  }, [page, user, authLoading]); // Removed loadingTransactions from dependencies
+  }, [user, authLoading, navigate]); // Dependencies: user and authLoading to react to auth state changes
 
   const fetchData = async () => {
-    // No need for `if (!user)` check here, as `useEffect` now handles redirection explicitly
-    // if the user is not present after authLoading finishes.
+    // We already handle redirection in a separate useEffect now, so this check is less critical here,
+    // but keeping it as a safeguard is fine.
+    if (!user) {
+      // This should ideally not be hit if the useEffect above is working correctly,
+      // but it's a defensive check.
+      console.warn("fetchData called without a user. Redirecting.");
+      navigate("/login");
+      return;
+    }
+
     try {
       setLoadingTransactions(true);
       const transactionResponse = await axios.get(
@@ -43,6 +55,7 @@ function ShoppingDetails() {
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
+        // Specifically handle 401 Unauthorized by redirecting to login
         navigate("/login");
       } else {
         setError(err.response?.data?.message || "Failed to fetch data");
@@ -96,6 +109,7 @@ function ShoppingDetails() {
     return "Shopping Transaction";
   };
 
+  // Display loading spinner while authentication is loading OR transactions are loading
   if (authLoading || loadingTransactions) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -107,9 +121,18 @@ function ShoppingDetails() {
     );
   }
 
+  // If we reach here and user is null (meaning authLoading is false, and they aren't logged in)
+  // This state implies the user was redirected by the second useEffect, so this component shouldn't render its full content.
+  // This return null or a simple message is a fallback, as navigation should already occur.
+  if (!user) {
+    return null; // Or a message like "You are not logged in. Redirecting..."
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 pt-20">
+      {/* Outer wrapper for full width on mobile, with horizontal padding */}
       <div className="px-4 sm:px-6 lg:px-8">
+        {/* Inner container to restrict max-width on larger screens and center content */}
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">
             Transaction History
