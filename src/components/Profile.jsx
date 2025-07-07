@@ -11,6 +11,7 @@ const Profile = () => {
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
+  const [balanceLoading, setBalanceLoading] = useState(false); // New state for balance operations
 
   useEffect(() => {
     const fetchData = async () => {
@@ -65,6 +66,7 @@ const Profile = () => {
 
   const handleAddBalance = async () => {
     try {
+      setBalanceLoading(true); // Start balance loading
       const res = await axios.patch(
         `https://bazar-hisab-backend.onrender.com/api/users/add-balance/${user?.id}`,
         { amount: balanceAmount },
@@ -75,11 +77,14 @@ const Profile = () => {
       setBalanceAmount("");
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to add balance");
+    } finally {
+      setBalanceLoading(false); // End balance loading
     }
   };
 
   const handleRemoveBalance = async () => {
     try {
+      setBalanceLoading(true); // Start balance loading
       const res = await axios.patch(
         `https://bazar-hisab-backend.onrender.com/api/users/remove-balance/${user?.id}`,
         { amount: balanceAmount },
@@ -90,27 +95,40 @@ const Profile = () => {
       setBalanceAmount("");
     } catch (err) {
       setMessage(err.response?.data?.message || "Failed to remove balance");
+    } finally {
+      setBalanceLoading(false); // End balance loading
     }
   };
 
-  if (loading) return <div className="text-center mt-10">Loading...</div>;
+  if (loading)
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl">
+          <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+          <p className="text-gray-700 text-lg font-medium">
+            Loading profile...
+          </p>
+        </div>
+      </div>
+    );
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">Profile</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900">Profile</h1>
 
-      <div className="mb-4 flex items-center justify-between">
+      <div className="mb-4 flex items-center justify-between border-b pb-4">
         <div>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-md font-semibold text-gray-800">
             Name: {user?.name}
           </p>
-          <p className="text-sm font-medium text-gray-700">
+          <p className="text-md font-semibold text-gray-800">
             Email: {user?.email}
           </p>
         </div>
         <button
           onClick={() => setIsEditing(!isEditing)}
-          className="text-blue-500 hover:text-blue-700"
+          className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
+          aria-label={isEditing ? "Cancel editing" : "Edit profile"}
         >
           <svg
             className="w-6 h-6"
@@ -132,122 +150,189 @@ const Profile = () => {
       {isEditing && (
         <>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="name-input"
+              className="block text-sm font-medium text-gray-700"
+            >
               Name
             </label>
             <input
+              id="name-input"
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="mt-1 block w-full p-2 border rounded-md"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email-input"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
+              id="email-input"
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="mt-1 block w-full p-2 border rounded-md"
+              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
 
           <button
             onClick={handleUpdateProfile}
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6"
+            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6 transition duration-200 ease-in-out shadow-md"
           >
             Update Profile
           </button>
         </>
       )}
 
-      <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
-          Password
-        </label>
-        <input
-          type="text"
-          value="*******"
-          disabled
-          className="mt-1 block w-full p-2 border rounded-md bg-gray-100"
-        />
-      </div>
+      <h2 className="text-xl font-bold mb-4 mt-6 text-gray-800">
+        Change Password
+      </h2>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="current-password-input"
+          className="block text-sm font-medium text-gray-700"
+        >
           Current Password
         </label>
         <input
+          id="current-password-input"
           type="password"
           value={currentPassword}
           onChange={e => setCurrentPassword(e.target.value)}
-          className="mt-1 block w-full p-2 border rounded-md"
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="new-password-input"
+          className="block text-sm font-medium text-gray-700"
+        >
           New Password
         </label>
         <input
+          id="new-password-input"
           type="password"
           value={newPassword}
           onChange={e => setNewPassword(e.target.value)}
-          className="mt-1 block w-full p-2 border rounded-md"
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
 
       <button
         onClick={handleChangePassword}
-        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6"
+        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6 transition duration-200 ease-in-out shadow-md"
       >
         Change Password
       </button>
-      <div className="mb-4">
+
+      <h2 className="text-xl font-bold mb-4 mt-6 text-gray-800">
+        Manage Balance
+      </h2>
+      <div className="mb-4 text-center p-3 rounded-lg border border-gray-200 bg-gray-50">
         <p
-          className={`text-md font-medium ${
+          className={`text-lg font-extrabold ${
             (user?.balance ?? 0) >= 0 ? "text-green-600" : "text-red-600"
-          } font-bold`}
+          }`}
         >
-          Your Balance: {(user?.balance ?? 0).toFixed(2)} tk
+          Your Current Balance: {(user?.balance ?? 0).toFixed(2)} tk
         </p>
       </div>
 
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="balance-amount-input"
+          className="block text-sm font-medium text-gray-700"
+        >
           Amount
         </label>
         <input
+          id="balance-amount-input"
           type="number"
           value={balanceAmount}
           onChange={e => setBalanceAmount(e.target.value)}
-          className="mt-1 block w-full p-2 border rounded-md"
+          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           min="0"
+          step="0.01"
         />
       </div>
 
       <div className="flex space-x-4">
         <button
           onClick={handleAddBalance}
-          className="flex-1 bg-green-500 text-white p-2 rounded-md hover:bg-green-600"
+          disabled={balanceLoading} // Disable button during loading
+          className="flex-1 bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Add Balance
+          {balanceLoading ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          ) : (
+            "Add Balance"
+          )}
         </button>
         <button
           onClick={handleRemoveBalance}
-          className="flex-1 bg-red-500 text-white p-2 rounded-md hover:bg-red-600"
+          disabled={balanceLoading} // Disable button during loading
+          className="flex-1 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Remove Balance
+          {balanceLoading ? (
+            <svg
+              className="animate-spin h-5 w-5 text-white mr-2"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                className="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="4"
+              ></circle>
+              <path
+                className="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+          ) : (
+            "Remove Balance"
+          )}
         </button>
       </div>
 
       {message && (
         <p
-          className={`mt-4 text-center ${
-            message.includes("Failed") ? "text-red-500" : "text-green-500"
+          className={`mt-4 text-center font-medium p-2 rounded ${
+            message.includes("Failed")
+              ? "bg-red-100 text-red-700"
+              : "bg-green-100 text-green-700"
           }`}
         >
           {message}
