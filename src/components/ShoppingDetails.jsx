@@ -382,9 +382,12 @@ function ShoppingDetails() {
                                             : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {transaction.createdBy?.balance?.toFixed(
-                                        2
-                                      ) ?? "0.00"}{" "}
+                                      {/* Corrected "After" balance calculation */}
+                                      {(
+                                        (transaction.userBalanceBeforeTransaction ||
+                                          0) -
+                                        Math.abs(transaction.totalPrice ?? 0)
+                                      ).toFixed(2) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                   </tr>
@@ -471,12 +474,19 @@ function ShoppingDetails() {
                                 <tbody>
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
-                                      const currentBalance =
-                                        sharedUserObj.balance ?? 0;
-                                      const individualDeduction =
-                                        transaction.individualDeduction ?? 0;
+                                      // Correctly get balance before transaction from the sharedUserObj if available
+                                      // Otherwise, calculate it based on the current balance and deduction
                                       const balanceBefore =
-                                        currentBalance + individualDeduction;
+                                        sharedUserObj.balanceBeforeTransaction ??
+                                        (sharedUserObj.balance ?? 0) +
+                                          (transaction.individualDeduction ??
+                                            0);
+
+                                      // Calculate the "After" balance based on "Before" and "Deduction"
+                                      const afterBalance =
+                                        balanceBefore -
+                                        (transaction.individualDeduction ?? 0);
+
                                       return (
                                         <tr
                                           key={sharedUserObj._id}
@@ -492,21 +502,21 @@ function ShoppingDetails() {
                                           </td>
                                           <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
                                             −{" "}
-                                            {individualDeduction?.toFixed(2) ??
-                                              "0.00"}{" "}
+                                            {transaction.individualDeduction?.toFixed(
+                                              2
+                                            ) ?? "0.00"}{" "}
                                             tk
                                           </td>
                                           <td
                                             className="py-2 text-right font-bold whitespace-nowrap"
                                             style={{
                                               color:
-                                                currentBalance < 0
+                                                afterBalance < 0
                                                   ? "rgb(220 38 38)"
                                                   : "rgb(5 150 105)",
                                             }}
                                           >
-                                            {currentBalance?.toFixed(2) ??
-                                              "0.00"}{" "}
+                                            {afterBalance?.toFixed(2) ?? "0.00"}{" "}
                                             tk
                                           </td>
                                         </tr>
