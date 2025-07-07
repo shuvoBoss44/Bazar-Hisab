@@ -5,9 +5,9 @@ import { AuthContext } from "../AuthContext"; // Assuming AuthContext provides u
 
 function EditTransaction() {
   const { user, loading: authLoading } = useContext(AuthContext);
-  // Removed users state as it's no longer needed without "Share With" section
+  const [users, setUsers] = useState([]); // Stores all users with their current balances
   const [items, setItems] = useState([{ itemName: "", price: "" }]); // For shopping transactions
-  // Removed sharedUserIds state as it's no longer needed
+  const [sharedUserIds, setSharedUserIds] = useState([]); // For shopping transactions
   const [amount, setAmount] = useState(""); // For balance addition/removal transactions
   const [isBalanceAddition, setIsBalanceAddition] = useState(false);
   const [isBalanceRemoval, setIsBalanceRemoval] = useState(false);
@@ -15,7 +15,7 @@ function EditTransaction() {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState({
-    // Removed users loading state
+    users: false, // Loading state for fetching users
     transaction: false, // Loading state for fetching the specific transaction
     submit: false, // Loading state for submitting the form
   });
@@ -34,20 +34,25 @@ function EditTransaction() {
     fetchData();
   }, [transactionId, user, authLoading, navigate]); // Dependencies for re-running the effect
 
-  // Function to fetch the specific transaction data
+  // Function to fetch users and the specific transaction data
   const fetchData = async () => {
     try {
-      // Set loading state for transaction
-      setLoading(prev => ({ ...prev, transaction: true }));
+      setLoading(prev => ({ ...prev, users: true, transaction: true })); // Set loading states
 
-      // Fetch only the specific transaction
-      const transRes = await axios.get(
-        `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
-        {
+      // Fetch all users and the specific transaction concurrently using Promise.all
+      const [usersRes, transRes] = await Promise.all([
+        axios.get("https://bazar-hisab-backend.onrender.com/api/users", {
           withCredentials: true,
-        }
-      );
+        }),
+        axios.get(
+          `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
+          {
+            withCredentials: true,
+          }
+        ),
+      ]);
 
+      const allUsers = usersRes.data.data || [];
       const transaction = transRes.data.data?.transaction;
 
       // Error handling if transaction is not found
@@ -60,6 +65,7 @@ function EditTransaction() {
         throw new Error("You are not authorized to edit this transaction");
       }
 
+      setUsers(allUsers); // Set the list of all users
       setOriginalTransaction(transaction); // Store the complete original transaction data
 
       // Determine transaction type from the fetched data and populate form fields accordingly
@@ -79,10 +85,14 @@ function EditTransaction() {
         setItems(
           transaction.items.map(item => ({
             itemName: item.itemName || "",
-            price: item.price?.toString() || "", // Defensive access
+            price: item.price?.toString() || "",
           }))
         );
-        // sharedUserIds is no longer managed in state or form, but we'll use original for payload
+        // Extract shared user IDs from the transaction and convert to string for consistency
+        const extractedSharedUserIds = transaction.sharedUsers
+          .map(u => (typeof u === "string" ? u : u._id?.toString()))
+          .filter(Boolean); // Filter out any null/undefined IDs
+        setSharedUserIds(extractedSharedUserIds);
       }
     } catch (err) {
       console.error(
@@ -97,7 +107,7 @@ function EditTransaction() {
       // Redirect on error after a delay for user to read message
       setTimeout(() => navigate("/shopping-details"), 3000);
     } finally {
-      setLoading(prev => ({ ...prev, transaction: false })); // Reset loading state
+      setLoading(prev => ({ ...prev, users: false, transaction: false })); // Reset loading states
     }
   };
 
@@ -114,6 +124,17 @@ function EditTransaction() {
   // Handler to remove an item row for shopping transactions (if more than one exists)
   const removeItem = index =>
     items.length > 1 && setItems(items.filter((_, i) => i !== index));
+
+  // Handler to toggle selection of shared users for shopping transactions
+  const handleUserToggle = userId => {
+    const userIdStr = userId.toString(); // Ensure consistent string comparison
+    setSharedUserIds(prev => {
+      const newIds = prev.includes(userIdStr)
+        ? prev.filter(id => id !== userIdStr) // Remove if already selected
+        : [...prev, userIdStr]; // Add if not selected
+      return newIds;
+    });
+  };
 
   // Form validation logic before submission
   const validateForm = () => {
@@ -143,7 +164,12 @@ function EditTransaction() {
           return false;
         }
       }
-      // Removed sharedUserIds validation as the section is removed
+      if (sharedUserIds.length === 0) {
+        setError(
+          "Please select at least one user to share this transaction with."
+        );
+        return false;
+      }
     }
     return true; // Form is valid
   };
@@ -180,8 +206,7 @@ function EditTransaction() {
             },
           ],
           // For balance transactions, the affected user is typically just the creator
-          // Use originalTransaction.sharedUsers to preserve shared users if the backend needs it for type check
-          sharedUsers: originalTransaction.sharedUsers,
+          sharedUsers: [userIdToAdjust], // Ensure only creator is in sharedUsers for balance transactions
           totalPrice: isBalanceRemoval ? -newAmount : newAmount,
         };
       } else {
@@ -191,9 +216,7 @@ function EditTransaction() {
             itemName: item.itemName.trim(),
             price: parseFloat(item.price),
           })),
-          // For shopping transactions, retain the original sharedUsers if the backend expects it.
-          // This assumes the sharedUsers cannot be changed from the edit form.
-          sharedUsers: originalTransaction.sharedUsers.map(u => u._id),
+          sharedUsers: sharedUserIds, // Array of user IDs
         };
       }
 
@@ -238,12 +261,11 @@ function EditTransaction() {
     }
   };
 
-  // Removed animation from the loading spinner div
-  if (authLoading || loading.transaction) {
+  // Display loading spinner while initial data is being fetched
+  if (authLoading || loading.users || loading.transaction) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="h-16 w-16 border-t-4 border-b-4 border-blue-600 rounded-full"></div>{" "}
-        {/* Animation removed */}
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
       </div>
     );
   }
@@ -259,11 +281,12 @@ function EditTransaction() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4 sm:p-6 pt-20 sm:pt-24">
-      <div className="bg-white shadow-2xl rounded-2xl p-6 sm:p-8 max-w-3xl w-full animate-in fade-in duration-300">
+      <div className="bg-white shadow-2xl rounded-2xl p-6 sm:p-8 max-w-3xl w-full">
+        {" "}
+        {/* Removed animate-in fade-in duration-300 */}
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">
           {getTitle()}
         </h2>
-
         {/* Error message display */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg flex items-center">
@@ -302,7 +325,6 @@ function EditTransaction() {
             {success}
           </div>
         )}
-
         <div className="space-y-6 sm:space-y-8">
           {/* Conditional rendering for balance transactions vs. regular transactions forms */}
           {isBalanceAddition || isBalanceRemoval ? (
@@ -391,7 +413,38 @@ function EditTransaction() {
                 </button>
               </div>
 
-              {/* "Share With" section removed as requested */}
+              {/* Share With section for regular shopping transactions */}
+              <div className="space-y-4">
+                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                  Share With
+                </h3>
+                {users.length === 0 ? (
+                  <p className="text-gray-500">
+                    No users available to share with. Please contact support.
+                  </p>
+                ) : (
+                  <div className="grid grid-cols-1 gap-3">
+                    {users.map(u => (
+                      <label
+                        key={u._id}
+                        className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-all"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={
+                            u._id && sharedUserIds.includes(u._id.toString())
+                          }
+                          onChange={() => u._id && handleUserToggle(u._id)}
+                          className="h-6 w-6 text-blue-600 rounded focus:ring-blue-500"
+                        />
+                        <span className="text-gray-700 text-base">
+                          {u.name} ({(u.balance ?? 0).toFixed(2)} tk)
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              </div>
             </>
           )}
 
@@ -407,13 +460,34 @@ function EditTransaction() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading.submit} // Removed check for users.length === 0
+              disabled={loading.submit || users.length === 0}
               className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-all flex items-center justify-center text-base"
             >
-              {loading.submit
-                ? // Removed spinner animation as requested
-                  "Saving..."
-                : "Save Changes"}
+              {loading.submit ? (
+                <>
+                  <svg
+                    className="animate-spin h-5 w-5 mr-2"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    />
+                  </svg>
+                  Saving...
+                </>
+              ) : (
+                "Save Changes"
+              )}
             </button>
           </div>
         </div>
