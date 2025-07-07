@@ -477,7 +477,7 @@ function ShoppingDetails() {
                                       // Correctly get balance before transaction from the sharedUserObj if available
                                       // Otherwise, calculate it based on the current balance and deduction
                                       const balanceBefore =
-                                        sharedUserObj.balanceBeforeTransaction ??
+                                        sharedUserObj.balanceBeforeTransaction ?? // Check if your backend *could* send this
                                         (sharedUserObj.balance ?? 0) +
                                           (transaction.individualDeduction ??
                                             0);
