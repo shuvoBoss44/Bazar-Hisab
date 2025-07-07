@@ -15,29 +15,20 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
-  // Effect for fetching transactions data
   useEffect(() => {
-    // Only attempt to fetch data if user is defined AND authLoading is false
-    // This ensures we wait for authentication status to be known
     if (user && !authLoading) {
       fetchData();
     }
-  }, [page, user, authLoading]); // Dependencies: page for pagination, user/authLoading for initial/re-auth fetch
+  }, [page, user, authLoading]);
 
-  // Effect for handling redirection if user becomes null after authLoading completes
   useEffect(() => {
     if (!user && !authLoading) {
-      // If auth has finished loading and user is still null, redirect to login
       navigate("/login");
     }
-  }, [user, authLoading, navigate]); // Dependencies: user and authLoading to react to auth state changes
+  }, [user, authLoading, navigate]);
 
   const fetchData = async () => {
-    // We already handle redirection in a separate useEffect now, so this check is less critical here,
-    // but keeping it as a safeguard is fine.
     if (!user) {
-      // This should ideally not be hit if the useEffect above is working correctly,
-      // but it's a defensive check.
       console.warn("fetchData called without a user. Redirecting.");
       navigate("/login");
       return;
@@ -55,7 +46,6 @@ function ShoppingDetails() {
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
-        // Specifically handle 401 Unauthorized by redirecting to login
         navigate("/login");
       } else {
         setError(err.response?.data?.message || "Failed to fetch data");
@@ -76,7 +66,6 @@ function ShoppingDetails() {
         }
       );
       setSuccess("Transaction deleted successfully!");
-      // Reset page to 1 after deletion to ensure consistent state and re-fetch from start
       setPage(1);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
@@ -109,7 +98,6 @@ function ShoppingDetails() {
     return "Shopping Transaction";
   };
 
-  // Display loading spinner while authentication is loading OR transactions are loading
   if (authLoading || loadingTransactions) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -121,18 +109,13 @@ function ShoppingDetails() {
     );
   }
 
-  // If we reach here and user is null (meaning authLoading is false, and they aren't logged in)
-  // This state implies the user was redirected by the second useEffect, so this component shouldn't render its full content.
-  // This return null or a simple message is a fallback, as navigation should already occur.
   if (!user) {
-    return null; // Or a message like "You are not logged in. Redirecting..."
+    return null;
   }
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 pt-20">
-      {/* Outer wrapper for full width on mobile, with horizontal padding */}
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Inner container to restrict max-width on larger screens and center content */}
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">
             Transaction History
@@ -143,7 +126,8 @@ function ShoppingDetails() {
               Current Central Balance
             </h3>
             <p className="text-4xl md:text-6xl font-extrabold mt-2 text-center">
-              {centralBalance.toFixed(2)}{" "}
+              {/* Ensure centralBalance is a number before toFixed */}
+              {centralBalance?.toFixed(2) ?? "0.00"}{" "}
               <span className="text-blue-200 text-3xl md:text-4xl">tk</span>
             </p>
           </div>
@@ -229,7 +213,8 @@ function ShoppingDetails() {
                             </span>{" "}
                             added{" "}
                             <span className="text-emerald-600 font-bold">
-                              {transaction.totalPrice.toFixed(2)} tk
+                              {/* Add optional chaining and nullish coalescing */}
+                              {transaction.totalPrice?.toFixed(2) ?? "0.00"} tk
                             </span>{" "}
                             to their balance.
                           </p>
@@ -261,24 +246,33 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {transaction.userBalanceBeforeTransaction.toFixed(
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.userBalanceBeforeTransaction?.toFixed(
                                         2
-                                      )}{" "}
+                                      ) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                     <td className="py-2 pr-4 text-right text-emerald-600 font-semibold whitespace-nowrap">
-                                      + {transaction.totalPrice.toFixed(2)} tk
+                                      +{" "}
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.totalPrice?.toFixed(2) ??
+                                        "0.00"}{" "}
+                                      tk
                                     </td>
                                     <td
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          transaction.createdBy.balance < 0
+                                          // Add optional chaining
+                                          transaction.createdBy?.balance < 0
                                             ? "rgb(220 38 38)" // rose-600
                                             : "rgb(5 150 105)", // emerald-600
                                       }}
                                     >
-                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.createdBy?.balance?.toFixed(
+                                        2
+                                      ) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                   </tr>
@@ -295,7 +289,11 @@ function ShoppingDetails() {
                             </span>{" "}
                             removed{" "}
                             <span className="text-rose-600 font-bold">
-                              {Math.abs(transaction.totalPrice).toFixed(2)} tk
+                              {/* Add optional chaining and nullish coalescing */}
+                              {Math.abs(transaction.totalPrice ?? 0)?.toFixed(
+                                2
+                              ) ?? "0.00"}{" "}
+                              tk
                             </span>{" "}
                             from their balance.
                           </p>
@@ -327,28 +325,34 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {transaction.userBalanceBeforeTransaction.toFixed(
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.userBalanceBeforeTransaction?.toFixed(
                                         2
-                                      )}{" "}
+                                      ) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                     <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
                                       −{" "}
-                                      {Math.abs(transaction.totalPrice).toFixed(
-                                        2
-                                      )}{" "}
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {Math.abs(
+                                        transaction.totalPrice ?? 0
+                                      )?.toFixed(2) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                     <td
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          transaction.createdBy.balance < 0
+                                          // Add optional chaining
+                                          transaction.createdBy?.balance < 0
                                             ? "rgb(220 38 38)"
                                             : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.createdBy?.balance?.toFixed(
+                                        2
+                                      ) ?? "0.00"}{" "}
                                       tk
                                     </td>
                                   </tr>
@@ -388,7 +392,8 @@ function ShoppingDetails() {
                                         {item.itemName}
                                       </td>
                                       <td className="py-2 text-right text-gray-800 font-medium whitespace-nowrap">
-                                        {item.price.toFixed(2)}
+                                        {/* Add optional chaining and nullish coalescing */}
+                                        {item.price?.toFixed(2) ?? "0.00"}
                                       </td>
                                     </tr>
                                   ))}
@@ -399,7 +404,9 @@ function ShoppingDetails() {
                                       Total
                                     </td>
                                     <td className="pt-3 text-right font-bold text-gray-800 text-base whitespace-nowrap">
-                                      {transaction.totalPrice.toFixed(2)}
+                                      {/* Add optional chaining and nullish coalescing */}
+                                      {transaction.totalPrice?.toFixed(2) ??
+                                        "0.00"}
                                     </td>
                                   </tr>
                                 </tfoot>
@@ -435,9 +442,9 @@ function ShoppingDetails() {
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
                                       const currentBalance =
-                                        sharedUserObj.balance || 0;
+                                        sharedUserObj.balance ?? 0; // Use ?? for default 0 if null/undefined
                                       const individualDeduction =
-                                        transaction.individualDeduction || 0;
+                                        transaction.individualDeduction ?? 0; // Use ?? for default 0
                                       const balanceBefore =
                                         currentBalance + individualDeduction;
                                       return (
@@ -449,10 +456,16 @@ function ShoppingDetails() {
                                             {sharedUserObj.name}
                                           </td>
                                           <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                            {balanceBefore.toFixed(2)} tk
+                                            {/* Add optional chaining and nullish coalescing */}
+                                            {balanceBefore?.toFixed(2) ??
+                                              "0.00"}{" "}
+                                            tk
                                           </td>
                                           <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
-                                            − {individualDeduction.toFixed(2)}{" "}
+                                            −{" "}
+                                            {/* Add optional chaining and nullish coalescing */}
+                                            {individualDeduction?.toFixed(2) ??
+                                              "0.00"}{" "}
                                             tk
                                           </td>
                                           <td
@@ -464,7 +477,9 @@ function ShoppingDetails() {
                                                   : "rgb(5 150 105)",
                                             }}
                                           >
-                                            {currentBalance.toFixed(2)} tk
+                                            {currentBalance?.toFixed(2) ??
+                                              "0.00"}{" "}
+                                            tk
                                           </td>
                                         </tr>
                                       );
@@ -485,15 +500,12 @@ function ShoppingDetails() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {transaction.usersBalancesAtTransactionTime &&
                           transaction.usersBalancesAtTransactionTime.map(
-                            (
-                              u,
-                              index // Added index for key fallback
-                            ) => (
+                            (u, index) => (
                               <div
                                 key={
                                   u._id ||
                                   `user-balance-${transaction._id}-${index}`
-                                } // Fallback key
+                                }
                                 className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
                               >
                                 <div className="flex justify-between items-center">
@@ -502,12 +514,14 @@ function ShoppingDetails() {
                                   </span>
                                   <span
                                     className={`font-semibold text-base ${
-                                      u.balanceAtTime < 0
+                                      // Add optional chaining and nullish coalescing for comparison
+                                      (u.balanceAtTime ?? 0) < 0
                                         ? "text-rose-600"
                                         : "text-emerald-600"
                                     }`}
                                   >
-                                    {u.balanceAtTime.toFixed(2)} tk
+                                    {/* THIS IS THE MOST LIKELY CULPRIT: Add optional chaining and nullish coalescing */}
+                                    {u.balanceAtTime?.toFixed(2) ?? "0.00"} tk
                                   </span>
                                 </div>
                               </div>
