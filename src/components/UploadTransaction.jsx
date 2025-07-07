@@ -64,7 +64,8 @@ function UploadTransaction() {
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
-    newItems[index][field] = field === "price" ? value : value.trim();
+    // Changed this line: removed .trim() for itemName
+    newItems[index][field] = field === "price" ? value : value;
     setItems(newItems);
   };
 

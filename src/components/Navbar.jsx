@@ -166,26 +166,7 @@ function Navbar() {
                 </svg>
                 Sign In
               </Link>
-              <Link
-                to="/register"
-                className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14c-1.49 0-2.924.356-4.265 1.015L7 16v-2h-2v2l-.735.015A7.996 7.996 0 004 18c0 1.25.378 2.428 1.015 3.428L5 22h14l.015-1.572C19.622 20.428 20 19.25 20 18c0-1.49-.356-2.924-1.015-4.265L18 14h-2V7z"
-                  ></path>
-                </svg>
-                Register
-              </Link>
+              {/* Removed Register button for desktop */}
             </>
           )}
         </div>
@@ -313,27 +294,7 @@ function Navbar() {
               </svg>
               Sign In
             </Link>
-            <Link
-              to="/register"
-              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
-              onClick={toggleMobileMenu}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM12 14c-1.49 0-2.924.356-4.265 1.015L7 16v-2h-2v2l-.735.015A7.996 7.996 0 004 18c0 1.25.378 2.428 1.015 3.428L5 22h14l.015-1.572C19.622 20.428 20 19.25 20 18c0-1.49-.356-2.924-1.015-4.265L18 14h-2V7z"
-                ></path>
-              </svg>
-              Register
-            </Link>
+            {/* Removed Register button for mobile */}
           </>
         )}
       </div>
