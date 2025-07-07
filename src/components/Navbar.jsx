@@ -26,13 +26,13 @@ function Navbar() {
         </Link>
         {/* Mobile menu button */}
         <button
-          className="md:hidden p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300"
+          className="md:hidden p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300" // Adjusted padding for mobile button
           onClick={toggleMobileMenu}
           aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           aria-expanded={isMobileMenuOpen}
         >
           <svg
-            className="w-7 h-7" // Increased size for better touch target
+            className="w-7 h-7"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -41,14 +41,14 @@ function Navbar() {
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2.5" // Slightly thicker stroke
+                strokeWidth="2.5"
                 d="M6 18L18 6M6 6l12 12"
               />
             ) : (
               <path
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                strokeWidth="2.5" // Slightly thicker stroke
+                strokeWidth="2.5"
                 d="M4 6h16M4 12h16M4 18h16"
               />
             )}
@@ -57,8 +57,6 @@ function Navbar() {
 
         {/* Desktop menu */}
         <div className="hidden md:flex items-center gap-6">
-          {" "}
-          {/* Increased gap for desktop */}
           {loading ? (
             <span className="text-blue-200 animate-pulse text-sm">
               Loading...
@@ -197,20 +195,20 @@ function Navbar() {
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
           isMobileMenuOpen
-            ? "max-h-screen opacity-100 py-4"
+            ? "max-h-screen opacity-100 py-3" // Adjusted vertical padding for mobile menu container
             : "max-h-0 opacity-0 py-0"
         } bg-blue-700 flex flex-col gap-2`}
         aria-hidden={!isMobileMenuOpen}
       >
         {loading ? (
-          <span className="text-blue-200 animate-pulse text-sm px-4 py-2">
+          <span className="text-blue-200 animate-pulse text-sm px-3 py-1.5">
             Loading...
           </span>
         ) : isAuthenticated ? (
           <>
             <Link
               to="/profile"
-              className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-4 py-2 rounded-md hover:bg-blue-800 flex items-center gap-2"
+              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
               onClick={toggleMobileMenu}
             >
               <svg
@@ -231,7 +229,7 @@ function Navbar() {
             </Link>
             <Link
               to="/shopping-details"
-              className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-4 py-2 rounded-md hover:bg-blue-800 flex items-center gap-2"
+              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
               onClick={toggleMobileMenu}
             >
               <svg
@@ -252,7 +250,7 @@ function Navbar() {
             </Link>
             <Link
               to="/upload-transaction"
-              className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-4 py-2 rounded-md hover:bg-blue-800 flex items-center gap-2"
+              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
               onClick={toggleMobileMenu}
             >
               <svg
@@ -273,7 +271,7 @@ function Navbar() {
             </Link>
             <button
               onClick={handleLogout}
-              className="bg-red-500 text-white text-sm font-medium px-4 py-2 mx-4 rounded-md hover:bg-red-600 transition-colors duration-200 w-fit flex items-center gap-2"
+              className="bg-red-500 text-white text-sm font-medium px-4 py-2 mx-3 rounded-md hover:bg-red-600 transition-colors duration-200 w-fit flex items-center gap-2" // Adjusted horizontal margin
             >
               <svg
                 className="w-5 h-5"
@@ -296,7 +294,7 @@ function Navbar() {
           <>
             <Link
               to="/login"
-              className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-4 py-2 rounded-md hover:bg-blue-800 flex items-center gap-2"
+              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
               onClick={toggleMobileMenu}
             >
               <svg
@@ -317,7 +315,7 @@ function Navbar() {
             </Link>
             <Link
               to="/register"
-              className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-4 py-2 rounded-md hover:bg-blue-800 flex items-center gap-2"
+              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
               onClick={toggleMobileMenu}
             >
               <svg
