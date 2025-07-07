@@ -22,24 +22,29 @@ function App() {
       <AuthProvider>
         <div className="min-h-screen bg-gray-50 flex flex-col">
           <Navbar />
-          <main className="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-12 pt-20">
-            <Routes>
-              <Route path="/register" element={<Register />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/shopping-details" element={<ShoppingDetails />} />
-              <Route
-                path="/upload-transaction"
-                element={<UploadTransaction />}
-              />
-              <Route
-                path="/edit-transaction/:id"
-                element={<EditTransaction />}
-              />
-              <Route path="/" element={<ShoppingDetails />} />
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-            <Footer />
+          {/* Main content area */}
+          <main className="flex-grow py-12 pt-20">
+            {/* Inner div to control max-width, centering, and responsive horizontal padding */}
+            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+              <Routes>
+                <Route path="/register" element={<Register />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/shopping-details" element={<ShoppingDetails />} />
+                <Route
+                  path="/upload-transaction"
+                  element={<UploadTransaction />}
+                />
+                <Route
+                  path="/edit-transaction/:id"
+                  element={<EditTransaction />}
+                />
+                <Route path="/" element={<ShoppingDetails />} />
+                <Route path="*" element={<Navigate to="/" />} />
+              </Routes>
+              {/* Ensure Footer is within the main content area, adjusted for full width if needed */}
+              <Footer />
+            </div>
           </main>
         </div>
       </AuthProvider>
