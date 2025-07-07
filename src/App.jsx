@@ -20,12 +20,13 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50 flex flex-col">
-          <Navbar />
-          {/* Main content area */}
-          <main className="flex-grow py-12 pt-20">
-            {/* Inner div to control max-width, centering, and responsive horizontal padding */}
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden">
+          {/* Navbar spans full width */}
+          <Navbar className="w-full" />
+          {/* Main content area spans full width */}
+          <main className="flex-grow py-12 pt-20 w-full">
+            {/* Remove mx-auto and padding classes, use full width */}
+            <div className="w-full">
               <Routes>
                 <Route path="/register" element={<Register />} />
                 <Route path="/login" element={<Login />} />
@@ -42,8 +43,8 @@ function App() {
                 <Route path="/" element={<ShoppingDetails />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
-              {/* Ensure Footer is within the main content area, adjusted for full width if needed */}
-              <Footer />
+              {/* Footer spans full width */}
+              <Footer className="w-full" />
             </div>
           </main>
         </div>
