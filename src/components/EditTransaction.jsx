@@ -1,89 +1,69 @@
 import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../AuthContext"; // Assuming AuthContext provides user info
+import { AuthContext } from "../AuthContext";
 
 function EditTransaction() {
   const { user, loading: authLoading } = useContext(AuthContext);
-  // Removed users state as it's no longer needed without "Share With" section
-  const [items, setItems] = useState([{ itemName: "", price: "" }]); // For shopping transactions
-  // Removed sharedUserIds state as it's no longer needed
-  const [amount, setAmount] = useState(""); // For balance addition/removal transactions
+  const [items, setItems] = useState([{ itemName: "", price: "" }]);
+  const [amount, setAmount] = useState("");
   const [isBalanceAddition, setIsBalanceAddition] = useState(false);
   const [isBalanceRemoval, setIsBalanceRemoval] = useState(false);
-  const [originalTransaction, setOriginalTransaction] = useState(null); // Stores the fetched transaction data to compare with edits
+  const [originalTransaction, setOriginalTransaction] = useState(null);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState({
-    // Removed users loading state
-    transaction: false, // Loading state for fetching the specific transaction
-    submit: false, // Loading state for submitting the form
+    transaction: false,
+    submit: false,
   });
 
   const navigate = useNavigate();
-  const { id: transactionId } = useParams(); // Extracts transaction ID from URL
+  const { id: transactionId } = useParams();
 
-  // Effect hook to fetch initial data when component mounts or dependencies change
   useEffect(() => {
-    // Only fetch data if authentication is not loading and user data is available
     if (authLoading || !user) {
-      // Optionally redirect to login if no user is found after auth loads
       if (!authLoading && !user) navigate("/login");
       return;
     }
     fetchData();
-  }, [transactionId, user, authLoading, navigate]); // Dependencies for re-running the effect
+  }, [transactionId, user, authLoading, navigate]);
 
-  // Function to fetch the specific transaction data (removed users fetch)
   const fetchData = async () => {
     try {
-      // Set loading state for transaction
       setLoading(prev => ({ ...prev, transaction: true }));
-
-      // Fetch only the specific transaction
       const transRes = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
 
       const transaction = transRes.data.data?.transaction;
-
-      // Error handling if transaction is not found
       if (!transaction) {
         throw new Error("Transaction not found");
       }
 
-      // Authorization check: Ensure only the creator can edit their transaction
       if (transaction.createdBy._id?.toString() !== user.id) {
         throw new Error("You are not authorized to edit this transaction");
       }
 
-      // Removed setUsers(allUsers)
-      setOriginalTransaction(transaction); // Store the complete original transaction data
+      setOriginalTransaction(transaction);
 
-      // Determine transaction type from the fetched data and populate form fields accordingly
       if (transaction.items[0]?.itemName === "Balance Addition") {
         setIsBalanceAddition(true);
         setIsBalanceRemoval(false);
-        setAmount(transaction.totalPrice?.toString() ?? ""); // Amount for display should be positive
+        setAmount(transaction.totalPrice?.toString() ?? "");
       } else if (transaction.items[0]?.itemName === "Balance Removal") {
         setIsBalanceRemoval(true);
         setIsBalanceAddition(false);
-        // For removal, totalPrice might be negative in DB, use Math.abs for positive display
         setAmount(Math.abs(transaction.totalPrice ?? 0)?.toString() ?? "");
       } else {
-        // It's a regular shopping transaction
         setIsBalanceAddition(false);
         setIsBalanceRemoval(false);
         setItems(
           transaction.items.map(item => ({
             itemName: item.itemName || "",
-            price: item.price?.toString() || "", // Defensive access
+            price: item.price?.toString() || "",
           }))
         );
-        // sharedUserIds is no longer managed in state or form, but we'll use original for payload
       }
     } catch (err) {
       console.error(
@@ -95,32 +75,25 @@ function EditTransaction() {
           err.message ||
           "Failed to load transaction data"
       );
-      // Redirect on error after a delay for user to read message
       setTimeout(() => navigate("/shopping-details"), 3000);
     } finally {
-      setLoading(prev => ({ ...prev, transaction: false })); // Reset loading state (removed users loading)
+      setLoading(prev => ({ ...prev, transaction: false }));
     }
   };
 
-  // Handler for changes in item name or price for shopping transactions
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
     newItems[index][field] = value;
     setItems(newItems);
   };
 
-  // Handler to add a new item row for shopping transactions
   const addItem = () => setItems([...items, { itemName: "", price: "" }]);
 
-  // Handler to remove an item row for shopping transactions (if more than one exists)
   const removeItem = index =>
     items.length > 1 && setItems(items.filter((_, i) => i !== index));
 
-  // Removed handleUserToggle as "Share With" section is removed
-
-  // Form validation logic before submission
   const validateForm = () => {
-    setError(null); // Clear previous errors before validating
+    setError(null);
     if (isBalanceAddition || isBalanceRemoval) {
       const amountValue = parseFloat(amount);
       if (isNaN(amountValue) || amountValue <= 0) {
@@ -130,7 +103,6 @@ function EditTransaction() {
         return false;
       }
     } else {
-      // Validation for regular shopping transactions
       if (items.length === 0) {
         setError("Please add at least one item.");
         return false;
@@ -146,32 +118,28 @@ function EditTransaction() {
           return false;
         }
       }
-      // Removed sharedUserIds validation as the section is removed
     }
-    return true; // Form is valid
+    return true;
   };
 
-  // Handler for submitting the form
   const handleSubmit = async () => {
-    setError(null); // Clear previous errors
-    setSuccess(null); // Clear previous successes
+    setError(null);
+    setSuccess(null);
 
-    if (!validateForm()) return; // Validate form inputs first
+    if (!validateForm()) return;
 
-    // Essential check: Ensure originalTransaction data is loaded before proceeding
     if (!originalTransaction) {
       setError("Original transaction data not loaded. Please try again.");
       return;
     }
 
     try {
-      setLoading(prev => ({ ...prev, submit: true })); // Set submit loading state
-      let payload = {}; // Initialize payload for the API request
+      setLoading(prev => ({ ...prev, submit: true }));
+      let payload = {};
 
-      // Construct payload based on transaction type
       if (isBalanceAddition || isBalanceRemoval) {
         const newAmount = parseFloat(amount);
-        const userIdToAdjust = originalTransaction.createdBy._id; // The user whose balance is affected
+        const userIdToAdjust = originalTransaction.createdBy._id;
 
         payload = {
           items: [
@@ -182,36 +150,44 @@ function EditTransaction() {
               price: newAmount,
             },
           ],
-          // For balance transactions, the affected user is typically just the creator
-          sharedUsers: [userIdToAdjust], // Ensure only creator is in sharedUsers for balance transactions
+          sharedUsers: [userIdToAdjust],
           totalPrice: isBalanceRemoval ? -newAmount : newAmount,
+          originalTotalPrice: originalTransaction.totalPrice,
+          userBalanceBeforeTransaction:
+            originalTransaction.userBalanceBeforeTransaction,
+          usersBalancesAtTransactionTime:
+            originalTransaction.usersBalancesAtTransactionTime,
         };
       } else {
-        // Payload for regular shopping transaction update
+        const newTotal = items.reduce(
+          (sum, item) => sum + parseFloat(item.price),
+          0
+        );
         payload = {
           items: items.map(item => ({
             itemName: item.itemName.trim(),
             price: parseFloat(item.price),
           })),
-          // For shopping transactions, retain the original sharedUsers if the backend expects it.
-          // This assumes the sharedUsers cannot be changed from the edit form.
           sharedUsers: originalTransaction.sharedUsers.map(u => u._id),
+          totalPrice: newTotal,
+          originalTotalPrice: originalTransaction.totalPrice,
+          userBalanceBeforeTransaction:
+            originalTransaction.userBalanceBeforeTransaction,
+          usersBalancesAtTransactionTime:
+            originalTransaction.usersBalancesAtTransactionTime,
         };
       }
 
-      // Send the PATCH request to update the transaction document
       const response = await axios.patch(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
         payload,
         { withCredentials: true }
       );
 
-      // Handle successful response
       if (response.status === 200) {
         setSuccess(
           response.data.message || "Transaction updated successfully!"
         );
-        // Redirect to shopping details page after a short delay
         setTimeout(() => navigate("/shopping-details"), 1500);
       }
     } catch (err) {
@@ -225,24 +201,17 @@ function EditTransaction() {
           "Failed to update transaction"
       );
     } finally {
-      setLoading(prev => ({ ...prev, submit: false })); // Reset submit loading state
+      setLoading(prev => ({ ...prev, submit: false }));
     }
   };
 
-  // Helper function to dynamically set the form title
   const getTitle = () => {
-    if (isBalanceAddition) {
-      return "Edit Balance Addition";
-    } else if (isBalanceRemoval) {
-      return "Edit Balance Removal";
-    } else {
-      return "Edit Transaction";
-    }
+    if (isBalanceAddition) return "Edit Balance Addition";
+    if (isBalanceRemoval) return "Edit Balance Removal";
+    return "Edit Transaction";
   };
 
-  // Display loading spinner while initial data is being fetched
   if (authLoading || loading.transaction) {
-    // Removed loading.users
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
@@ -250,7 +219,6 @@ function EditTransaction() {
     );
   }
 
-  // Display a message if originalTransaction hasn't loaded (should be very brief)
   if (!originalTransaction) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -265,7 +233,6 @@ function EditTransaction() {
         <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 text-center">
           {getTitle()}
         </h2>
-        {/* Error message display */}
         {error && (
           <div className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-lg flex items-center">
             <svg
@@ -284,7 +251,6 @@ function EditTransaction() {
             {error}
           </div>
         )}
-        {/* Success message display */}
         {success && (
           <div className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-lg flex items-center">
             <svg
@@ -304,7 +270,6 @@ function EditTransaction() {
           </div>
         )}
         <div className="space-y-6 sm:space-y-8">
-          {/* Conditional rendering for balance transactions vs. regular transactions forms */}
           {isBalanceAddition || isBalanceRemoval ? (
             <div className="space-y-4">
               <div>
@@ -328,74 +293,67 @@ function EditTransaction() {
               </p>
             </div>
           ) : (
-            <>
-              {/* Items section for regular shopping transactions */}
-              <div className="space-y-4">
-                <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
-                  Items
-                </h3>
-                {items.map((item, index) => (
-                  <div
-                    key={index}
-                    className="flex flex-col gap-4 sm:flex-row sm:gap-3 sm:items-end"
-                  >
-                    <div className="flex-1">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Item Name
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter item name"
-                        value={item.itemName}
-                        onChange={e =>
-                          handleItemChange(index, "itemName", e.target.value)
-                        }
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        required
-                      />
-                    </div>
-                    <div className="w-full sm:w-32">
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Price (tk)
-                      </label>
-                      <input
-                        type="number"
-                        placeholder="0.00"
-                        value={item.price}
-                        onChange={e =>
-                          handleItemChange(index, "price", e.target.value)
-                        }
-                        className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-                        min="0.01"
-                        step="0.01"
-                        required
-                      />
-                    </div>
-                    {items.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeItem(index)}
-                        className="w-full sm:w-auto mt-2 sm:mt-0 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
-                      >
-                        Remove
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addItem}
-                  className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-all"
+            <div className="space-y-4">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800">
+                Items
+              </h3>
+              {items.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex flex-col gap-4 sm:flex-row sm:gap-3 sm:items-end"
                 >
-                  + Add Another Item
-                </button>
-              </div>
-
-              {/* "Share With" section removed as requested */}
-            </>
+                  <div className="flex-1">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Item Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter item name"
+                      value={item.itemName}
+                      onChange={e =>
+                        handleItemChange(index, "itemName", e.target.value)
+                      }
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      required
+                    />
+                  </div>
+                  <div className="w-full sm:w-32">
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Price (tk)
+                    </label>
+                    <input
+                      type="number"
+                      placeholder="0.00"
+                      value={item.price}
+                      onChange={e =>
+                        handleItemChange(index, "price", e.target.value)
+                      }
+                      className="w-full p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                      min="0.01"
+                      step="0.01"
+                      required
+                    />
+                  </div>
+                  {items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="w-full sm:w-auto mt-2 sm:mt-0 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition-all"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={addItem}
+                className="text-blue-600 hover:text-blue-800 text-sm font-medium transition-all"
+              >
+                + Add Another Item
+              </button>
+            </div>
           )}
-
-          {/* Action buttons */}
           <div className="flex flex-col sm:flex-row justify-end gap-4 mt-6">
             <button
               type="button"
@@ -407,7 +365,7 @@ function EditTransaction() {
             <button
               type="button"
               onClick={handleSubmit}
-              disabled={loading.submit} // Removed users.length === 0 check
+              disabled={loading.submit}
               className="w-full sm:w-auto px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 transition-all flex items-center justify-center text-base"
             >
               {loading.submit ? (

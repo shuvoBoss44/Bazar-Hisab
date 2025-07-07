@@ -98,14 +98,12 @@ function ShoppingDetails() {
         page === totalPages &&
         totalPages > 1
       ) {
-        // If last item on the last page is deleted, re-fetch to update totalPages
         await fetchData();
       } else if (
         page === 1 &&
         updatedTransactions.length === 0 &&
         totalPages > 1
       ) {
-        // If last item on page 1 is deleted, re-fetch to update totalPages
         await fetchData();
       }
 
@@ -194,13 +192,14 @@ function ShoppingDetails() {
           )}
 
           <div className="space-y-6 lg:space-y-8">
-            {transactions.map(transaction => {
+            {transactions.map((transaction, index) => {
               const isBalanceAddition =
                 transaction.items[0]?.itemName === "Balance Addition";
               const isBalanceRemoval =
                 transaction.items[0]?.itemName === "Balance Removal";
               const isCreator =
                 user && transaction.createdBy._id.toString() === user.id;
+              const isLatestTransaction = index === 0; // First transaction is the most recent due to sorting
 
               return (
                 <div
@@ -473,7 +472,6 @@ function ShoppingDetails() {
                                 <tbody>
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
-                                      // Find the user's balance at transaction time from usersBalancesAtTransactionTime
                                       const balanceAtTimeObj =
                                         transaction.usersBalancesAtTransactionTime?.find(
                                           u =>
@@ -486,7 +484,6 @@ function ShoppingDetails() {
                                         : sharedUserObj.balanceBeforeTransaction ??
                                           null;
 
-                                      // If no historical data, fall back to current balance with a caveat
                                       const hasHistoricalData =
                                         balanceAtTimeObj ||
                                         sharedUserObj.balanceBeforeTransaction !==
@@ -607,7 +604,7 @@ function ShoppingDetails() {
                     </div>
                   </div>
 
-                  {isCreator && (
+                  {isCreator && isLatestTransaction && (
                     <div className="p-4 border-t border-gray-100 bg-gray-50 flex justify-end space-x-3">
                       <button
                         onClick={() =>
