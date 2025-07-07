@@ -7,7 +7,7 @@ function ShoppingDetails() {
   const { user, loading: authLoading } = useContext(AuthContext);
   const [transactions, setTransactions] = useState([]);
   const [centralBalance, setCentralBalance] = useState(0);
-  const [users, setUsers] = useState([]);
+  // Removed `users` state as it's no longer needed for historical balances
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -28,19 +28,15 @@ function ShoppingDetails() {
     }
     try {
       setLoading(true);
-      const [transactionResponse, usersResponse] = await Promise.all([
-        axios.get(
-          `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
-          { withCredentials: true }
-        ),
-        axios.get("https://bazar-hisab-backend.onrender.com/api/users", {
-          withCredentials: true,
-        }),
-      ]);
+      // Only fetching transactions now, assuming historical user balances are embedded
+      const transactionResponse = await axios.get(
+        `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
+        { withCredentials: true }
+      );
       setTransactions(transactionResponse.data.data.transactions);
       setCentralBalance(transactionResponse.data.data.centralBalance || 0);
       setTotalPages(transactionResponse.data.data.totalPages || 1);
-      setUsers(usersResponse.data.data);
+      // Removed setUsers as the global users list is not needed here anymore
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
@@ -258,6 +254,7 @@ function ShoppingDetails() {
                                           : "rgb(5 150 105)", // emerald-600
                                     }}
                                   >
+                                    {/* This is the balance *after* addition, specific to this user */}
                                     {transaction.createdBy.balance.toFixed(2)}{" "}
                                     tk
                                   </td>
@@ -332,6 +329,7 @@ function ShoppingDetails() {
                                           : "rgb(5 150 105)",
                                     }}
                                   >
+                                    {/* This is the balance *after* removal, specific to this user */}
                                     {transaction.createdBy.balance.toFixed(2)}{" "}
                                     tk
                                   </td>
@@ -418,6 +416,8 @@ function ShoppingDetails() {
                                 <tbody>
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
+                                      // Here, `sharedUserObj.balance` is likely the balance *after* this transaction for this specific user.
+                                      // If you want "Before", you'd use `sharedUserObj.balance + transaction.individualDeduction`.
                                       const currentBalance =
                                         sharedUserObj.balance || 0;
                                       const individualDeduction =
@@ -462,33 +462,41 @@ function ShoppingDetails() {
                       </div>
                     )}
 
+                    {/* NEW: Displays balances of all users AT THE TIME of this transaction */}
                     <div className="mt-8">
                       <h4 className="font-semibold text-gray-800 mb-3 text-base">
-                        Current Balances of All Users
+                        Balances of All Users at Transaction Time
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {users.map(u => (
-                          <div
-                            key={u._id}
-                            className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
-                          >
-                            <div className="flex justify-between items-center">
-                              <span className="font-medium text-gray-700">
-                                {u.name}
-                              </span>
-                              <span
-                                className={`font-semibold text-base ${
-                                  u.balance < 0
-                                    ? "text-rose-600"
-                                    : "text-emerald-600"
-                                }`}
-                              >
-                                {u.balance.toFixed(2)} tk
-                              </span>
+                        {transaction.usersBalancesAtTransactionTime &&
+                          transaction.usersBalancesAtTransactionTime.map(u => (
+                            <div
+                              key={u._id}
+                              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium text-gray-700">
+                                  {u.name}
+                                </span>
+                                <span
+                                  className={`font-semibold text-base ${
+                                    u.balanceAtTime < 0
+                                      ? "text-rose-600"
+                                      : "text-emerald-600"
+                                  }`}
+                                >
+                                  {u.balanceAtTime.toFixed(2)} tk
+                                </span>
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
                       </div>
+                      {!transaction.usersBalancesAtTransactionTime && (
+                        <p className="text-gray-600 text-sm mt-2">
+                          Historical user balances not available for this
+                          transaction type or record.
+                        </p>
+                      )}
                     </div>
                   </div>
 
