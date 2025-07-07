@@ -15,27 +15,39 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
+  // Effect for fetching transactions data
   useEffect(() => {
+    // Only attempt to fetch data if user is defined AND authLoading is false
+    // This ensures we wait for authentication status to be known
     if (user && !authLoading) {
-      console.log("Fetching data for page:", page);
       fetchData();
     }
+  }, [page, user, authLoading]); // Dependencies: page for pagination, user/authLoading for initial/re-auth fetch
+
+  // Effect for handling redirection if user becomes null after authLoading completes
+  useEffect(() => {
     if (!user && !authLoading) {
+      // If auth has finished loading and user is still null, redirect to login
       navigate("/login");
     }
-  }, [page, user, authLoading]);
+  }, [user, authLoading, navigate]); // Dependencies: user and authLoading to react to auth state changes
 
   const fetchData = async () => {
+    if (!user) {
+      console.warn("fetchData called without a user. Redirecting.");
+      navigate("/login");
+      return;
+    }
+
     try {
       setLoadingTransactions(true);
       const transactionResponse = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
       );
-      console.log("Backend Response:", transactionResponse.data);
-      setTransactions(transactionResponse.data.data.data.transactions);
-      setCentralBalance(transactionResponse.data.data.data.centralBalance || 0);
-      setTotalPages(transactionResponse.data.data.data.totalPages || 1);
+      setTransactions(transactionResponse.data.data.transactions);
+      setCentralBalance(transactionResponse.data.data.centralBalance || 0); // Already defensive here
+      setTotalPages(transactionResponse.data.data.totalPages || 1);
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
@@ -54,7 +66,9 @@ function ShoppingDetails() {
       setLoadingTransactions(true);
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
-        { withCredentials: true }
+        {
+          withCredentials: true,
+        }
       );
       setSuccess("Transaction deleted successfully!");
       setPage(1);
@@ -100,6 +114,10 @@ function ShoppingDetails() {
     );
   }
 
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 py-8 pt-20">
       <div className="px-4 sm:px-6 lg:px-8">
@@ -113,7 +131,8 @@ function ShoppingDetails() {
               Current Central Balance
             </h3>
             <p className="text-4xl md:text-6xl font-extrabold mt-2 text-center">
-              {centralBalance.toFixed(2)}{" "}
+              {/* Defensive toFixed */}
+              {(centralBalance || 0).toFixed(2)}{" "}
               <span className="text-blue-200 text-3xl md:text-4xl">tk</span>
             </p>
           </div>
@@ -199,7 +218,8 @@ function ShoppingDetails() {
                             </span>{" "}
                             added{" "}
                             <span className="text-emerald-600 font-bold">
-                              {transaction.totalPrice.toFixed(2)} tk
+                              {/* Defensive toFixed */}
+                              {(transaction.totalPrice || 0).toFixed(2)} tk
                             </span>{" "}
                             to their balance.
                           </p>
@@ -231,24 +251,32 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {transaction.userBalanceBeforeTransaction.toFixed(
-                                        2
-                                      )}{" "}
+                                      {/* Defensive toFixed */}
+                                      {(
+                                        transaction.userBalanceBeforeTransaction ||
+                                        0
+                                      ).toFixed(2)}{" "}
                                       tk
                                     </td>
                                     <td className="py-2 pr-4 text-right text-emerald-600 font-semibold whitespace-nowrap">
-                                      + {transaction.totalPrice.toFixed(2)} tk
+                                      +{" "}
+                                      {(transaction.totalPrice || 0).toFixed(2)}{" "}
+                                      tk
                                     </td>
                                     <td
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          transaction.createdBy.balance < 0
-                                            ? "rgb(220 38 38)"
-                                            : "rgb(5 150 105)",
+                                          (transaction.createdBy.balance || 0) <
+                                          0
+                                            ? "rgb(220 38 38)" // rose-600
+                                            : "rgb(5 150 105)", // emerald-600
                                       }}
                                     >
-                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      {/* Defensive toFixed */}
+                                      {(
+                                        transaction.createdBy.balance || 0
+                                      ).toFixed(2)}{" "}
                                       tk
                                     </td>
                                   </tr>
@@ -265,7 +293,11 @@ function ShoppingDetails() {
                             </span>{" "}
                             removed{" "}
                             <span className="text-rose-600 font-bold">
-                              {Math.abs(transaction.totalPrice).toFixed(2)} tk
+                              {/* Defensive toFixed */}
+                              {Math.abs(transaction.totalPrice || 0).toFixed(
+                                2
+                              )}{" "}
+                              tk
                             </span>{" "}
                             from their balance.
                           </p>
@@ -297,28 +329,34 @@ function ShoppingDetails() {
                                       {transaction.createdBy.name}
                                     </td>
                                     <td className="py-2 pr-4 text-right text-gray-600 whitespace-nowrap">
-                                      {transaction.userBalanceBeforeTransaction.toFixed(
-                                        2
-                                      )}{" "}
+                                      {/* Defensive toFixed */}
+                                      {(
+                                        transaction.userBalanceBeforeTransaction ||
+                                        0
+                                      ).toFixed(2)}{" "}
                                       tk
                                     </td>
                                     <td className="py-2 pr-4 text-right text-rose-600 font-semibold whitespace-nowrap">
-                                      −{" "}
-                                      {Math.abs(transaction.totalPrice).toFixed(
-                                        2
-                                      )}{" "}
+                                      − {/* Defensive toFixed */}
+                                      {Math.abs(
+                                        transaction.totalPrice || 0
+                                      ).toFixed(2)}{" "}
                                       tk
                                     </td>
                                     <td
                                       className="py-2 text-right font-bold whitespace-nowrap"
                                       style={{
                                         color:
-                                          transaction.createdBy.balance < 0
+                                          (transaction.createdBy.balance || 0) <
+                                          0
                                             ? "rgb(220 38 38)"
                                             : "rgb(5 150 105)",
                                       }}
                                     >
-                                      {transaction.createdBy.balance.toFixed(2)}{" "}
+                                      {/* Defensive toFixed */}
+                                      {(
+                                        transaction.createdBy.balance || 0
+                                      ).toFixed(2)}{" "}
                                       tk
                                     </td>
                                   </tr>
@@ -358,7 +396,8 @@ function ShoppingDetails() {
                                         {item.itemName}
                                       </td>
                                       <td className="py-2 text-right text-gray-800 font-medium whitespace-nowrap">
-                                        {item.price.toFixed(2)}
+                                        {/* Defensive toFixed */}
+                                        {(item.price || 0).toFixed(2)}
                                       </td>
                                     </tr>
                                   ))}
@@ -369,7 +408,8 @@ function ShoppingDetails() {
                                       Total
                                     </td>
                                     <td className="pt-3 text-right font-bold text-gray-800 text-base whitespace-nowrap">
-                                      {transaction.totalPrice.toFixed(2)}
+                                      {/* Defensive toFixed */}
+                                      {(transaction.totalPrice || 0).toFixed(2)}
                                     </td>
                                   </tr>
                                 </tfoot>
@@ -404,6 +444,7 @@ function ShoppingDetails() {
                                 <tbody>
                                   {transaction.sharedUsers.map(
                                     sharedUserObj => {
+                                      // Get current balance and individual deduction defensively
                                       const currentBalance =
                                         sharedUserObj.balance || 0;
                                       const individualDeduction =
@@ -453,32 +494,37 @@ function ShoppingDetails() {
                         Balances of All Users at Transaction Time
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {transaction.usersBalancesAtTransactionTime.map(
-                          (u, index) => (
-                            <div
-                              key={
-                                u._id ||
-                                `user-balance-${transaction._id}-${index}`
-                              }
-                              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
-                            >
-                              <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-700">
-                                  {u.name}
-                                </span>
-                                <span
-                                  className={`font-semibold text-base ${
-                                    u.balanceAtTime < 0
-                                      ? "text-rose-600"
-                                      : "text-emerald-600"
-                                  }`}
-                                >
-                                  {u.balanceAtTime.toFixed(2)} tk
-                                </span>
+                        {transaction.usersBalancesAtTransactionTime &&
+                          transaction.usersBalancesAtTransactionTime.map(
+                            (
+                              u,
+                              index // Added index for key fallback
+                            ) => (
+                              <div
+                                key={
+                                  u._id ||
+                                  `user-balance-${transaction._id}-${index}`
+                                } // Fallback key
+                                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
+                              >
+                                <div className="flex justify-between items-center">
+                                  <span className="font-medium text-gray-700">
+                                    {u.name}
+                                  </span>
+                                  <span
+                                    className={`font-semibold text-base ${
+                                      (u.balanceAtTime || 0) < 0
+                                        ? "text-rose-600"
+                                        : "text-emerald-600"
+                                    }`}
+                                  >
+                                    {/* Defensive toFixed */}
+                                    {(u.balanceAtTime || 0).toFixed(2)} tk
+                                  </span>
+                                </div>
                               </div>
-                            </div>
-                          )
-                        )}
+                            )
+                          )}
                       </div>
                       {!transaction.usersBalancesAtTransactionTime?.length && (
                         <p className="text-gray-600 text-sm mt-2">
