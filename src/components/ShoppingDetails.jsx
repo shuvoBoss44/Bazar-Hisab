@@ -9,34 +9,30 @@ function ShoppingDetails() {
   const [centralBalance, setCentralBalance] = useState(0);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
-  const [loadingTransactions, setLoadingTransactions] = useState(false); // Renamed for clarity
+  const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const navigate = useNavigate();
   const limit = 10;
 
-  // Use a separate loading state specifically for transactions data fetching
-  // and only trigger fetch when user is available and not already loading auth or transactions
   useEffect(() => {
-    if (!user || authLoading) {
-      // If user is not authenticated or auth is still loading, do nothing
-      // (The initial check in fetchData will handle redirection if user is null)
-      return;
-    }
-    // Only fetch data if we are not already loading transactions
-    if (!loadingTransactions) {
-      // Added this check
+    // Only fetch data if the user is authenticated and auth loading is complete
+    if (user && !authLoading) {
       fetchData();
     }
-  }, [page, user, authLoading, loadingTransactions]); // Added loadingTransactions to dependencies
+    // If user is null and authLoading is false, it means they are not logged in,
+    // so we should redirect them. This typically handles initial load scenarios
+    // where user might be null before AuthContext fully loads or if not logged in.
+    if (!user && !authLoading) {
+      navigate("/login");
+    }
+  }, [page, user, authLoading]); // Removed loadingTransactions from dependencies
 
   const fetchData = async () => {
-    if (!user) {
-      navigate("/login");
-      return;
-    }
+    // No need for `if (!user)` check here, as `useEffect` now handles redirection explicitly
+    // if the user is not present after authLoading finishes.
     try {
-      setLoadingTransactions(true); // Use the specific loading state
+      setLoadingTransactions(true);
       const transactionResponse = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
@@ -53,13 +49,13 @@ function ShoppingDetails() {
         setTimeout(() => setError(null), 3000);
       }
     } finally {
-      setLoadingTransactions(false); // Ensure loading is set to false in finally
+      setLoadingTransactions(false);
     }
   };
 
   const handleDelete = async id => {
     try {
-      setLoadingTransactions(true); // Use the specific loading state
+      setLoadingTransactions(true);
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
         {
@@ -68,8 +64,7 @@ function ShoppingDetails() {
       );
       setSuccess("Transaction deleted successfully!");
       // Reset page to 1 after deletion to ensure consistent state and re-fetch from start
-      setPage(1); // Added this line to reset page after delete
-      // fetchData(); // fetchData will be called by useEffect due to page change
+      setPage(1);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
       console.error(
@@ -79,7 +74,7 @@ function ShoppingDetails() {
       setError(err.response?.data?.message || "Failed to delete transaction");
       setTimeout(() => setError(null), 3000);
     } finally {
-      setLoadingTransactions(false); // Ensure loading is set to false in finally
+      setLoadingTransactions(false);
     }
   };
 
@@ -102,7 +97,6 @@ function ShoppingDetails() {
   };
 
   if (authLoading || loadingTransactions) {
-    // Use the correct loading state here
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl">
@@ -115,9 +109,7 @@ function ShoppingDetails() {
 
   return (
     <div className="min-h-screen bg-gray-100 py-8 pt-20">
-      {/* Outer wrapper for full width on mobile, with horizontal padding */}
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Inner container to restrict max-width on larger screens and center content */}
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">
             Transaction History
@@ -144,14 +136,13 @@ function ShoppingDetails() {
             </div>
           )}
 
-          {!loadingTransactions &&
-            transactions.length === 0 && ( // Use the correct loading state here
-              <div className="bg-white rounded-xl p-8 shadow-md text-center border border-gray-200">
-                <p className="text-gray-600 text-lg font-medium">
-                  No transactions recorded yet.
-                </p>
-              </div>
-            )}
+          {!loadingTransactions && transactions.length === 0 && (
+            <div className="bg-white rounded-xl p-8 shadow-md text-center border border-gray-200">
+              <p className="text-gray-600 text-lg font-medium">
+                No transactions recorded yet.
+              </p>
+            </div>
+          )}
 
           <div className="space-y-6 lg:space-y-8">
             {transactions.map(transaction => {
@@ -206,16 +197,7 @@ function ShoppingDetails() {
                   </div>
 
                   <div className="p-4 md:p-6">
-                    {/* The Balance Update Summary and Items Purchased sections remain as they were */}
-                    {/* Only the `usersBalancesAtTransactionTime` block needs to be outside the !isBalanceAddition && !isBalanceRemoval */}
                     {(isBalanceAddition || isBalanceRemoval) &&
-                      // This is for the 'Balance Update Summary' table specific to balance transactions
-                      // This condition (isBalanceAddition || isBalanceRemoval) already wraps the summary table HTML
-                      // based on your original code, so no changes needed here.
-                      // Make sure the structure for balance additions/removals is as it was
-                      // including the <div className="space-y-5"> and the internal tables.
-                      // I am simply adding a placeholder to indicate where the previous HTML was.
-                      // Previous HTML for Balance Update Summary (Addition)
                       (isBalanceAddition ? (
                         <div className="space-y-5">
                           <p className="text-lg font-medium text-gray-800 leading-relaxed">
@@ -283,7 +265,6 @@ function ShoppingDetails() {
                           </div>
                         </div>
                       ) : (
-                        // Previous HTML for Balance Update Summary (Removal)
                         <div className="space-y-5">
                           <p className="text-lg font-medium text-gray-800 leading-relaxed">
                             <span className="font-semibold">
@@ -355,7 +336,6 @@ function ShoppingDetails() {
                         </div>
                       ))}
 
-                    {/* Original shopping transaction details */}
                     {!isBalanceAddition && !isBalanceRemoval && (
                       <div className="space-y-6">
                         <div>
@@ -475,7 +455,6 @@ function ShoppingDetails() {
                       </div>
                     )}
 
-                    {/* This block is now outside the transaction-type specific conditionals */}
                     <div className="mt-8">
                       <h4 className="font-semibold text-gray-800 mb-3 text-base">
                         Balances of All Users at Transaction Time
