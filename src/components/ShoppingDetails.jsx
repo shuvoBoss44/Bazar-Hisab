@@ -605,7 +605,7 @@ function ShoppingDetails() {
               >
                 Next
               </button>
-            </div> // Pagination controls
+            </div>
           )}
         </div>
       </div>
