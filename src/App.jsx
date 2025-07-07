@@ -21,11 +21,8 @@ function App() {
     <Router>
       <AuthProvider>
         <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden">
-          {/* Navbar spans full width */}
           <Navbar className="w-full" />
-          {/* Main content area spans full width */}
           <main className="flex-grow py-12 pt-20 w-full">
-            {/* Remove mx-auto and padding classes, use full width */}
             <div className="w-full">
               <Routes>
                 <Route path="/register" element={<Register />} />
@@ -43,7 +40,6 @@ function App() {
                 <Route path="/" element={<ShoppingDetails />} />
                 <Route path="*" element={<Navigate to="/" />} />
               </Routes>
-              {/* Footer spans full width */}
               <Footer className="w-full" />
             </div>
           </main>

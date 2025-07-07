@@ -15,47 +15,30 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
-  // Effect for fetching transactions data
   useEffect(() => {
-    // Only attempt to fetch data if user is defined AND authLoading is false
-    // This ensures we wait for authentication status to be known
     if (user && !authLoading) {
+      console.log("Fetching data for page:", page);
       fetchData();
     }
-  }, [page, user, authLoading]); // Dependencies: page for pagination, user/authLoading for initial/re-auth fetch
-
-  // Effect for handling redirection if user becomes null after authLoading completes
-  useEffect(() => {
     if (!user && !authLoading) {
-      // If auth has finished loading and user is still null, redirect to login
       navigate("/login");
     }
-  }, [user, authLoading, navigate]); // Dependencies: user and authLoading to react to auth state changes
+  }, [page, user, authLoading]);
 
   const fetchData = async () => {
-    // We already handle redirection in a separate useEffect now, so this check is less critical here,
-    // but keeping it as a safeguard is fine.
-    if (!user) {
-      // This should ideally not be hit if the useEffect above is working correctly,
-      // but it's a defensive check.
-      console.warn("fetchData called without a user. Redirecting.");
-      navigate("/login");
-      return;
-    }
-
     try {
       setLoadingTransactions(true);
       const transactionResponse = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
       );
-      setTransactions(transactionResponse.data.data.transactions);
-      setCentralBalance(transactionResponse.data.data.centralBalance || 0);
-      setTotalPages(transactionResponse.data.data.totalPages || 1);
+      console.log("Backend Response:", transactionResponse.data);
+      setTransactions(transactionResponse.data.data.data.transactions);
+      setCentralBalance(transactionResponse.data.data.data.centralBalance || 0);
+      setTotalPages(transactionResponse.data.data.data.totalPages || 1);
     } catch (err) {
       console.error("Error fetching data:", err.response?.data || err.message);
       if (err.response?.status === 401) {
-        // Specifically handle 401 Unauthorized by redirecting to login
         navigate("/login");
       } else {
         setError(err.response?.data?.message || "Failed to fetch data");
@@ -71,12 +54,9 @@ function ShoppingDetails() {
       setLoadingTransactions(true);
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
       setSuccess("Transaction deleted successfully!");
-      // Reset page to 1 after deletion to ensure consistent state and re-fetch from start
       setPage(1);
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
@@ -109,7 +89,6 @@ function ShoppingDetails() {
     return "Shopping Transaction";
   };
 
-  // Display loading spinner while authentication is loading OR transactions are loading
   if (authLoading || loadingTransactions) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
@@ -121,18 +100,9 @@ function ShoppingDetails() {
     );
   }
 
-  // If we reach here and user is null (meaning authLoading is false, and they aren't logged in)
-  // This state implies the user was redirected by the second useEffect, so this component shouldn't render its full content.
-  // This return null or a simple message is a fallback, as navigation should already occur.
-  if (!user) {
-    return null; // Or a message like "You are not logged in. Redirecting..."
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 py-8 pt-20">
-      {/* Outer wrapper for full width on mobile, with horizontal padding */}
       <div className="px-4 sm:px-6 lg:px-8">
-        {/* Inner container to restrict max-width on larger screens and center content */}
         <div className="mx-auto max-w-6xl">
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-gray-900 mb-8 text-center tracking-tight">
             Transaction History
@@ -274,8 +244,8 @@ function ShoppingDetails() {
                                       style={{
                                         color:
                                           transaction.createdBy.balance < 0
-                                            ? "rgb(220 38 38)" // rose-600
-                                            : "rgb(5 150 105)", // emerald-600
+                                            ? "rgb(220 38 38)"
+                                            : "rgb(5 150 105)",
                                       }}
                                     >
                                       {transaction.createdBy.balance.toFixed(2)}{" "}
@@ -483,36 +453,32 @@ function ShoppingDetails() {
                         Balances of All Users at Transaction Time
                       </h4>
                       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {transaction.usersBalancesAtTransactionTime &&
-                          transaction.usersBalancesAtTransactionTime.map(
-                            (
-                              u,
-                              index // Added index for key fallback
-                            ) => (
-                              <div
-                                key={
-                                  u._id ||
-                                  `user-balance-${transaction._id}-${index}`
-                                } // Fallback key
-                                className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
-                              >
-                                <div className="flex justify-between items-center">
-                                  <span className="font-medium text-gray-700">
-                                    {u.name}
-                                  </span>
-                                  <span
-                                    className={`font-semibold text-base ${
-                                      u.balanceAtTime < 0
-                                        ? "text-rose-600"
-                                        : "text-emerald-600"
-                                    }`}
-                                  >
-                                    {u.balanceAtTime.toFixed(2)} tk
-                                  </span>
-                                </div>
+                        {transaction.usersBalancesAtTransactionTime.map(
+                          (u, index) => (
+                            <div
+                              key={
+                                u._id ||
+                                `user-balance-${transaction._id}-${index}`
+                              }
+                              className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 transform transition-transform duration-150 hover:scale-[1.02]"
+                            >
+                              <div className="flex justify-between items-center">
+                                <span className="font-medium text-gray-700">
+                                  {u.name}
+                                </span>
+                                <span
+                                  className={`font-semibold text-base ${
+                                    u.balanceAtTime < 0
+                                      ? "text-rose-600"
+                                      : "text-emerald-600"
+                                  }`}
+                                >
+                                  {u.balanceAtTime.toFixed(2)} tk
+                                </span>
                               </div>
-                            )
-                          )}
+                            </div>
+                          )
+                        )}
                       </div>
                       {!transaction.usersBalancesAtTransactionTime?.length && (
                         <p className="text-gray-600 text-sm mt-2">
