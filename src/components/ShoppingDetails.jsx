@@ -58,7 +58,7 @@ function ShoppingDetails() {
 
   const handleDelete = async id => {
     try {
-      setLoadingTransactions(true);
+      setLoadingTransactions(true); // Indicate that an action is in progress
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
         {
@@ -66,17 +66,34 @@ function ShoppingDetails() {
         }
       );
       setSuccess("Transaction deleted successfully!");
-      setPage(1);
-      setTimeout(() => setSuccess(null), 3000);
+
+      // --- START: Instant UI Update ---
+      // Filter out the deleted transaction from the current state
+      setTransactions(prevTransactions =>
+        prevTransactions.filter(transaction => transaction._id !== id)
+      );
+
+      // Re-fetch data to update pagination, central balance, and ensure consistency
+      // This will also handle cases where the last item on a page was deleted.
+      // If the current page becomes empty, it will automatically go to the previous page.
+      if (transactions.length === 1 && page > 1) {
+        // If deleting the last item on the current page and not on page 1
+        setPage(prevPage => prevPage - 1); // Go to previous page
+      } else {
+        fetchData(); // Otherwise, re-fetch current page data
+      }
+      // --- END: Instant UI Update ---
+
+      setTimeout(() => setSuccess(null), 3000); // Clear success message after 3 seconds
     } catch (err) {
       console.error(
         "Error deleting transaction:",
         err.response?.data || err.message
       );
       setError(err.response?.data?.message || "Failed to delete transaction");
-      setTimeout(() => setError(null), 3000);
+      setTimeout(() => setError(null), 3000); // Clear error message after 3 seconds
     } finally {
-      setLoadingTransactions(false);
+      setLoadingTransactions(false); // Reset loading state
     }
   };
 
