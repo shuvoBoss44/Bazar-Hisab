@@ -25,61 +25,62 @@ function EditTransaction() {
       if (!authLoading && !user) navigate("/login");
       return;
     }
+
+    const fetchData = async () => {
+      try {
+        setLoading(prev => ({ ...prev, transaction: true }));
+        const transRes = await axios.get(
+          `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
+          { withCredentials: true }
+        );
+
+        const transaction = transRes.data.data?.transaction;
+        if (!transaction) {
+          throw new Error("Transaction not found");
+        }
+
+        if (transaction.createdBy._id?.toString() !== user.id) {
+          throw new Error("You are not authorized to edit this transaction");
+        }
+
+        setOriginalTransaction(transaction);
+
+        if (transaction.items[0]?.itemName === "Balance Addition") {
+          setIsBalanceAddition(true);
+          setIsBalanceRemoval(false);
+          setAmount(transaction.totalPrice?.toString() ?? "");
+        } else if (transaction.items[0]?.itemName === "Balance Removal") {
+          setIsBalanceRemoval(true);
+          setIsBalanceAddition(false);
+          setAmount(Math.abs(transaction.totalPrice ?? 0)?.toString() ?? "");
+        } else {
+          setIsBalanceAddition(false);
+          setIsBalanceRemoval(false);
+          setItems(
+            transaction.items.map(item => ({
+              itemName: item.itemName || "",
+              price: item.price?.toString() || "",
+            }))
+          );
+        }
+      } catch (err) {
+        console.error(
+          "Error fetching data for edit:",
+          err.response?.data || err.message
+        );
+        setError(
+          err.response?.data?.message ||
+            err.message ||
+            "Failed to load transaction data"
+        );
+        setTimeout(() => navigate("/shopping-details"), 3000);
+      } finally {
+        setLoading(prev => ({ ...prev, transaction: false }));
+      }
+    };
+
     fetchData();
   }, [transactionId, user, authLoading, navigate]);
-
-  const fetchData = async () => {
-    try {
-      setLoading(prev => ({ ...prev, transaction: true }));
-      const transRes = await axios.get(
-        `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
-        { withCredentials: true }
-      );
-
-      const transaction = transRes.data.data?.transaction;
-      if (!transaction) {
-        throw new Error("Transaction not found");
-      }
-
-      if (transaction.createdBy._id?.toString() !== user.id) {
-        throw new Error("You are not authorized to edit this transaction");
-      }
-
-      setOriginalTransaction(transaction);
-
-      if (transaction.items[0]?.itemName === "Balance Addition") {
-        setIsBalanceAddition(true);
-        setIsBalanceRemoval(false);
-        setAmount(transaction.totalPrice?.toString() ?? "");
-      } else if (transaction.items[0]?.itemName === "Balance Removal") {
-        setIsBalanceRemoval(true);
-        setIsBalanceAddition(false);
-        setAmount(Math.abs(transaction.totalPrice ?? 0)?.toString() ?? "");
-      } else {
-        setIsBalanceAddition(false);
-        setIsBalanceRemoval(false);
-        setItems(
-          transaction.items.map(item => ({
-            itemName: item.itemName || "",
-            price: item.price?.toString() || "",
-          }))
-        );
-      }
-    } catch (err) {
-      console.error(
-        "Error fetching data for edit:",
-        err.response?.data || err.message
-      );
-      setError(
-        err.response?.data?.message ||
-          err.message ||
-          "Failed to load transaction data"
-      );
-      setTimeout(() => navigate("/shopping-details"), 3000);
-    } finally {
-      setLoading(prev => ({ ...prev, transaction: false }));
-    }
-  };
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];

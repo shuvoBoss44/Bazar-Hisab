@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
@@ -19,7 +19,7 @@ function ShoppingDetails() {
     if (user && !authLoading) {
       fetchData();
     }
-  }, [page, user, authLoading]);
+  }, [page, user, authLoading, fetchData]);
 
   useEffect(() => {
     if (!user && !authLoading) {
@@ -27,7 +27,7 @@ function ShoppingDetails() {
     }
   }, [user, authLoading, navigate]);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     if (!user) {
       console.warn("fetchData called without a user. Redirecting.");
       navigate("/login");
@@ -55,7 +55,7 @@ function ShoppingDetails() {
     } finally {
       setLoadingTransactions(false);
     }
-  };
+  }, [user, navigate, page, limit]);
 
   const handleDelete = async id => {
     try {

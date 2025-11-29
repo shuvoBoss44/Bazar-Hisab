@@ -1,8 +1,7 @@
-import { createContext, useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-
-export const AuthContext = createContext();
+import { AuthContext } from "./AuthContext";
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -12,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const navigate = useNavigate();
   const API_URL = "https://bazar-hisab-backend.onrender.com";
 
-  const checkAuth = async () => {
+  const checkAuth = useCallback(async () => {
     try {
       const response = await axios.get(`${API_URL}/api/users/check-auth`, {
         withCredentials: true,
@@ -33,13 +32,13 @@ export const AuthProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     try {
       await axios.post(
         `${API_URL}/api/users/logout`,
@@ -54,7 +53,7 @@ export const AuthProvider = ({ children }) => {
       console.error("Logout failed:", err);
       setError(err.response?.data?.message || "Logout failed");
     }
-  };
+  }, [navigate]);
 
   const contextValue = useMemo(
     () => ({
@@ -67,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       checkAuth,
       setUser,
     }),
-    [isAuthenticated, user, loading, error]
+    [isAuthenticated, user, loading, error, logout, checkAuth]
   );
 
   return (
