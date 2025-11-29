@@ -15,18 +15,6 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
-  useEffect(() => {
-    if (user && !authLoading) {
-      fetchData();
-    }
-  }, [page, user, authLoading, fetchData]);
-
-  useEffect(() => {
-    if (!user && !authLoading) {
-      navigate("/login");
-    }
-  }, [user, authLoading, navigate]);
-
   const fetchData = useCallback(async () => {
     if (!user) {
       console.warn("fetchData called without a user. Redirecting.");
@@ -56,6 +44,18 @@ function ShoppingDetails() {
       setLoadingTransactions(false);
     }
   }, [user, navigate, page, limit]);
+
+  useEffect(() => {
+    if (user && !authLoading) {
+      fetchData();
+    }
+  }, [page, user, authLoading, fetchData]);
+
+  useEffect(() => {
+    if (!user && !authLoading) {
+      navigate("/login");
+    }
+  }, [user, authLoading, navigate]);
 
   const handleDelete = async id => {
     try {
