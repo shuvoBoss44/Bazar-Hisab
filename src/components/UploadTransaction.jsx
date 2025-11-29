@@ -1,342 +1,263 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 
-// Existing useUsers hook (no changes needed for UI/UX)
-function useUsers() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios.get(
-          "https://bazar-hisab-backend.onrender.com/api/users",
-          {
-            withCredentials: true,
-          }
-        );
-        const validUsers = response.data.data.map(user => ({
-          ...user,
-          _id: user.id,
-        }));
-        setUsers(validUsers);
-      } catch (err) {
-        setError(err.response?.data?.message || "Failed to fetch users");
-        if (err.response?.status === 401) {
-          setError("Session expired. Redirecting to login...");
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchUsers();
-  }, []);
-
-  return { users, loading, error };
-}
-
 function UploadTransaction() {
-  const { user, loading: authLoading } = useContext(AuthContext);
-  const { users, loading: usersLoading, error: usersError } = useUsers();
   const [items, setItems] = useState([{ itemName: "", price: "" }]);
-  const [sharedUserIds, setSharedUserIds] = useState([]);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [transactionType, setTransactionType] = useState("shopping");
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (authLoading || usersLoading) return;
-    if (!user) {
-      setError("Please log in to create a transaction");
-      setTimeout(() => navigate("/login"), 2000);
-    }
-    if (usersError) {
-      setError(usersError);
-      if (usersError.includes("Redirecting")) {
-        setTimeout(() => navigate("/login"), 2000);
-      }
-    }
-  }, [authLoading, user, usersLoading, usersError, navigate]);
+  const { user } = useContext(AuthContext);
 
   const handleItemChange = (index, field, value) => {
     const newItems = [...items];
-    // Changed this line: removed .trim() for itemName
-    newItems[index][field] = field === "price" ? value : value;
+    newItems[index][field] = value;
     setItems(newItems);
   };
 
-  const addItem = () => setItems([...items, { itemName: "", price: "" }]);
+  const addItem = () => {
+    setItems([...items, { itemName: "", price: "" }]);
+  };
 
-  const removeItem = index =>
-    items.length > 1 && setItems(items.filter((_, i) => i !== index));
+  const removeItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    setItems(newItems);
+  };
 
-  const handleUserToggle = userId =>
-    setSharedUserIds(prev =>
-      prev.includes(userId)
-        ? prev.filter(id => id !== userId)
-        : [...prev, userId]
-    );
-
-  const handleSubmit = async () => {
-    setError(null);
-    setSuccess(null);
-
-    if (
-      !items.every(item => item.itemName.trim() && parseFloat(item.price) > 0)
-    ) {
-      setError("All items must have a valid name and positive price.");
-      return;
-    }
-    if (sharedUserIds.length === 0) {
-      setError("Please select at least one user to share the cost.");
-      return;
-    }
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    setIsSubmitting(true);
 
     try {
-      setLoading(true);
-      // Removed the extra axios.get to fetch createdUser as `user` from AuthContext should already have this info
-      // If `user` in AuthContext doesn't have the ID, you might need to adjust AuthContext or your backend.
-      // For now, assuming `user.id` is available from AuthContext.
-      if (!user || !user.id) {
-        setError("User information not available. Please log in again.");
-        setLoading(false);
-        return;
+      let payload = {};
+
+      if (transactionType === "shopping") {
+        const validItems = items.filter(
+          (item) => item.itemName.trim() !== "" && item.price !== ""
+        );
+        if (validItems.length === 0) {
+          setError("Please add at least one valid item");
+          setIsSubmitting(false);
+          return;
+        }
+        payload = {
+          items: validItems.map((item) => ({
+            itemName: item.itemName,
+            price: parseFloat(item.price),
+          })),
+        };
+      } else {
+        const amount = parseFloat(items[0].price);
+        if (!amount || amount <= 0) {
+          setError("Please enter a valid amount");
+          setIsSubmitting(false);
+          return;
+        }
+        payload = {
+          items: [
+            {
+              itemName:
+                transactionType === "addition"
+                  ? "Balance Addition"
+                  : "Balance Removal",
+              price: amount,
+            },
+          ],
+        };
       }
 
-      const payload = {
-        items: items.map(item => ({
-          itemName: item.itemName,
-          price: parseFloat(item.price),
-        })),
-        sharedUserIds,
-        createdBy: user.id, // Using user.id from AuthContext
-      };
       await axios.post(
         "https://bazar-hisab-backend.onrender.com/api/transactions",
         payload,
-        {
-          withCredentials: true,
-        }
+        { withCredentials: true }
       );
-      setSuccess("Transaction created successfully!");
+
+      setSuccess("Transaction uploaded successfully!");
       setItems([{ itemName: "", price: "" }]);
-      setSharedUserIds([]);
       setTimeout(() => navigate("/shopping-details"), 1500);
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to create transaction.");
+      setError(err.response?.data?.message || "Error uploading transaction");
     } finally {
-      setLoading(false);
+      setIsSubmitting(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center pt-20">
-      {/* New wrapper for responsive padding and max-width */}
-      <div className="w-full px-4 sm:px-6 lg:px-8">
-        <div className="bg-white shadow-lg rounded-xl p-6 sm:p-8 md:p-10 max-w-2xl mx-auto border border-gray-200">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-primary mb-8 text-center">
-            Create New Transaction
-          </h2>
-          {error && (
-            <div
-              className="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-md flex items-center space-x-3 animate-fade-in"
-              role="alert"
-            >
-              <svg
-                className="w-6 h-6 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586l-1.293-1.293z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <p className="font-medium">{error}</p>
-            </div>
-          )}
-          {success && (
-            <div
-              className="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-md flex items-center space-x-3 animate-fade-in"
-              role="alert"
-            >
-              <svg
-                className="w-6 h-6 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-              <p className="font-medium">{success}</p>
-            </div>
-          )}
-          <div className="space-y-8">
-            {/* Items Section */}
-            <section className="space-y-5">
-              <h3 className="text-2xl font-semibold text-gray-800 border-b pb-3 mb-4">
-                Items Details
-              </h3>
-              {items.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col sm:flex-row gap-4 items-end"
-                >
-                  <div className="flex-1 w-full">
-                    <label htmlFor={`itemName-${index}`} className="sr-only">
-                      Item Name
-                    </label>
-                    <input
-                      id={`itemName-${index}`}
-                      type="text"
-                      placeholder="Item Name"
-                      value={item.itemName}
-                      onChange={e =>
-                        handleItemChange(index, "itemName", e.target.value)
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
-                    />
-                  </div>
-                  <div className="w-full sm:w-32">
-                    <label htmlFor={`itemPrice-${index}`} className="sr-only">
-                      Price (tk)
-                    </label>
-                    <input
-                      id={`itemPrice-${index}`}
-                      type="number"
-                      placeholder="Price (tk)"
-                      value={item.price}
-                      onChange={e =>
-                        handleItemChange(index, "price", e.target.value)
-                      }
-                      className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition duration-200"
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                  {items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      className="w-full sm:w-auto bg-red-500 text-white px-5 py-3 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition duration-200"
-                      aria-label={`Remove item ${index + 1}`}
-                    >
-                      Remove
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addItem}
-                className="text-primary hover:text-blue-700 font-medium text-base sm:text-lg transition duration-200 flex items-center gap-1"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                Add Another Item
-              </button>
-            </section>
-
-            {/* Share With Section */}
-            <section className="space-y-5">
-              <h3 className="text-2xl font-semibold text-gray-800 border-b pb-3 mb-4">
-                Share With
-              </h3>
-              {usersLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary mx-auto"></div>
-                  <p className="mt-4 text-gray-600">Loading users...</p>
-                </div>
-              ) : usersError ? (
-                <p className="text-red-600 text-center py-4">{usersError}</p>
-              ) : users.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">
-                  No users available to share with.
-                </p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-3 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
-                  {users.map(user => (
-                    <label
-                      key={user._id}
-                      htmlFor={`user-${user._id}`}
-                      className="flex items-center p-3 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors duration-200 border border-gray-200"
-                    >
-                      <input
-                        id={`user-${user._id}`}
-                        type="checkbox"
-                        checked={sharedUserIds.includes(user._id)}
-                        onChange={() => handleUserToggle(user._id)}
-                        className="h-5 w-5 text-primary rounded border-gray-300 focus:ring-primary focus:ring-offset-0 transition duration-150"
-                      />
-                      <span className="ml-3 text-gray-700 font-medium truncate">
-                        {user.name}{" "}
-                        <span className="text-sm text-gray-500">
-                          ({user.balance?.toFixed(2) || "0.00"} tk)
-                        </span>
-                      </span>
-                    </label>
-                  ))}
-                </div>
-              )}
-            </section>
-
-            {/* Submit Button */}
-            <button
-              onClick={handleSubmit}
-              disabled={loading || usersLoading || !user || authLoading}
-              className="w-full bg-primary text-white py-3 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:bg-gray-400 disabled:cursor-not-allowed transition duration-300 transform hover:scale-105"
-            >
-              {loading ? "Creating Transaction..." : "Create Transaction"}
-            </button>
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-secondary-50 flex items-center justify-center p-4">
+        <div className="glass-card p-8 text-center max-w-md w-full">
+          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
           </div>
+          <h2 className="text-xl font-bold text-secondary-900 mb-2">Authentication Required</h2>
+          <p className="text-secondary-600 mb-6">Please sign in to upload transactions.</p>
+          <button
+            onClick={() => navigate("/login")}
+            className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30"
+          >
+            Sign In
+          </button>
         </div>
       </div>
-      {/* Custom Scrollbar Styles (optional, add to your global CSS or a style tag) */}
-      <style>{`
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f1f1f1;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: #888;
-          border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: #555;
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.5s ease-out forwards;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto">
+        <div className="glass rounded-3xl p-8 md:p-12 animate-in slide-in-from-bottom">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-secondary-900 mb-2">
+              Upload Transaction
+            </h2>
+            <p className="text-secondary-500">Record a new purchase or update balance</p>
+          </div>
+
+          {error && (
+            <div className="bg-rose-50 border-l-4 border-rose-500 text-rose-700 p-4 mb-8 rounded-r-lg shadow-sm font-medium flex items-center animate-in fade-in">
+              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="bg-emerald-50 border-l-4 border-emerald-500 text-emerald-700 p-4 mb-8 rounded-r-lg shadow-sm font-medium flex items-center animate-in fade-in">
+              <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+              {success}
+            </div>
+          )}
+
+          <div className="mb-8">
+            <div className="grid grid-cols-3 gap-4 p-1 bg-secondary-100 rounded-xl">
+              <button
+                type="button"
+                onClick={() => setTransactionType("shopping")}
+                className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                  transactionType === "shopping"
+                    ? "bg-white text-primary-600 shadow-sm"
+                    : "text-secondary-500 hover:text-secondary-700"
+                }`}
+              >
+                Shopping
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransactionType("addition")}
+                className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                  transactionType === "addition"
+                    ? "bg-white text-emerald-600 shadow-sm"
+                    : "text-secondary-500 hover:text-secondary-700"
+                }`}
+              >
+                Add Balance
+              </button>
+              <button
+                type="button"
+                onClick={() => setTransactionType("removal")}
+                className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 ${
+                  transactionType === "removal"
+                    ? "bg-white text-rose-600 shadow-sm"
+                    : "text-secondary-500 hover:text-secondary-700"
+                }`}
+              >
+                Remove Balance
+              </button>
+            </div>
+          </div>
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {transactionType === "shopping" ? (
+              <div className="space-y-4">
+                {items.map((item, index) => (
+                  <div key={index} className="flex gap-4 items-start animate-in fade-in">
+                    <div className="flex-1">
+                      <input
+                        type="text"
+                        placeholder="Item Name"
+                        value={item.itemName}
+                        onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                        required
+                      />
+                    </div>
+                    <div className="w-32">
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(index, "price", e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm"
+                        required
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(index)}
+                        className="p-3 text-rose-500 hover:bg-rose-50 rounded-xl transition-colors"
+                      >
+                        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="w-full py-3 border-2 border-dashed border-secondary-300 rounded-xl text-secondary-500 font-medium hover:border-primary-500 hover:text-primary-600 transition-all flex items-center justify-center gap-2"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                  Add Another Item
+                </button>
+              </div>
+            ) : (
+              <div className="animate-in fade-in">
+                <label className="block text-sm font-medium text-secondary-700 mb-2">
+                  Amount to {transactionType === "addition" ? "Add" : "Remove"}
+                </label>
+                <div className="relative">
+                  <span className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary-400 font-medium">tk</span>
+                  <input
+                    type="number"
+                    value={items[0].price}
+                    onChange={(e) => handleItemChange(0, "price", e.target.value)}
+                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-secondary-200 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all bg-white/50 backdrop-blur-sm text-lg font-medium"
+                    placeholder="0.00"
+                    required
+                    min="0"
+                    step="0.01"
+                  />
+                </div>
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-bold rounded-xl hover:from-primary-700 hover:to-primary-800 transition-all shadow-lg shadow-primary-500/30 transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
+                  Upload Transaction
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

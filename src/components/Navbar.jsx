@@ -1,302 +1,199 @@
-import { useState, useContext } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useContext, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 
 function Navbar() {
   const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
 
   const handleLogout = () => {
     logout();
-    setIsMobileMenuOpen(false); // Close menu on logout
+    setIsMobileMenuOpen(false);
     navigate("/login");
   };
 
-  return (
-    <nav className="fixed w-full top-0 left-0 z-50 bg-gradient-to-r from-blue-600 to-blue-800 text-white shadow-lg">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <Link
-          to="/"
-          className="text-2xl font-bold tracking-tight hover:text-blue-200 transition-colors duration-300"
-        >
-          Bazar Hisab
-        </Link>
-        {/* Mobile menu button */}
-        <button
-          className="md:hidden p-1 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-300" // Adjusted padding for mobile button
-          onClick={toggleMobileMenu}
-          aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={isMobileMenuOpen}
-        >
-          <svg
-            className="w-7 h-7"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            {isMobileMenuOpen ? (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M6 18L18 6M6 6l12 12"
-              />
-            ) : (
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.5"
-                d="M4 6h16M4 12h16M4 18h16"
-              />
-            )}
-          </svg>
-        </button>
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-        {/* Desktop menu */}
-        <div className="hidden md:flex items-center gap-6">
-          {loading ? (
-            <span className="text-blue-200 animate-pulse text-sm">
-              Loading...
-            </span>
-          ) : isAuthenticated ? (
-            <>
-              <Link
-                to="/profile"
-                className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [location]);
+
+  const navLinks = [
+    { name: "Transactions", path: "/shopping-details", icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+      </svg>
+    )},
+    { name: "Upload", path: "/upload-transaction", icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    )},
+    { name: "Profile", path: "/profile", icon: (
+      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+      </svg>
+    )},
+  ];
+
+  return (
+    <nav 
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
+        scrolled || isMobileMenuOpen 
+          ? "bg-white/80 backdrop-blur-md shadow-glass border-b border-white/20" 
+          : "bg-transparent"
+      }`}
+    >
+      <div className="container mx-auto px-4 py-4">
+        <div className="flex justify-between items-center">
+          <Link
+            to="/"
+            className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${
+              scrolled || isMobileMenuOpen ? "text-primary-600" : "text-white"
+            }`}
+          >
+            Bazar<span className={scrolled || isMobileMenuOpen ? "text-secondary-800" : "text-white/90"}>Hisab</span>
+          </Link>
+
+          {/* Mobile menu button */}
+          <button
+            className={`md:hidden p-2 rounded-lg transition-colors ${
+              scrolled || isMobileMenuOpen ? "text-secondary-800 hover:bg-secondary-100" : "text-white hover:bg-white/10"
+            }`}
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+
+          {/* Desktop menu */}
+          <div className="hidden md:flex items-center gap-2">
+            {loading ? (
+              <div className="h-10 w-24 bg-secondary-200 animate-pulse rounded-lg"></div>
+            ) : isAuthenticated ? (
+              <>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                      location.pathname === link.path
+                        ? scrolled 
+                          ? "bg-primary-50 text-primary-600" 
+                          : "bg-white/20 text-white backdrop-blur-sm"
+                        : scrolled
+                          ? "text-secondary-600 hover:bg-secondary-50 hover:text-primary-600"
+                          : "text-white/90 hover:bg-white/10 hover:text-white"
+                    }`}
+                  >
+                    {link.icon}
+                    {link.name}
+                  </Link>
+                ))}
+                
+                <div className="w-px h-6 bg-secondary-200 mx-2 opacity-50"></div>
+                
+                <button
+                  onClick={handleLogout}
+                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    scrolled
+                      ? "text-rose-600 hover:bg-rose-50"
+                      : "text-white/90 hover:bg-white/10 hover:text-white"
+                  }`}
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                  ></path>
-                </svg>
-                Profile ({user?.name || "User"})
-              </Link>
-              <Link
-                to="/shopping-details"
-                className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                  ></path>
-                </svg>
-                Transactions History
-              </Link>
-              <Link
-                to="/upload-transaction"
-                className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
-                Upload Transaction
-              </Link>
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-base font-medium px-5 py-2 rounded-md hover:bg-red-600 transition-colors duration-300 shadow-md flex items-center gap-2"
-              >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  ></path>
-                </svg>
-                Logout
-              </button>
-            </>
-          ) : (
-            <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Logout
+                </button>
+              </>
+            ) : (
               <Link
                 to="/login"
-                className="text-base font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-2 rounded-md hover:bg-blue-700 flex items-center gap-2"
+                className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
+                  scrolled
+                    ? "bg-primary-600 text-white hover:bg-primary-700"
+                    : "bg-white text-primary-600 hover:bg-primary-50"
+                }`}
               >
-                <svg
-                  className="w-5 h-5"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                  ></path>
-                </svg>
                 Sign In
               </Link>
-              {/* Removed Register button for desktop */}
-            </>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Mobile menu with animation */}
+      {/* Mobile menu */}
       <div
         className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen
-            ? "max-h-screen opacity-100 py-3" // Adjusted vertical padding for mobile menu container
-            : "max-h-0 opacity-0 py-0"
-        } bg-blue-700 flex flex-col gap-2`}
-        aria-hidden={!isMobileMenuOpen}
+          isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
+        }`}
       >
-        {loading ? (
-          <span className="text-blue-200 animate-pulse text-sm px-3 py-1.5">
-            Loading...
-          </span>
-        ) : isAuthenticated ? (
-          <>
-            <Link
-              to="/profile"
-              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
-              onClick={toggleMobileMenu}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+        <div className="px-4 pb-6 space-y-2 bg-white/80 backdrop-blur-md border-t border-secondary-100">
+          {loading ? (
+            <div className="py-4 text-center text-secondary-500 text-sm">Loading...</div>
+          ) : isAuthenticated ? (
+            <>
+              <div className="py-2 px-4 mb-2">
+                <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider">Menu</p>
+              </div>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
+                    location.pathname === link.path
+                      ? "bg-primary-50 text-primary-700"
+                      : "text-secondary-600 hover:bg-secondary-50 hover:text-secondary-900"
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    {link.icon}
+                    {link.name}
+                  </div>
+                </Link>
+              ))}
+              <div className="h-px bg-secondary-100 my-2"></div>
+              <button
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-3"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                ></path>
-              </svg>
-              Profile ({user?.name || "User"})
-            </Link>
-            <Link
-              to="/shopping-details"
-              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
-              onClick={toggleMobileMenu}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sign Out
+              </button>
+            </>
+          ) : (
+            <div className="p-4">
+              <Link
+                to="/login"
+                className="block w-full text-center py-3 rounded-xl bg-primary-600 text-white font-semibold shadow-lg hover:bg-primary-700 transition-colors"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"
-                ></path>
-              </svg>
-              Transactions History
-            </Link>
-            <Link
-              to="/upload-transaction"
-              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
-              onClick={toggleMobileMenu}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                ></path>
-              </svg>
-              Upload Transaction
-            </Link>
-            <button
-              onClick={handleLogout}
-              className="bg-red-500 text-white text-sm font-medium px-4 py-2 mx-3 rounded-md hover:bg-red-600 transition-colors duration-200 w-fit flex items-center gap-2" // Adjusted horizontal margin
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                ></path>
-              </svg>
-              Logout
-            </button>
-          </>
-        ) : (
-          <>
-            <Link
-              to="/login"
-              className="text-sm font-medium hover:text-blue-200 transition-colors duration-300 px-3 py-1.5 rounded-md hover:bg-blue-800 flex items-center gap-2" // Adjusted font size and padding
-              onClick={toggleMobileMenu}
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                ></path>
-              </svg>
-              Sign In
-            </Link>
-            {/* Removed Register button for mobile */}
-          </>
-        )}
+                Sign In
+              </Link>
+            </div>
+          )}
+        </div>
       </div>
     </nav>
   );
