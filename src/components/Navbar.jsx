@@ -93,12 +93,8 @@ function Navbar() {
                     to={link.path}
                     className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                       location.pathname === link.path
-                        ? scrolled 
-                          ? "bg-primary-50 text-primary-600" 
-                          : "bg-white/20 text-white backdrop-blur-sm"
-                        : scrolled
-                          ? "text-secondary-600 hover:bg-secondary-50 hover:text-primary-600"
-                          : "text-white/90 hover:bg-white/10 hover:text-white"
+                        ? "bg-primary-50 text-primary-600"
+                        : "text-secondary-600 hover:bg-secondary-50 hover:text-primary-600"
                     }`}
                   >
                     {link.icon}
@@ -110,11 +106,7 @@ function Navbar() {
                 
                 <button
                   onClick={handleLogout}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
-                    scrolled
-                      ? "text-rose-600 hover:bg-rose-50"
-                      : "text-white/90 hover:bg-white/10 hover:text-white"
-                  }`}
+                  className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-rose-600 hover:bg-rose-50"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -125,11 +117,7 @@ function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className={`px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 ${
-                  scrolled
-                    ? "bg-primary-600 text-white hover:bg-primary-700"
-                    : "bg-white text-primary-600 hover:bg-primary-50"
-                }`}
+                className="px-6 py-2.5 rounded-full text-sm font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
               >
                 Sign In
               </Link>
