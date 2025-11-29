@@ -7,42 +7,44 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary - Purple/Violet
+        // Primary - Indigo (Professional, trustworthy)
         primary: {
-          50: '#faf5ff',
-          100: '#f3e8ff',
-          200: '#e9d5ff',
-          300: '#d8b4fe',
-          400: '#c084fc',
-          500: '#a855f7',
-          600: '#9333ea',
-          700: '#7e22ce',
-          800: '#6b21a8',
-          900: '#581c87',
+          50: '#eef2ff',
+          100: '#e0e7ff',
+          200: '#c7d2fe',
+          300: '#a5b4fc',
+          400: '#818cf8',
+          500: '#6366f1',
+          600: '#4f46e5',
+          700: '#4338ca',
+          800: '#3730a3',
+          900: '#312e81',
+          950: '#1e1b4b',
         },
-        // Secondary - Teal/Cyan
+        // Secondary - Sky Blue (Modern, clean)
         secondary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
         },
-        // Accents
+        // Accents - Professional palette
         accent: {
-          coral: '#ff6b6b',
-          orange: '#fd7e14',
-          pink: '#ec4899',
-          amber: '#f59e0b',
+          blue: '#3b82f6',
+          cyan: '#06b6d4',
+          violet: '#8b5cf6',
+          purple: '#a855f7',
           emerald: '#10b981',
-          rose: '#f43f5e',
+          green: '#22c55e',
         },
-        // Neutral - Dark Slate
+        // Neutral - Softer slate
         neutral: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -65,8 +67,9 @@ export default {
         'soft': '0 2px 15px rgba(0, 0, 0, 0.08)',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
         'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
-        'glow-purple': '0 0 30px rgba(168, 85, 247, 0.3)',
-        'glow-teal': '0 0 30px rgba(20, 184, 166, 0.3)',
+        'glow-primary': '0 0 30px rgba(99, 102, 241, 0.4)',
+        'glow-secondary': '0 0 30px rgba(14, 165, 233, 0.4)',
+        'glow-blue': '0 0 25px rgba(59, 130, 246, 0.35)',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

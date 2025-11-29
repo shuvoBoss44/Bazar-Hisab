@@ -26,21 +26,21 @@
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
   }
   
-  /* Purple-tinted Glass */
-  .glass-purple {
-    background: rgba(126, 34, 206, 0.15);
+  /* Indigo-tinted Glass */
+  .glass-indigo {
+    background: rgba(67, 56, 202, 0.15);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(168, 85, 247, 0.2);
+    border: 1px solid rgba(99, 102, 241, 0.25);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   }
   
-  /* Teal-tinted Glass */
-  .glass-teal {
-    background: rgba(20, 184, 166, 0.15);
+  /* Blue-tinted Glass */
+  .glass-blue {
+    background: rgba(14, 165, 233, 0.15);
     backdrop-filter: blur(16px) saturate(180%);
     -webkit-backdrop-filter: blur(16px) saturate(180%);
-    border: 1px solid rgba(20, 184, 166, 0.2);
+    border: 1px solid rgba(56, 189, 248, 0.25);
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
   }
   
@@ -53,15 +53,15 @@
   }
   
   /* Gradient Text */
-  .text-gradient-purple {
-    background: linear-gradient(135deg, #c084fc 0%, #5eead4 100%);
+  .text-gradient-primary {
+    background: linear-gradient(135deg, #6366f1 0%, #38bdf8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
   
-  .text-gradient-teal {
-    background: linear-gradient(135deg, #14b8a6 0%, #a855f7 100%);
+  .text-gradient-blue {
+    background: linear-gradient(135deg, #0ea5e9 0%, #8b5cf6 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -72,12 +72,12 @@
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
   }
   
-  .bg-gradient-purple {
-    background: linear-gradient(135deg, #581c87 0%, #7e22ce 50%, #9333ea 100%);
+  .bg-gradient-primary {
+    background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
   }
   
-  .bg-gradient-teal {
-    background: linear-gradient(135deg, #134e4a 0%, #0f766e 50%, #14b8a6 100%);
+  .bg-gradient-blue {
+    background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0ea5e9 100%);
   }
   
   /* Animate In */
@@ -104,13 +104,13 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #7e22ce, #14b8a6);
+  background: linear-gradient(180deg, #4338ca, #0ea5e9);
   border-radius: 10px;
   transition: background 0.2s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #9333ea, #2dd4bf);
+  background: linear-gradient(180deg, #6366f1, #38bdf8);
 }
 
 /* Keyframes */

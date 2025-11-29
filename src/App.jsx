@@ -20,7 +20,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-gray-50 flex flex-col overflow-x-hidden">
+        <div className="min-h-screen bg-neutral-950 flex flex-col overflow-x-hidden">
           <Navbar className="w-full" />
           <main className="flex-grow py-12 pt-20 w-full">
             <div className="w-full">

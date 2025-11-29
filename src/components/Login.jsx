@@ -59,18 +59,18 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-purple-900 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-primary-950 p-4 relative overflow-hidden">
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 right-20 w-96 h-96 bg-primary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary-500 rounded-full opacity-20 blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-accent-pink rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary-400 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
       </div>
 
-      <div className="glass-purple rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-purple relative z-10 animate-in slide-in-from-bottom">
+      <div className="glass-indigo rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-primary relative z-10 animate-in slide-in-from-bottom">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-purple mb-3 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-primary mb-3 tracking-tight">
             Welcome Back
           </h1>
           <p className="text-neutral-300 text-sm">Sign in to access your account</p>

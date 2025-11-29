@@ -53,7 +53,7 @@ function Navbar() {
     <nav 
       className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "glass-dark shadow-glow-purple border-b border-neutral-700" 
+          ? "glass-dark shadow-glow-primary border-b border-neutral-700" 
           : "glass-dark shadow-glass-dark"
       }`}
     >
@@ -62,9 +62,9 @@ function Navbar() {
           {/* Logo */}
           <Link
             to="/"
-            className="text-2xl md:text-3xl font-extrabold text-gradient-purple transition-all hover:scale-105"
+            className="text-2xl md:text-3xl font-extrabold text-gradient-primary transition-all hover:scale-105"
           >
-            Bazar<span className="text-gradient-teal">Hisab</span>
+            Bazar<span className="text-gradient-blue">Hisab</span>
           </Link>
 
           {/* Desktop Navigation */}

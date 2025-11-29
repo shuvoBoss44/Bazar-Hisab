@@ -89,16 +89,16 @@ function UploadTransaction() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-secondary-50 flex items-center justify-center p-4">
-        <div className="glass-card p-8 text-center max-w-md w-full">
-          <div className="w-16 h-16 bg-rose-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center p-4">
+        <div className="glass-dark p-8 text-center max-w-md w-full rounded-3xl shadow-glow-primary">
+          <div className="w-16 h-16 bg-rose-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
           </div>
-          <h2 className="text-xl font-bold text-secondary-900 mb-2">Authentication Required</h2>
-          <p className="text-secondary-600 mb-6">Please sign in to upload transactions.</p>
+          <h2 className="text-xl font-bold text-neutral-100 mb-2">Authentication Required</h2>
+          <p className="text-neutral-400 mb-6">Please sign in to upload transactions.</p>
           <button
             onClick={() => navigate("/login")}
-            className="w-full py-3 bg-primary-600 text-white rounded-xl font-semibold hover:bg-primary-700 transition-colors shadow-lg shadow-primary-500/30"
+            className="w-full py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:from-primary-500 hover:to-primary-600 transition-all shadow-lg shadow-primary-900/50"
           >
             Sign In
           </button>
@@ -108,14 +108,14 @@ function UploadTransaction() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="glass rounded-3xl p-8 md:p-12 animate-in slide-in-from-bottom">
+        <div className="glass-dark rounded-3xl p-8 md:p-12 shadow-glow-primary animate-in slide-in-from-bottom">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-secondary-900 mb-2">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gradient-primary mb-2">
               Upload Transaction
             </h2>
-            <p className="text-secondary-500">Record a new purchase or update balance</p>
+            <p className="text-neutral-400">Record a new purchase or update balance</p>
           </div>
 
           {error && (

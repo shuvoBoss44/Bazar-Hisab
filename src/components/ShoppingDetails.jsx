@@ -136,10 +136,10 @@ function ShoppingDetails() {
 
   if (authLoading || loadingTransactions) {
     return (
-      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
-        <div className="flex flex-col items-center p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-soft">
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="flex flex-col items-center p-8 glass-dark rounded-2xl shadow-glow-primary">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-600 mb-4"></div>
-          <p className="text-secondary-600 text-lg font-medium animate-pulse">Loading data...</p>
+          <p className="text-neutral-300 text-lg font-medium animate-pulse">Loading data...</p>
         </div>
       </div>
     );
@@ -150,13 +150,13 @@ function ShoppingDetails() {
   }
 
   return (
-    <div className="min-h-screen bg-secondary-50 py-8 pt-24 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-950 py-8 pt-24 px-4 sm:px-6 lg:px-8">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl sm:text-5xl font-extrabold text-secondary-900 mb-10 text-center tracking-tight animate-in slide-in-from-bottom">
+        <h2 className="text-4xl sm:text-5xl font-extrabold text-gradient-primary mb-10 text-center tracking-tight animate-in slide-in-from-bottom">
           Transaction History
         </h2>
 
-        <div className="glass bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-3xl p-8 mb-12 shadow-glow transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group">
+        <div className="glass-indigo bg-gradient-to-br from-primary-600 to-primary-800 text-white rounded-3xl p-8 mb-12 shadow-glow-primary transform hover:scale-[1.02] transition-all duration-300 relative overflow-hidden group">
           <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 rounded-full bg-white/10 blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
           <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-64 h-64 rounded-full bg-white/10 blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
           

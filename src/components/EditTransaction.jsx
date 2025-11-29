@@ -171,24 +171,24 @@ function EditTransaction() {
 
   if (loading || authLoading) {
     return (
-      <div className="min-h-screen bg-secondary-50 flex items-center justify-center">
-        <div className="flex flex-col items-center p-8 bg-white/50 backdrop-blur-sm rounded-2xl shadow-soft">
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="flex flex-col items-center p-8 glass-dark rounded-2xl shadow-glow-primary">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-600 mb-4"></div>
-          <p className="text-secondary-600 text-lg font-medium animate-pulse">Loading...</p>
+          <p className="text-neutral-300 text-lg font-medium animate-pulse">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-secondary-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="glass rounded-3xl p-8 md:p-12 animate-in slide-in-from-bottom">
+        <div className="glass-dark rounded-3xl p-8 md:p-12 shadow-glow-primary animate-in slide-in-from-bottom">
           <div className="text-center mb-10">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-secondary-900 mb-2">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gradient-primary mb-2">
               Edit Transaction
             </h2>
-            <p className="text-secondary-500">Update the details of your transaction</p>
+            <p className="text-neutral-400">Update the details of your transaction</p>
           </div>
 
           {error && (

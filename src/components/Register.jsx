@@ -66,18 +66,18 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-purple-950 to-neutral-900 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-primary-950 to-neutral-900 p-4 relative overflow-hidden">
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-10 left-10 w-96 h-96 bg-secondary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow"></div>
         <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
-        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-accent-coral rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-primary-400 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '3s' }}></div>
       </div>
 
-      <div className="glass-purple rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-purple relative z-10 animate-in slide-in-from-bottom">
+      <div className="glass-indigo rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-primary relative z-10 animate-in slide-in-from-bottom">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-teal mb-3 tracking-tight">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-blue mb-3 tracking-tight">
             Create Account
           </h1>
           <p className="text-neutral-300 text-sm">Join us to manage your transactions</p>

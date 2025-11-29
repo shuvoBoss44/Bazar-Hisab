@@ -104,10 +104,10 @@ const Profile = () => {
 
   if (loading)
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center p-6 bg-white rounded-lg shadow-xl">
-          <div className="animate-spin rounded-full h-20 w-20 border-t-4 border-b-4 border-blue-600 mb-4"></div>
-          <p className="text-gray-700 text-lg font-medium">
+      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+        <div className="flex flex-col items-center p-8 glass-dark rounded-2xl shadow-glow-primary">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-600 mb-4"></div>
+          <p className="text-neutral-300 text-lg font-medium">
             Loading profile...
           </p>
         </div>
@@ -115,23 +115,25 @@ const Profile = () => {
     );
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900">Profile</h1>
+    <div className="min-h-screen bg-neutral-950 py-12 px-4">
+      <div className="max-w-2xl mx-auto">
+        <div className="glass-dark rounded-3xl p-8 md:p-10 shadow-glow-primary animate-in fade-in">
+          <h1 className="text-3xl md:text-4xl font-extrabold text-gradient-primary mb-8">Profile</h1>
 
-      <div className="mb-4 flex items-center justify-between border-b pb-4">
-        <div>
-          <p className="text-md font-semibold text-gray-800">
-            Name: {user?.name}
-          </p>
-          <p className="text-md font-semibold text-gray-800">
-            Email: {user?.email}
-          </p>
-        </div>
-        <button
-          onClick={() => setIsEditing(!isEditing)}
-          className="text-blue-500 hover:text-blue-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
-          aria-label={isEditing ? "Cancel editing" : "Edit profile"}
-        >
+        <div className="mb-6 flex items-center justify-between border-b border-neutral-700 pb-6">
+          <div>
+            <p className="text-lg font-semibold text-neutral-200 mb-1">
+              Name: {user?.name}
+            </p>
+            <p className="text-lg font-semibold text-neutral-300">
+              Email: {user?.email}
+            </p>
+          </div>
+          <button
+            onClick={() => setIsEditing(!isEditing)}
+            className="text-primary-400 hover:text-primary-300 p-2 rounded-full hover:bg-neutral-800 transition-colors"
+            aria-label={isEditing ? "Cancel editing" : "Edit profile"}  
+          >
           <svg
             className="w-6 h-6"
             fill="none"
@@ -151,10 +153,10 @@ const Profile = () => {
 
       {isEditing && (
         <>
-          <div className="mb-4">
+          <div className="mb-6">
             <label
               htmlFor="name-input"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-neutral-300 mb-2"
             >
               Name
             </label>
@@ -163,14 +165,14 @@ const Profile = () => {
               type="text"
               value={name}
               onChange={e => setName(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
             />
           </div>
 
-          <div className="mb-4">
+          <div className="mb-6">
             <label
               htmlFor="email-input"
-              className="block text-sm font-medium text-gray-700"
+              className="block text-sm font-medium text-neutral-300 mb-2"
             >
               Email
             </label>
@@ -179,100 +181,99 @@ const Profile = () => {
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
-              className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
             />
           </div>
 
           <button
             onClick={handleUpdateProfile}
-            className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6 transition duration-200 ease-in-out shadow-md"
+            className="w-full bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold py-3.5 rounded-xl hover:from-primary-500 hover:to-primary-600 transition-all shadow-lg shadow-primary-900/50 mb-6"
           >
             Update Profile
           </button>
         </>
       )}
 
-      <h2 className="text-xl font-bold mb-4 mt-6 text-gray-800">
-        Change Password
-      </h2>
+        <h2 className="text-2xl font-bold mb-6 mt-8 text-gradient-blue border-b border-neutral-700 pb-3">
+          Change Password
+        </h2>
 
-      <div className="mb-4">
-        <label
-          htmlFor="current-password-input"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Current Password
-        </label>
-        <input
-          id="current-password-input"
-          type="password"
-          value={currentPassword}
-          onChange={e => setCurrentPassword(e.target.value)}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
+        <div className="mb-6">
+          <label
+            htmlFor="current-password-input"
+            className="block text-sm font-medium text-neutral-300 mb-2"
+          >
+            Current Password
+          </label>
+          <input
+            id="current-password-input"
+            type="password"
+            value={currentPassword}
+            onChange={e => setCurrentPassword(e.target.value)}
+            className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+          />
+        </div>
 
-      <div className="mb-4">
-        <label
-          htmlFor="new-password-input"
-          className="block text-sm font-medium text-gray-700"
-        >
-          New Password
-        </label>
-        <input
-          id="new-password-input"
-          type="password"
-          value={newPassword}
-          onChange={e => setNewPassword(e.target.value)}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-        />
-      </div>
+        <div className="mb-6">
+          <label
+            htmlFor="new-password-input"
+            className="block text-sm font-medium text-neutral-300 mb-2"
+          >
+            New Password
+          </label>
+          <input
+            id="new-password-input"
+            type="password"
+            value={newPassword}
+            onChange={e => setNewPassword(e.target.value)}
+            className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+          />
+        </div>
 
-      <button
-        onClick={handleChangePassword}
-        className="w-full bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 mb-6 transition duration-200 ease-in-out shadow-md"
-      >
-        Change Password
-      </button>
-
-      <h2 className="text-xl font-bold mb-4 mt-6 text-gray-800">
-        Manage Balance
-      </h2>
-      <div className="mb-4 text-center p-3 rounded-lg border border-gray-200 bg-gray-50">
-        <p
-          className={`text-lg font-extrabold ${
-            (user?.balance ?? 0) >= 0 ? "text-green-600" : "text-red-600"
-          }`}
-        >
-          Your Current Balance: {(user?.balance ?? 0).toFixed(2)} tk
-        </p>
-      </div>
-
-      <div className="mb-4">
-        <label
-          htmlFor="balance-amount-input"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Amount
-        </label>
-        <input
-          id="balance-amount-input"
-          type="number"
-          value={balanceAmount}
-          onChange={e => setBalanceAmount(e.target.value)}
-          className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          min="0"
-          step="0.01"
-        />
-      </div>
-
-      <div className="flex space-x-4">
         <button
-          onClick={handleAddBalance}
-          // Disable if adding or removing balance is in progress
-          disabled={addingBalance || removingBalance}
-          className="flex-1 bg-green-500 text-white p-2 rounded-md hover:bg-green-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={handleChangePassword}
+          className="w-full bg-gradient-to-r from-secondary-600 to-secondary-700 text-white font-semibold py-3.5 rounded-xl hover:from-secondary-500 hover:to-secondary-600 transition-all shadow-lg shadow-secondary-900/50 mb-8"
         >
+          Change Password
+        </button>
+
+        <h2 className="text-2xl font-bold mb-6 mt-8 text-gradient-primary border-b border-neutral-700 pb-3">
+          Manage Balance
+        </h2>
+        <div className="mb-6 text-center p-5 rounded-xl glass-indigo">
+          <p
+            className={`text-2xl font-extrabold ${
+              (user?.balance ?? 0) >= 0 ? "text-accent-green" : "text-accent-emerald"
+            }`}
+          >
+            Your Current Balance: {(user?.balance ?? 0).toFixed(2)} tk
+          </p>
+        </div>
+
+        <div className="mb-6">
+          <label
+            htmlFor="balance-amount-input"
+            className="block text-sm font-medium text-neutral-300 mb-2"
+          >
+            Amount
+          </label>
+          <input
+            id="balance-amount-input"
+            type="number"
+            value={balanceAmount}
+            onChange={e => setBalanceAmount(e.target.value)}
+            className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
+            min="0"
+            step="0.01"
+          />
+        </div>
+
+        <div className="flex gap-4">
+          <button
+            onClick={handleAddBalance}
+            disabled={addingBalance || removingBalance}
+            className="flex-1 bg-gradient-to-r from-accent-green to-accent-emerald text-white font-semibold py-3.5 rounded-xl hover:from-accent-emerald hover:to-accent-green transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
           {addingBalance ? (
             <>
               <svg
@@ -301,12 +302,11 @@ const Profile = () => {
             "Add Balance"
           )}
         </button>
-        <button
-          onClick={handleRemoveBalance}
-          // Disable if adding or removing balance is in progress
-          disabled={addingBalance || removingBalance}
-          className="flex-1 bg-red-500 text-white p-2 rounded-md hover:bg-red-600 transition duration-200 ease-in-out shadow-md flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+          <button
+            onClick={handleRemoveBalance}
+            disabled={addingBalance || removingBalance}
+            className="flex-1 bg-gradient-to-r from-rose-500 to-rose-600 text-white font-semibold py-3.5 rounded-xl hover:from-rose-600 hover:to-rose-700 transition-all shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          >
           {removingBalance ? (
             <>
               <svg
@@ -335,19 +335,21 @@ const Profile = () => {
             "Remove Balance"
           )}
         </button>
-      </div>
+        </div>
 
-      {message && (
-        <p
-          className={`mt-4 text-center font-medium p-2 rounded ${
-            message.includes("Failed")
-              ? "bg-red-100 text-red-700"
-              : "bg-green-100 text-green-700"
-          }`}
-        >
-          {message}
-        </p>
-      )}
+        {message && (
+          <div
+            className={`mt-6 text-center font-medium p-4 rounded-xl animate-in fade-in ${
+              message.includes("Failed")
+                ? "bg-rose-500/10 border border-rose-500/30 text-rose-400"
+                : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
+            }`}
+          >
+            {message}
+          </div>
+        )}
+      </div>
+      </div>
     </div>
   );
 };
