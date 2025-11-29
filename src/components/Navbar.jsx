@@ -52,27 +52,23 @@ function Navbar() {
   return (
     <nav 
       className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
-        scrolled || isMobileMenuOpen 
-          ? "bg-white/80 backdrop-blur-md shadow-glass border-b border-white/20" 
-          : "bg-transparent"
+        scrolled 
+          ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-secondary-200" 
+          : "bg-white/70 backdrop-blur-md shadow-sm"
       }`}
     >
       <div className="container mx-auto px-4 py-4">
         <div className="flex justify-between items-center">
           <Link
             to="/"
-            className={`text-2xl font-bold tracking-tight transition-colors duration-300 ${
-              scrolled || isMobileMenuOpen ? "text-primary-600" : "text-white"
-            }`}
+            className="text-2xl font-bold tracking-tight text-primary-600 transition-colors duration-300"
           >
-            Bazar<span className={scrolled || isMobileMenuOpen ? "text-secondary-800" : "text-white/90"}>Hisab</span>
+            Bazar<span className="text-secondary-800">Hisab</span>
           </Link>
 
           {/* Mobile menu button */}
           <button
-            className={`md:hidden p-2 rounded-lg transition-colors ${
-              scrolled || isMobileMenuOpen ? "text-secondary-800 hover:bg-secondary-100" : "text-white hover:bg-white/10"
-            }`}
+            className="md:hidden p-2 rounded-lg text-secondary-800 hover:bg-secondary-100 transition-colors"
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
