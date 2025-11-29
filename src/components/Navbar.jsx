@@ -53,48 +53,34 @@ function Navbar() {
     <nav 
       className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
         scrolled 
-          ? "bg-white/95 backdrop-blur-md shadow-lg border-b border-secondary-200" 
-          : "bg-white/70 backdrop-blur-md shadow-sm"
+          ? "glass-dark shadow-glow-purple border-b border-neutral-700" 
+          : "glass-dark shadow-glass-dark"
       }`}
     >
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex justify-between items-center">
+      <div className="container mx-auto px-4 lg:px-8">
+        <div className="flex justify-between items-center h-16 md:h-18">
+          {/* Logo */}
           <Link
             to="/"
-            className="text-2xl font-bold tracking-tight text-primary-600 transition-colors duration-300"
+            className="text-2xl md:text-3xl font-extrabold text-gradient-purple transition-all hover:scale-105"
           >
-            Bazar<span className="text-secondary-800">Hisab</span>
+            Bazar<span className="text-gradient-teal">Hisab</span>
           </Link>
 
-          {/* Mobile menu button */}
-          <button
-            className="md:hidden p-2 rounded-lg text-secondary-800 hover:bg-secondary-100 transition-colors"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
-          </button>
-
-          {/* Desktop menu */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* Desktop Navigation */}
+          <div className="hidden lg:flex items-center gap-6">
             {loading ? (
-              <div className="h-10 w-24 bg-secondary-200 animate-pulse rounded-lg"></div>
+              <div className="h-10 w-32 bg-neutral-700/50 animate-pulse rounded-lg"></div>
             ) : isAuthenticated ? (
               <>
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
                       location.pathname === link.path
-                        ? "bg-primary-50 text-primary-600"
-                        : "text-secondary-600 hover:bg-secondary-50 hover:text-primary-600"
+                        ? "bg-primary-600/20 text-primary-400 border border-primary-500/30"
+                        : "text-neutral-300 hover:bg-neutral-700/50 hover:text-secondary-400"
                     }`}
                   >
                     {link.icon}
@@ -102,11 +88,11 @@ function Navbar() {
                   </Link>
                 ))}
                 
-                <div className="w-px h-6 bg-secondary-200 mx-2 opacity-50"></div>
+                <div className="w-px h-6 bg-neutral-700 mx-2"></div>
                 
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 flex items-center gap-2 text-rose-600 hover:bg-rose-50"
+                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-accent-coral hover:bg-accent-coral/10 border border-transparent hover:border-accent-coral/30 transition-all duration-200 flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -117,68 +103,78 @@ function Navbar() {
             ) : (
               <Link
                 to="/login"
-                className="px-6 py-2.5 rounded-full text-sm font-semibold bg-primary-600 text-white hover:bg-primary-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+                className="px-6 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all duration-300 shadow-lg shadow-primary-900/30 transform hover:-translate-y-0.5"
+              >
+                Sign In
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile menu button */}
+          <button
+            className="lg:hidden p-2 rounded-xl text-neutral-300 hover:bg-neutral-700/50 transition-colors"
+            onClick={toggleMobileMenu}
+            aria-label="Toggle menu"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              {isMobileMenuOpen ? (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              ) : (
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
+              )}
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile Menu */}
+      {isMobileMenuOpen && (
+        <div className="lg:hidden border-t border-neutral-700 glass-dark animate-in slide-in-from-right">
+          <div className="container mx-auto px-4 py-4 space-y-2">
+            {loading ? (
+              <div className="h-12 w-full bg-neutral-700/50 animate-pulse rounded-xl"></div>
+            ) : isAuthenticated ? (
+              <>
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.path}
+                    to={link.path}
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
+                      location.pathname === link.path
+                        ? "bg-primary-600/20 text-primary-400 border border-primary-500/30"
+                        : "text-neutral-300 hover:bg-neutral-700/50 hover:text-secondary-400"
+                    }`}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    {link.icon}
+                    {link.name}
+                  </Link>
+                ))}
+                
+                <div className="h-px bg-neutral-700 my-2"></div>
+                
+                <button
+                  onClick={handleLogout}
+                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-accent-coral hover:bg-accent-coral/10 border border-transparent hover:border-accent-coral/30 transition-all"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                to="/login"
+                className="block w-full text-center px-6 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all shadow-lg"
+                onClick={() => setIsMobileMenuOpen(false)}
               >
                 Sign In
               </Link>
             )}
           </div>
         </div>
-      </div>
-
-      {/* Mobile menu */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-4 pb-6 space-y-2 bg-white/80 backdrop-blur-md border-t border-secondary-100">
-          {loading ? (
-            <div className="py-4 text-center text-secondary-500 text-sm">Loading...</div>
-          ) : isAuthenticated ? (
-            <>
-              <div className="py-2 px-4 mb-2">
-                <p className="text-xs font-semibold text-secondary-400 uppercase tracking-wider">Menu</p>
-              </div>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`block px-4 py-3 rounded-xl text-base font-medium transition-colors ${
-                    location.pathname === link.path
-                      ? "bg-primary-50 text-primary-700"
-                      : "text-secondary-600 hover:bg-secondary-50 hover:text-secondary-900"
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    {link.icon}
-                    {link.name}
-                  </div>
-                </Link>
-              ))}
-              <div className="h-px bg-secondary-100 my-2"></div>
-              <button
-                onClick={handleLogout}
-                className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-rose-600 hover:bg-rose-50 transition-colors flex items-center gap-3"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Sign Out
-              </button>
-            </>
-          ) : (
-            <div className="p-4">
-              <Link
-                to="/login"
-                className="block w-full text-center py-3 rounded-xl bg-primary-600 text-white font-semibold shadow-lg hover:bg-primary-700 transition-colors"
-              >
-                Sign In
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
+      )}
     </nav>
   );
 }
