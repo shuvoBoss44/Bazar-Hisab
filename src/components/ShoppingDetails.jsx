@@ -12,7 +12,7 @@ function ShoppingDetails() {
   const [loadingTransactions, setLoadingTransactions] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [expandedTransactions, setExpandedTransactions] = useState(new Set());
+  const [expandedTransaction, setExpandedTransaction] = useState(null);
   const navigate = useNavigate();
   const limit = 10;
 
@@ -53,6 +53,8 @@ function ShoppingDetails() {
   }, [user, authLoading, navigate]);
 
   const handleDelete = async (id) => {
+    if (!confirm("Are you sure you want to delete this transaction?")) return;
+    
     try {
       await axios.delete(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
@@ -65,18 +67,6 @@ function ShoppingDetails() {
       setError(err.response?.data?.message || "Failed to delete transaction");
       setTimeout(() => setError(null), 3000);
     }
-  };
-
-  const toggleExpand = (id) => {
-    setExpandedTransactions(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
   };
 
   if (authLoading || loadingTransactions) {
@@ -94,21 +84,14 @@ function ShoppingDetails() {
 
   return (
     <div className="min-h-screen py-12 px-4">
-      <div className="max-w-6xl mx-auto space-y-8">
+      <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="space-y-1">
-            <h1 className="text-4xl font-bold text-gradient-primary">
-              Dashboard
-            </h1>
-            <p className="text-slate-400">
-              Welcome back, {user.name}
-            </p>
+            <h1 className="text-4xl font-bold text-gradient-primary">Dashboard</h1>
+            <p className="text-slate-400">Welcome back, {user.name}</p>
           </div>
-          <button
-            onClick={() => navigate("/upload-transaction")}
-            className="btn-primary"
-          >
+          <button onClick={() => navigate("/upload-transaction")} className="btn-primary">
             + New Transaction
           </button>
         </div>
@@ -140,9 +123,9 @@ function ShoppingDetails() {
           </p>
         </div>
 
-        {/* Transactions */}
+        {/* Transactions Table */}
         <div className="space-y-4">
-          <h2 className="text-2xl font-bold">Transactions</h2>
+          <h2 className="text-2xl font-bold">Transaction History</h2>
 
           {transactions.length === 0 ? (
             <div className="glass-card p-12 text-center space-y-4">
@@ -155,140 +138,211 @@ function ShoppingDetails() {
                 <h3 className="text-xl font-semibold">No transactions yet</h3>
                 <p className="text-slate-400 mt-2">Get started by creating your first transaction</p>
               </div>
-              <button
-                onClick={() => navigate("/upload-transaction")}
-                className="btn-primary mx-auto"
-              >
+              <button onClick={() => navigate("/upload-transaction")} className="btn-primary mx-auto">
                 Create Transaction
               </button>
             </div>
           ) : (
-            <div className="space-y-3">
-              {transactions.map((transaction) => {
-                const isExpanded = expandedTransactions.has(transaction._id);
-                const isBalanceTransaction = 
-                  transaction.items[0]?.itemName === "Balance Addition" || 
-                  transaction.items[0]?.itemName === "Balance Removal";
+            <div className="glass-card overflow-hidden">
+              {/* Desktop Table */}
+              <div className="hidden md:block overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-neutral-900/60 border-b border-white/10">
+                    <tr>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Date</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Type</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Created By</th>
+                      <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">Details</th>
+                      <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Amount</th>
+                      <th className="px-6 py-4 text-right text-xs font-semibold text-slate-400 uppercase tracking-wider">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/5">
+                    {transactions.map((transaction) => {
+                      const isBalanceTransaction = 
+                        transaction.items[0]?.itemName === "Balance Addition" || 
+                        transaction.items[0]?.itemName === "Balance Removal";
+                      const isExpanded = expandedTransaction === transaction._id;
 
-                return (
-                  <div
-                    key={transaction._id}
-                    className="glass-card-hover p-6 space-y-4"
-                  >
-                    {/* Header */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                          <h3 className="font-semibold text-xl">
-                            {transaction.items[0]?.itemName === "Balance Addition" ? (
-                              <span className="text-success-500">Balance Addition</span>
-                            ) : transaction.items[0]?.itemName === "Balance Removal" ? (
-                              <span className="text-error-500">Balance Removal</span>
-                            ) : (
-                              "Shopping Transaction"
-                            )}
-                          </h3>
-                          {!isBalanceTransaction && (
-                            <button
-                              onClick={() => toggleExpand(transaction._id)}
-                              className="text-primary-400 hover:text-primary-300 text-sm font-medium"
-                            >
-                              {isExpanded ? "Hide Details" : "Show Details"}
-                            </button>
+                      return (
+                        <React.Fragment key={transaction._id}>
+                          <tr className="hover:bg-white/5 transition-colors">
+                            <td className="px-6 py-4 text-sm text-slate-300">
+                              {new Date(transaction.createdAt).toLocaleDateString()}
+                              <br />
+                              <span className="text-xs text-slate-500">
+                                {new Date(transaction.createdAt).toLocaleTimeString()}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4">
+                              {transaction.items[0]?.itemName === "Balance Addition" ? (
+                                <span className="badge-success">Addition</span>
+                              ) : transaction.items[0]?.itemName === "Balance Removal" ? (
+                                <span className="badge-error">Removal</span>
+                              ) : (
+                                <span className="badge-info">Shopping</span>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-sm text-slate-300">
+                              {transaction.createdBy?.name || "Unknown"}
+                            </td>
+                            <td className="px-6 py-4 text-sm">
+                              {isBalanceTransaction ? (
+                                <span className="text-slate-400">-</span>
+                              ) : (
+                                <button
+                                  onClick={() => setExpandedTransaction(isExpanded ? null : transaction._id)}
+                                  className="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                                >
+                                  {isExpanded ? "Hide" : "View"} ({transaction.items.length} items)
+                                </button>
+                              )}
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              <span className="text-lg font-bold text-gradient-primary">
+                                ৳{transaction.totalPrice?.toFixed(2)}
+                              </span>
+                            </td>
+                            <td className="px-6 py-4 text-right">
+                              {transaction.createdBy?._id === user.id && (
+                                <div className="flex justify-end gap-2">
+                                  <button
+                                    onClick={() => navigate(`/edit-transaction/${transaction._id}`)}
+                                    className="text-primary-400 hover:text-primary-300 text-sm font-medium"
+                                  >
+                                    Edit
+                                  </button>
+                                  <button
+                                    onClick={() => handleDelete(transaction._id)}
+                                    className="text-error-400 hover:text-error-300 text-sm font-medium"
+                                  >
+                                    Delete
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                          
+                          {/* Expanded Details Row */}
+                          {isExpanded && !isBalanceTransaction && (
+                            <tr className="bg-neutral-900/40">
+                              <td colSpan="6" className="px-6 py-4">
+                                <div className="space-y-4">
+                                  {/* Items */}
+                                  <div>
+                                    <h4 className="text-sm font-semibold text-slate-300 mb-2">Items Purchased</h4>
+                                    <div className="grid grid-cols-2 gap-2">
+                                      {transaction.items.map((item, idx) => (
+                                        <div key={idx} className="flex justify-between bg-neutral-900/60 rounded px-3 py-2">
+                                          <span className="text-sm text-slate-300">{item.itemName}</span>
+                                          <span className="text-sm text-slate-400 font-medium">৳{item.price?.toFixed(2)}</span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+
+                                  {/* User Splits */}
+                                  {transaction.sharedUsers && transaction.sharedUsers.length > 0 && (
+                                    <div>
+                                      <h4 className="text-sm font-semibold text-slate-300 mb-2">Split Among Users</h4>
+                                      <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                        {transaction.sharedUsers.map((sharedUser, idx) => (
+                                          <div key={idx} className="bg-neutral-900/60 rounded px-3 py-2 flex items-center justify-between">
+                                            <span className="text-sm text-slate-300">{sharedUser.userId?.name || 'Unknown'}</span>
+                                            <span className={`text-sm font-semibold ${
+                                              (sharedUser.balance ?? 0) >= 0 ? 'text-success-500' : 'text-error-500'
+                                            }`}>
+                                              {(sharedUser.balance ?? 0) >= 0 ? '+' : ''}৳{(sharedUser.balance ?? 0).toFixed(2)}
+                                            </span>
+                                          </div>
+                                        ))}
+                                      </div>
+                                    </div>
+                                  )}
+                                </div>
+                              </td>
+                            </tr>
                           )}
+                        </React.Fragment>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards */}
+              <div className="md:hidden divide-y divide-white/5">
+                {transactions.map((transaction) => {
+                  const isBalanceTransaction = 
+                    transaction.items[0]?.itemName === "Balance Addition" || 
+                    transaction.items[0]?.itemName === "Balance Removal";
+                  const isExpanded = expandedTransaction === transaction._id;
+
+                  return (
+                    <div key={transaction._id} className="p-4 space-y-3">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <div className="mb-2">
+                            {transaction.items[0]?.itemName === "Balance Addition" ? (
+                              <span className="badge-success">Addition</span>
+                            ) : transaction.items[0]?.itemName === "Balance Removal" ? (
+                              <span className="badge-error">Removal</span>
+                            ) : (
+                              <span className="badge-info">Shopping</span>
+                            )}
+                          </div>
+                          <p className="text-sm text-slate-400">
+                            {new Date(transaction.createdAt).toLocaleString()}
+                          </p>
+                          <p className="text-sm text-slate-300 mt-1">By {transaction.createdBy?.name}</p>
                         </div>
-                        <p className="text-sm text-slate-400 mt-1">
-                          By {transaction.createdBy?.name} • {new Date(transaction.createdAt).toLocaleString()}
+                        <p className="text-xl font-bold text-gradient-primary">
+                          ৳{transaction.totalPrice?.toFixed(2)}
                         </p>
                       </div>
-                      <p className="text-3xl font-bold text-gradient-primary">
-                        ৳{transaction.totalPrice?.toFixed(2)}
-                      </p>
-                    </div>
 
-                    {/* Items List */}
-                    {!isBalanceTransaction && (
-                      <div className="space-y-2 border-t border-white/10 pt-4">
-                        <h4 className="text-sm font-semibold text-slate-300">Items Purchased</h4>
-                        <div className="space-y-1">
-                          {transaction.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-sm bg-neutral-900/40 rounded-lg px-3 py-2">
-                              <span className="text-slate-300">{item.itemName}</span>
-                              <span className="text-slate-400 font-medium">৳{item.price?.toFixed(2)}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                      {!isBalanceTransaction && (
+                        <button
+                          onClick={() => setExpandedTransaction(isExpanded ? null : transaction._id)}
+                          className="text-primary-400 text-sm font-medium"
+                        >
+                          {isExpanded ? "Hide Details" : `View Details (${transaction.items.length} items)`}
+                        </button>
+                      )}
 
-                    {/* User Split Details - Show when expanded */}
-                    {isExpanded && !isBalanceTransaction && transaction.sharedUsers && transaction.sharedUsers.length > 0 && (
-                      <div className="space-y-2 border-t border-white/10 pt-4">
-                        <h4 className="text-sm font-semibold text-slate-300">Split Details</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                          {transaction.sharedUsers.map((sharedUser, idx) => (
-                            <div 
-                              key={idx} 
-                              className="bg-neutral-900/40 rounded-lg px-3 py-2 flex items-center justify-between"
-                            >
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-xs font-bold">
-                                  {sharedUser.userId?.name?.charAt(0).toUpperCase() || '?'}
-                                </div>
-                                <span className="text-sm text-slate-300">{sharedUser.userId?.name || 'Unknown'}</span>
+                      {isExpanded && !isBalanceTransaction && (
+                        <div className="space-y-3 pt-3 border-t border-white/10">
+                          <div className="space-y-2">
+                            {transaction.items.map((item, idx) => (
+                              <div key={idx} className="flex justify-between bg-neutral-900/40 rounded px-3 py-2">
+                                <span className="text-sm">{item.itemName}</span>
+                                <span className="text-sm font-medium">৳{item.price?.toFixed(2)}</span>
                               </div>
-                              <div className="text-right">
-                                <p className={`text-sm font-semibold ${
-                                  sharedUser.balance >= 0 ? 'text-success-500' : 'text-error-500'
-                                }`}>
-                                  {sharedUser.balance >= 0 ? '+' : ''}৳{sharedUser.balance?.toFixed(2)}
-                                </p>
-                                <p className="text-xs text-slate-500">Balance change</p>
-                              </div>
-                            </div>
-                          ))}
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
+                      )}
 
-                    {/* Quick Info */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-slate-400">
-                      {!isBalanceTransaction && transaction.sharedUsers && transaction.sharedUsers.length > 0 && (
-                        <div className="flex items-center gap-1.5">
-                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                          </svg>
-                          <span>Split among {transaction.sharedUsers.length} user(s)</span>
+                      {transaction.createdBy?._id === user.id && (
+                        <div className="flex gap-2 pt-2 border-t border-white/10">
+                          <button
+                            onClick={() => navigate(`/edit-transaction/${transaction._id}`)}
+                            className="flex-1 btn-ghost text-sm"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={() => handleDelete(transaction._id)}
+                            className="flex-1 btn-ghost text-error-400 text-sm"
+                          >
+                            Delete
+                          </button>
                         </div>
                       )}
                     </div>
-
-                    {/* Actions */}
-                    {transaction.createdBy?._id === user.id && (
-                      <div className="flex gap-2 pt-2 border-t border-white/10">
-                        <button
-                          onClick={() => navigate(`/edit-transaction/${transaction._id}`)}
-                          className="btn-ghost"
-                        >
-                          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
-                          Edit
-                        </button>
-                        <button
-                          onClick={() => handleDelete(transaction._id)}
-                          className="btn-ghost text-error-400 hover:text-error-300"
-                        >
-                          <svg className="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                          </svg>
-                          Delete
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
           )}
 

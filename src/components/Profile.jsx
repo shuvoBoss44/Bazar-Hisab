@@ -116,8 +116,8 @@ function Profile() {
               {/* Balance */}
               <div className="pt-6 border-t border-white/10 space-y-2">
                 <p className="text-sm text-slate-400">Current Balance</p>
-                <p className={`text-3xl font-bold ${balance >= 0 ? 'text-success-500' : 'text-error-500'}`}>
-                  ৳{balance.toFixed(2)}
+                <p className={`text-3xl font-bold ${(balance ?? 0) >= 0 ? 'text-success-500' : 'text-error-500'}`}>
+                  ৳{(balance ?? 0).toFixed(2)}
                 </p>
               </div>
 
