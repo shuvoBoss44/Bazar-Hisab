@@ -168,19 +168,7 @@ function Profile() {
                       {user.email}
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-slate-400">Member Since</label>
-                    <div className="bg-neutral-900/60 border border-white/10 rounded-lg px-4 py-3">
-                      {new Date(user.createdAt || Date.now()).toLocaleDateString()}
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-sm text-slate-400">Status</label>
-                    <div className="bg-neutral-900/60 border border-white/10 rounded-lg px-4 py-3 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-success-500"></span>
-                      Active
-                    </div>
-                  </div>
+                  {/* Removed Member Since and Status as per user request */}
                 </div>
               </div>
             )}

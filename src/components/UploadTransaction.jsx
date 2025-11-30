@@ -20,6 +20,10 @@ function UploadTransaction() {
       try {
         // Backend returns data as an array directly or wrapped in data object depending on controller
         // Based on UserController.getAllUsers: res.status(200).json({ status: "success", data: [...] })
+        const response = await axios.get(
+          "https://bazar-hisab-backend.onrender.com/api/users",
+          { withCredentials: true }
+        );
         const usersData = response.data.data;
         setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);
       } catch (err) {
