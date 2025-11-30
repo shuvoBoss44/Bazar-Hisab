@@ -18,11 +18,10 @@ function UploadTransaction() {
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          "https://bazar-hisab-backend.onrender.com/api/users",
-          { withCredentials: true }
-        );
-        setUsers(response.data.data?.users || []);
+        // Backend returns data as an array directly or wrapped in data object depending on controller
+        // Based on UserController.getAllUsers: res.status(200).json({ status: "success", data: [...] })
+        const usersData = response.data.data;
+        setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);
       } catch (err) {
         console.error("Error fetching users:", err);
       }
@@ -294,7 +293,7 @@ function UploadTransaction() {
                   <div className="space-y-4 pt-6 border-t border-white/10">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                       <div>
-                        <label className="text-lg font-semibold text-white">Split Expense With</label>
+                        <label className="text-lg font-semibold text-white">With whom I want to share the expenses</label>
                         <p className="text-sm text-slate-400">Select users to share this cost</p>
                       </div>
                       {selectedUsers.length > 0 && (
