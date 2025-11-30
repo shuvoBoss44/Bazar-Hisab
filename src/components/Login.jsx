@@ -19,7 +19,7 @@ function Login() {
 
     try {
       const res = await axios.post(
-        "https://bazar-hisab-backend.onrender.com/api/auth/login",
+        "https://bazar-hisab-backend.onrender.com/api/users/login",
         { email, password },
         { withCredentials: true }
       );

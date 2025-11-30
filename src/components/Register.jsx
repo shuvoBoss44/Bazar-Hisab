@@ -28,7 +28,7 @@ function Register() {
 
     try {
       const res = await axios.post(
-        "https://bazar-hisab-backend.onrender.com/api/auth/register",
+        "https://bazar-hisab-backend.onrender.com/api/users/register",
         { name, email, password },
         { withCredentials: true }
       );
