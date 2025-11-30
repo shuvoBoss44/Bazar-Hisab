@@ -6,16 +6,9 @@ import { AuthContext } from "../AuthContext";
 function EditTransaction() {
   const { user, loading: authLoading } = useContext(AuthContext);
   const [items, setItems] = useState([{ itemName: "", price: "" }]);
-  const [amount, setAmount] = useState("");
-  const [isBalanceAddition, setIsBalanceAddition] = useState(false);
-  const [isBalanceRemoval, setIsBalanceRemoval] = useState(false);
-  const [originalTransaction, setOriginalTransaction] = useState(null);
   const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(null);
-  const [loading, setLoading] = useState({
-    transaction: false,
-    submit: false,
-  });
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
   const { id: transactionId } = useParams();
@@ -28,54 +21,28 @@ function EditTransaction() {
 
     const fetchData = async () => {
       try {
-        setLoading(prev => ({ ...prev, transaction: true }));
-        const transRes = await axios.get(
+        const res = await axios.get(
           `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
           { withCredentials: true }
         );
 
-        const transaction = transRes.data.data?.transaction;
-        if (!transaction) {
-          throw new Error("Transaction not found");
-        }
-
+        const transaction = res.data.data?.transaction;
+        if (!transaction) throw new Error("Transaction not found");
         if (transaction.createdBy._id?.toString() !== user.id) {
-          throw new Error("You are not authorized to edit this transaction");
+          throw new Error("Not authorized");
         }
 
-        setOriginalTransaction(transaction);
-
-        if (transaction.items[0]?.itemName === "Balance Addition") {
-          setIsBalanceAddition(true);
-          setIsBalanceRemoval(false);
-          setAmount(transaction.totalPrice?.toString() ?? "");
-        } else if (transaction.items[0]?.itemName === "Balance Removal") {
-          setIsBalanceRemoval(true);
-          setIsBalanceAddition(false);
-          setAmount(Math.abs(transaction.totalPrice ?? 0)?.toString() ?? "");
-        } else {
-          setIsBalanceAddition(false);
-          setIsBalanceRemoval(false);
-          setItems(
-            transaction.items.map(item => ({
-              itemName: item.itemName || "",
-              price: item.price?.toString() || "",
-            }))
-          );
-        }
+        setItems(
+          transaction.items.map(item => ({
+            itemName: item.itemName || "",
+            price: item.price?.toString() || "",
+          }))
+        );
       } catch (err) {
-        console.error(
-          "Error fetching data for edit:",
-          err.response?.data || err.message
-        );
-        setError(
-          err.response?.data?.message ||
-            err.message ||
-            "Failed to load transaction data"
-        );
-        setTimeout(() => navigate("/shopping-details"), 3000);
+        setError(err.response?.data?.message || err.message);
+        setTimeout(() => navigate("/shopping-details"), 2000);
       } finally {
-        setLoading(prev => ({ ...prev, transaction: false }));
+        setLoading(false);
       }
     };
 
@@ -89,216 +56,150 @@ function EditTransaction() {
   };
 
   const addItem = () => setItems([...items, { itemName: "", price: "" }]);
+  const removeItem = (index) => items.length > 1 &&  setItems(items.filter((_, i) => i !== index));
 
-  const removeItem = index =>
-    items.length > 1 && setItems(items.filter((_, i) => i !== index));
-
-  const validateForm = () => {
-    setError(null);
-    if (isBalanceAddition || isBalanceRemoval) {
-      const amountValue = parseFloat(amount);
-      if (isNaN(amountValue) || amountValue <= 0) {
-        setError(
-          "Please enter a valid positive amount for balance transaction."
-        );
-        return false;
-      }
-    } else {
-      if (items.length === 0) {
-        setError("Please add at least one item.");
-        return false;
-      }
-      for (const item of items) {
-        if (!item.itemName.trim()) {
-          setError("All items must have a non-empty name.");
-          return false;
-        }
-        const price = parseFloat(item.price);
-        if (isNaN(price) || price <= 0) {
-          setError("All items must have a valid positive price.");
-          return false;
-        }
-      }
-    }
-    return true;
+  const calculateTotal = () => {
+    return items.reduce((sum, item) => sum + (parseFloat(item.price) || 0), 0);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
-
-    if (!validateForm()) return;
-
-    if (!originalTransaction) {
-      setError("Original transaction data not loaded. Please try again.");
-      return;
-    }
+    setSubmitting(true);
 
     try {
-      setLoading(prev => ({ ...prev, submit: true }));
-      let payload = {};
-
-      if (isBalanceAddition || isBalanceRemoval) {
-        const newAmount = parseFloat(amount);
-        const userIdToAdjust = originalTransaction.createdBy._id;
-
-        payload = {
-          items: [
-            {
-              itemName: isBalanceAddition
-                ? "Balance Addition"
-                : "Balance Removal",
-              price: newAmount,
-            },
-          ],
-          sharedUsers: [userIdToAdjust],
-          totalPrice: isBalanceRemoval ? -newAmount : newAmount,
-        };
-      } else {
-        payload = {
-            items: items.map(item => ({
-                itemName: item.itemName,
-                price: parseFloat(item.price)
-            }))
-        }
-      }
-
       await axios.put(
         `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
-        payload,
+        {
+          items: items.map(item => ({
+            itemName: item.itemName,
+            price: parseFloat(item.price)
+          }))
+        },
         { withCredentials: true }
       );
 
-      setSuccess("Transaction updated successfully!");
-      setTimeout(() => navigate("/shopping-details"), 1500);
+      navigate("/shopping-details");
     } catch (err) {
       setError(err.response?.data?.message || "Error updating transaction");
-    } finally {
-        setLoading(prev => ({ ...prev, submit: false }));
+      setSubmitting(false);
     }
   };
 
-  if (loading.transaction || authLoading) {
+  if (loading || authLoading) {
     return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="flex flex-col items-center p-8 glass-card">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary-500 mb-4"></div>
-          <p className="text-neutral-300 text-[length:var(--font-size-lg)] font-medium animate-pulse">Loading...</p>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <div className="w-12 h-12 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p className="text-slate-400">Loading...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="w-full max-w-4xl mx-auto">
-      <div className="glass-card p-8 md:p-12 shadow-neon-cyan animate-in slide-in-from-bottom relative overflow-hidden">
-        {/* Background Glow */}
-        <div className="absolute top-0 right-0 w-64 h-64 bg-secondary-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-
-        <div className="text-center mb-10 relative z-10">
-          <h2 className="text-[length:var(--font-size-3xl)] md:text-[length:var(--font-size-4xl)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-secondary-300 mb-2">
+    <div className="min-h-screen py-12 px-4">
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-2">
+          <h1 className="text-4xl font-bold text-gradient-primary">
             Edit Transaction
-          </h2>
-          <p className="text-neutral-400 text-[length:var(--font-size-lg)]">Update the details of your transaction</p>
+          </h1>
+          <p className="text-slate-400">
+            Update transaction details
+          </p>
         </div>
 
-        {error && (
-          <div className="glass-liquid border-l-4 border-rose-500 text-rose-300 p-4 mb-8 rounded-r-lg shadow-sm font-medium flex items-center animate-in fade-in relative z-10 backdrop-blur-sm">
-            <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-            {error}
-          </div>
-        )}
+        {/* Main Card */}
+        <div className="glass-card p-6 md:p-8 space-y-6 animate-in slide-in-from-bottom">
+          {error && (
+            <div className="alert-error animate-in flex items-center gap-3">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span>{error}</span>
+            </div>
+          )}
 
-        {success && (
-          <div className="glass-liquid border-l-4 border-emerald-500 text-emerald-300 p-4 mb-8 rounded-r-lg shadow-sm font-medium flex items-center animate-in fade-in relative z-10 backdrop-blur-sm">
-            <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
-            {success}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="space-y-6 animate-in fade-in">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
-              <div className="flex justify-between items-center px-1">
-                <label className="text-lg font-bold text-white">Items</label>
+              <div className="flex justify-between items-center">
+                <label className="text-lg font-semibold">Items</label>
                 <button
                   type="button"
                   onClick={addItem}
-                  className="text-sm font-bold text-primary-400 hover:text-primary-300 flex items-center gap-1 transition-colors bg-primary-500/10 px-3 py-1.5 rounded-lg border border-primary-500/20 hover:bg-primary-500/20"
+                  className="btn-ghost text-sm"
                 >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                  Add Item
+                  + Add Item
                 </button>
               </div>
               
-              <div className="space-y-3">
-                {items.map((item, index) => (
-                  <div key={index} className="flex gap-3 items-start group">
-                    <div className="flex-grow space-y-1">
-                      <input
-                        type="text"
-                        value={item.itemName}
-                        onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
-                        className="input-field"
-                        placeholder="Item name (e.g., Rice)"
-                        required
-                      />
-                    </div>
-                    <div className="w-32 space-y-1">
-                      <input
-                        type="number"
-                        value={item.price}
-                        onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                        className="input-field text-right"
-                        placeholder="0.00"
-                        required
-                        min="0"
-                        step="0.01"
-                      />
-                    </div>
-                    {items.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeItem(index)}
-                        className="mt-1 p-3 text-neutral-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/20"
-                        title="Remove item"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                      </button>
-                    )}
-                  </div>
-                ))}
-              </div>
-              
-              <div className="flex justify-end items-center pt-4 border-t border-white/10 mt-4">
-                <div className="text-right">
-                  <span className="text-neutral-400 text-sm mr-3 font-medium">Total Amount</span>
-                  <span className="text-[length:var(--font-size-2xl)] font-bold text-accent-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
-                    {items.reduce((acc, item) => acc + parseFloat(item.price || 0), 0).toFixed(2)} <span className="text-sm text-neutral-500 font-normal">tk</span>
-                  </span>
+              {items.map((item, index) => (
+                <div key={index} className="flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Item name"
+                    value={item.itemName}
+                    onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
+                    className="input-field flex-1"
+                    required
+                  />
+                  <input
+                    type="number"
+                    placeholder="Price"
+                    value={item.price}
+                    onChange={(e) => handleItemChange(index, "price", e.target.value)}
+                    className="input-field w-32"
+                    required
+                    min="0"
+                    step="0.01"
+                  />
+                  {items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeItem(index)}
+                      className="p-3 text-error-400 hover:bg-error-500/10 rounded-lg transition-all"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
+                  )}
                 </div>
+              ))}
+
+              <div className="flex justify-end items-baseline gap-2 pt-4 border-t border-white/10">
+                <span className="text-slate-400">Total:</span>
+                <span className="text-2xl font-bold text-gradient-primary">
+                  ৳{calculateTotal().toFixed(2)}
+                </span>
               </div>
             </div>
-          </div>
 
-          <div className="pt-6 border-t border-white/10 flex gap-4">
-            <button
-              type="button"
-              onClick={() => navigate("/shopping-details")}
-              className="flex-1 btn-secondary"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading.submit}
-              className="flex-1 btn-primary"
-            >
-              {loading.submit ? "Updating..." : "Update Transaction"}
-            </button>
-          </div>
-        </form>
+            <div className="flex gap-3 pt-4">
+              <button
+                type="button"
+                onClick={() => navigate("/shopping-details")}
+                className="flex-1 btn-secondary"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                disabled={submitting}
+                className="flex-1 btn-primary"
+              >
+                {submitting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <span className="spinner"></span>
+                    Saving...
+                  </span>
+                ) : (
+                  "Save Changes"
+                )}
+              </button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
   );

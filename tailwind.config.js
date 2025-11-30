@@ -7,44 +7,54 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary - Deep Space (Backgrounds)
+        border: "rgba(255, 255, 255, 0.1)",
+        // Professional Blue-Violet Palette
         primary: {
-          50: '#f5f3ff',
-          100: '#ede9fe',
-          200: '#ddd6fe',
-          300: '#c4b5fd',
-          400: '#a78bfa',
-          500: '#8b5cf6',
-          600: '#7c3aed',
-          700: '#6d28d9',
-          800: '#5b21b6',
-          900: '#4c1d95',
-          950: '#000000', // Pure Black for Deep Space
+          50: '#eff6ff',
+          100: '#dbeafe',
+          200: '#bfdbfe',
+          300: '#93c5fd',
+          400: '#60a5fa',
+          500: '#3b82f6',
+          600: '#2563eb',
+          700: '#1d4ed8',
+          800: '#1e40af',
+          900: '#1e3a8a',
+          950: '#172554',
         },
-        // Secondary - Electric Violet/Blue (Brand)
         secondary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#faf5ff',
+          100: '#f3e8ff',
+          200: '#e9d5ff',
+          300: '#d8b4fe',
+          400: '#c084fc',
+          500: '#a855f7',
+          600: '#9333ea',
+          700: '#7e22ce',
+          800: '#6b21a8',
+          900: '#581c87',
+          950: '#3b0764',
         },
-        // Accents - Neon & Deep Space Glows
-        accent: {
-          cyan: '#22d3ee',    // Electric Cyan
-          magenta: '#e879f9', // Neon Purple
-          lime: '#a3e635',    // Alien Green
-          orange: '#fb923c',  // Solar Flare
-          pink: '#f472b6',    // Nebula Pink
-          purple: '#c084fc',  // Deep Void Purple
+        // Semantic Colors
+        success: {
+          50: '#f0fdf4',
+          500: '#10b981',
+          600: '#059669',
+          700: '#047857',
         },
-        // Neutral - Cool Greys for text
+        error: {
+          50: '#fef2f2',
+          500: '#ef4444',
+          600: '#dc2626',
+          700: '#b91c1c',
+        },
+        warning: {
+          50: '#fffbeb',
+          500: '#f59e0b',
+          600: '#d97706',
+          700: '#b45309',
+        },
+        // Neutral Grays
         neutral: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -60,30 +70,42 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        display: ['Outfit', 'system-ui', '-apple-system', 'sans-serif'],
       },
       boxShadow: {
-        'neon-blue': '0 0 5px theme("colors.blue.400"), 0 0 20px theme("colors.blue.700")',
-        'neon-purple': '0 0 5px theme("colors.purple.400"), 0 0 20px theme("colors.purple.700")',
-        'neon-cyan': '0 0 5px theme("colors.cyan.400"), 0 0 20px theme("colors.cyan.700")',
-        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'glass-sm': '0 4px 16px 0 rgba(31, 38, 135, 0.37)',
+        'glow-blue': '0 0 20px rgba(59, 130, 246, 0.3)',
+        'glow-purple': '0 0 20px rgba(139, 92, 246, 0.3)',
+        'glow-cyan': '0 0 20px rgba(6, 182, 212, 0.3)',
+        'soft': '0 2px 8px -2px rgba(0, 0, 0, 0.2), 0 1px 4px -1px rgba(0, 0, 0, 0.1)',
+        'medium': '0 4px 12px -2px rgba(0, 0, 0, 0.3), 0 2px 6px -1px rgba(0, 0, 0, 0.2)',
+        'large': '0 8px 24px -4px rgba(0, 0, 0, 0.4), 0 4px 12px -2px rgba(0, 0, 0, 0.3)',
       },
       animation: {
-        'float': 'float 6s ease-in-out infinite',
-        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-        'spin-slow': 'spin 8s linear infinite',
+        'fade-in': 'fadeIn 0.4s ease-out',
+        'slide-in-bottom': 'slideInFromBottom 0.5s ease-out',
+        'slide-in-top': 'slideInFromTop 0.5s ease-out',
+        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
       },
       keyframes: {
-        float: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        slideInFromBottom: {
+          '0%': { opacity: '0', transform: 'translateY(20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideInFromTop: {
+          '0%': { opacity: '0', transform: 'translateY(-20px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
         },
       },
-      backgroundImage: {
-        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-pattern': "url('/assets/grid.svg')", // Assuming you might add a grid pattern later
+      transitionDuration: {
+        '400': '400ms',
+      },
+      transitionTimingFunction: {
+        'smooth': 'cubic-bezier(0.4, 0, 0.2, 1)',
       },
     },
   },
