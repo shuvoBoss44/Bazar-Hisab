@@ -310,17 +310,17 @@ function UploadTransaction() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {users.map((u) => (
                         <button
-                          key={u._id}
+                          key={u.id}
                           type="button"
-                          onClick={() => toggleUserSelection(u._id)}
+                          onClick={() => toggleUserSelection(u.id)}
                           className={`group flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200 text-left relative overflow-hidden ${
-                            selectedUsers.includes(u._id)
+                            selectedUsers.includes(u.id)
                               ? "border-primary-500 bg-primary-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
                               : "border-white/5 bg-neutral-900/40 hover:border-white/20 hover:bg-white/5"
                           }`}
                         >
                           <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white transition-transform group-hover:scale-110 ${
-                            selectedUsers.includes(u._id)
+                            selectedUsers.includes(u.id)
                               ? "bg-gradient-to-br from-primary-500 to-secondary-500"
                               : "bg-neutral-800"
                           }`}>
@@ -328,13 +328,13 @@ function UploadTransaction() {
                           </div>
                           <div className="flex-1 min-w-0">
                             <p className={`font-medium text-sm truncate ${
-                              selectedUsers.includes(u._id) ? "text-white" : "text-slate-300"
+                              selectedUsers.includes(u.id) ? "text-white" : "text-slate-300"
                             }`}>
                               {u.name}
                             </p>
                             <p className="text-xs text-slate-500 truncate">{u.email}</p>
                           </div>
-                          {selectedUsers.includes(u._id) && (
+                          {selectedUsers.includes(u.id) && (
                             <div className="absolute top-2 right-2">
                               <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse"></div>
                             </div>

@@ -16,6 +16,8 @@ function ShoppingDetails() {
   const navigate = useNavigate();
   const limit = 10;
 
+  const [users, setUsers] = useState([]);
+
   const fetchData = useCallback(async () => {
     if (!user) {
       navigate("/login");
@@ -24,6 +26,8 @@ function ShoppingDetails() {
 
     try {
       setLoadingTransactions(true);
+      
+      // Fetch transactions
       const transactionResponse = await axios.get(
         `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
@@ -32,6 +36,16 @@ function ShoppingDetails() {
       setTransactions(data.transactions || []);
       setCentralBalance(data.centralBalance || 0);
       setTotalPages(data.totalPages || 1);
+
+      // Fetch all users for balance display
+      const usersResponse = await axios.get(
+        "https://bazar-hisab-backend.onrender.com/api/users",
+        { withCredentials: true }
+      );
+      // Handle different response structures (array direct or inside data object)
+      const usersData = usersResponse.data.data;
+      setUsers(Array.isArray(usersData) ? usersData : usersData?.users || []);
+
     } catch (err) {
       if (err.response?.status === 401) {
         navigate("/login");
@@ -115,12 +129,30 @@ function ShoppingDetails() {
           </div>
         )}
 
-        {/* Balance Card */}
-        <div className="glass-card p-6 md:p-8 text-center">
-          <p className="text-slate-400 text-sm mb-2">Central Pool Balance</p>
-          <p className={`text-4xl md:text-5xl font-bold ${centralBalance >= 0 ? 'text-success-500' : 'text-error-500'}`}>
-            ৳{centralBalance.toFixed(2)}
-          </p>
+        {/* Balances Section */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Central Pool Balance */}
+          <div className="glass-card p-6 text-center lg:col-span-4 bg-gradient-to-br from-neutral-900/80 to-neutral-900/40 border-primary-500/20">
+            <p className="text-slate-400 text-sm mb-2 uppercase tracking-wider font-semibold">Central Pool Balance</p>
+            <p className={`text-4xl md:text-5xl font-bold ${centralBalance >= 0 ? 'text-success-500' : 'text-error-500'}`}>
+              ৳{centralBalance.toFixed(2)}
+            </p>
+          </div>
+
+          {/* Individual User Balances */}
+          {users.map((u) => (
+            <div key={u._id} className="glass-card p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-lg font-bold text-white flex-shrink-0">
+                {u.name.charAt(0).toUpperCase()}
+              </div>
+              <div className="min-w-0">
+                <p className="font-semibold text-white truncate">{u.name}</p>
+                <p className={`text-lg font-bold ${(u.balance ?? 0) >= 0 ? 'text-success-400' : 'text-error-400'}`}>
+                  ৳{(u.balance ?? 0).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Transactions */}
@@ -179,12 +211,13 @@ function ShoppingDetails() {
                               ৳{transaction.totalPrice?.toFixed(2)}
                             </p>
                           </div>
-                          {transaction.createdBy?._id === user.id && (
+                          {/* Only show actions if user is creator AND it is the latest transaction */}
+                          {transaction.createdBy?._id === user.id && page === 1 && idx === 0 && (
                             <div className="flex gap-2">
                               <button
                                 onClick={() => navigate(`/edit-transaction/${transaction._id}`)}
                                 className="p-2 hover:bg-primary-500/10 rounded-lg transition-colors"
-                                title="Edit"
+                                title="Edit (Latest Only)"
                               >
                                 <svg className="w-5 h-5 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -193,7 +226,7 @@ function ShoppingDetails() {
                               <button
                                 onClick={() => handleDelete(transaction._id)}
                                 className="p-2 hover:bg-error-500/10 rounded-lg transition-colors"
-                                title="Delete"
+                                title="Delete (Latest Only)"
                               >
                                 <svg className="w-5 h-5 text-error-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
