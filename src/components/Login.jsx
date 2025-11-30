@@ -24,7 +24,7 @@ function Login() {
         { withCredentials: true }
       );
 
-      if (res.data.success) {
+      if (res.data.status === "success") {
         login(res.data.data.user);
         navigate("/shopping-details");
       }

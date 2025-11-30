@@ -33,7 +33,7 @@ function Register() {
         { withCredentials: true }
       );
 
-      if (res.data.success) {
+      if (res.data.status === "success") {
         setSuccess("Account created successfully! Redirecting...");
         login(res.data.data.user);
         setTimeout(() => navigate("/shopping-details"), 1500);
