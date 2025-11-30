@@ -21,9 +21,8 @@ function Navbar() {
     setMobileMenuOpen(false);
   }, [location.pathname]);
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
+  const handleLogout = async () => {
+    await logout();
   };
 
   const isActive = (path) => location.pathname === path;

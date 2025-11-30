@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
-  const API_URL = "https://bazar-hisab-backend.onrender.com";
+  const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
 
   const checkAuth = useCallback(async () => {
     try {
