@@ -31,9 +31,11 @@ function Profile() {
             "https://bazar-hisab-backend.onrender.com/api/users/me",
             { withCredentials: true }
           );
-          setBalance(response.data.data.balance);
+          // Balance should be from response.data.data.user.balance
+          setBalance(response.data.data?.user?.balance ?? response.data.data?.balance ?? 0);
         } catch (err) {
           console.error("Error fetching balance:", err);
+          setBalance(0);
         } finally {
           setLoading(false);
         }

@@ -165,8 +165,8 @@ function ShoppingDetails() {
                       const isExpanded = expandedTransaction === transaction._id;
 
                       return (
-                        <React.Fragment key={transaction._id}>
-                          <tr className="hover:bg-white/5 transition-colors">
+                        <>
+                          <tr key={transaction._id} className="hover:bg-white/5 transition-colors">
                             <td className="px-6 py-4 text-sm text-slate-300">
                               {new Date(transaction.createdAt).toLocaleDateString()}
                               <br />
@@ -263,7 +263,7 @@ function ShoppingDetails() {
                               </td>
                             </tr>
                           )}
-                        </React.Fragment>
+                        </>
                       );
                     })}
                   </tbody>
