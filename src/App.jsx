@@ -33,7 +33,7 @@ function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="flex flex-col min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-primary-500/30 selection:text-primary-200">
+        <div className="flex flex-col min-h-screen text-neutral-100 font-sans selection:bg-primary-500/30 selection:text-primary-200">
           <Navbar />
           <main className="flex-grow py-8 pt-24 w-full">
             <div className="container-fluid">

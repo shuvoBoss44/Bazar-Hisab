@@ -32,7 +32,7 @@ function Navbar() {
     <nav 
       className={`fixed w-full top-0 left-0 z-50 transition-all duration-500 border-b ${
         scrolled 
-          ? "bg-neutral-950/60 backdrop-blur-3xl border-white/5 shadow-lg" 
+          ? "bg-black/80 backdrop-blur-3xl border-white/5 shadow-2xl" 
           : "bg-transparent border-transparent"
       }`}
     >
@@ -40,7 +40,7 @@ function Navbar() {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:scale-105 transition-transform duration-300">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-600 to-secondary-600 flex items-center justify-center shadow-[0_0_20px_rgba(124,58,237,0.3)] group-hover:scale-105 transition-transform duration-300">
               <span className="text-white font-bold text-xl">B</span>
             </div>
             <span className="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-secondary-200 transition-all">
@@ -53,9 +53,9 @@ function Navbar() {
             <div className="hidden md:flex items-center gap-2">
               <Link 
                 to="/shopping-details" 
-                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
                   isActive("/shopping-details") || isActive("/") 
-                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    ? "bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-md border border-white/10" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -63,9 +63,9 @@ function Navbar() {
               </Link>
               <Link 
                 to="/upload-transaction" 
-                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
                   isActive("/upload-transaction") 
-                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    ? "bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-md border border-white/10" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -73,9 +73,9 @@ function Navbar() {
               </Link>
               <Link 
                 to="/profile" 
-                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                className={`px-5 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
                   isActive("/profile") 
-                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    ? "bg-white/10 text-white shadow-[0_0_15px_rgba(255,255,255,0.1)] backdrop-blur-md border border-white/10" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -94,7 +94,7 @@ function Navbar() {
                 </div>
                 <button 
                   onClick={handleLogout}
-                  className="px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all hover:shadow-lg hover:shadow-rose-900/20 backdrop-blur-sm"
+                  className="px-5 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all hover:shadow-[0_0_20px_rgba(244,63,94,0.2)] backdrop-blur-sm"
                 >
                   Logout
                 </button>
@@ -103,13 +103,13 @@ function Navbar() {
               <div className="flex items-center gap-3">
                 <Link 
                   to="/login"
-                  className="px-6 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium text-white hover:bg-white/5 transition-all"
+                  className="px-6 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-medium text-white hover:bg-white/5 transition-all"
                 >
                   Login
                 </Link>
                 <Link 
                   to="/register"
-                  className="px-6 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium bg-white text-neutral-950 hover:bg-neutral-200 transition-all shadow-lg shadow-white/10"
+                  className="px-6 py-2.5 rounded-2xl text-[length:var(--font-size-base)] font-bold bg-white text-black hover:bg-neutral-200 transition-all shadow-[0_0_20px_rgba(255,255,255,0.3)]"
                 >
                   Sign Up
                 </Link>
@@ -136,15 +136,15 @@ function Navbar() {
         <div className="p-4 space-y-2">
           {user ? (
             <>
-              <div className="p-4 rounded-xl bg-white/5 mb-4 border border-white/5">
+              <div className="p-4 rounded-2xl bg-white/5 mb-4 border border-white/5">
                 <p className="text-[length:var(--font-size-base)] font-medium text-white">{user.name}</p>
                 <p className="text-xs text-neutral-400">{user.email}</p>
               </div>
               <Link 
                 to="/shopping-details" 
-                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                className={`block px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium ${
                   isActive("/shopping-details") || isActive("/") 
-                    ? "bg-primary-600/20 text-primary-400" 
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -152,9 +152,9 @@ function Navbar() {
               </Link>
               <Link 
                 to="/upload-transaction" 
-                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                className={`block px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium ${
                   isActive("/upload-transaction") 
-                    ? "bg-primary-600/20 text-primary-400" 
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -162,9 +162,9 @@ function Navbar() {
               </Link>
               <Link 
                 to="/profile" 
-                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                className={`block px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium ${
                   isActive("/profile") 
-                    ? "bg-primary-600/20 text-primary-400" 
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20" 
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -172,7 +172,7 @@ function Navbar() {
               </Link>
               <button 
                 onClick={handleLogout}
-                className="w-full text-left px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
+                className="w-full text-left px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
               >
                 Logout
               </button>
@@ -181,13 +181,13 @@ function Navbar() {
             <div className="grid grid-cols-2 gap-4 p-2">
               <Link 
                 to="/login"
-                className="flex justify-center px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium text-white bg-white/5 border border-white/10"
+                className="flex justify-center px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium text-white bg-white/5 border border-white/10"
               >
                 Login
               </Link>
               <Link 
                 to="/register"
-                className="flex justify-center px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium bg-primary-600 text-white shadow-lg shadow-primary-900/50"
+                className="flex justify-center px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-bold bg-white text-black shadow-[0_0_20px_rgba(255,255,255,0.2)]"
               >
                 Sign Up
               </Link>

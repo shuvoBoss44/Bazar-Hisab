@@ -217,113 +217,72 @@ function EditTransaction() {
           </div>
         )}
 
-        <div className="mb-8 relative z-10">
-          <div className="grid grid-cols-3 gap-2 p-1 bg-neutral-900/50 rounded-xl border border-white/5">
-            <button
-              type="button"
-              disabled={isBalanceAddition || isBalanceRemoval}
-              className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                !isBalanceAddition && !isBalanceRemoval
-                  ? "bg-primary-600 text-white shadow-lg shadow-primary-900/50"
-                  : "text-neutral-500 cursor-not-allowed"
-              }`}
-            >
-              Shopping
-            </button>
-            <button
-              type="button"
-              disabled={!isBalanceAddition}
-              className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                isBalanceAddition
-                  ? "bg-accent-lime text-neutral-950 shadow-lg shadow-lime-900/50"
-                  : "text-neutral-500 cursor-not-allowed"
-              }`}
-            >
-              Add Balance
-            </button>
-            <button
-              type="button"
-              disabled={!isBalanceRemoval}
-              className={`py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 ${
-                isBalanceRemoval
-                  ? "bg-accent-pink text-white shadow-lg shadow-pink-900/50"
-                  : "text-neutral-500 cursor-not-allowed"
-              }`}
-            >
-              Remove Balance
-            </button>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
-          {!isBalanceAddition && !isBalanceRemoval ? (
+        <form onSubmit={handleSubmit} className="space-y-8">
+          <div className="space-y-6 animate-in fade-in">
             <div className="space-y-4">
-              {items.map((item, index) => (
-                <div key={index} className="flex gap-4 items-start animate-in fade-in">
-                  <div className="flex-1">
-                    <input
-                      type="text"
-                      placeholder="Item Name"
-                      value={item.itemName}
-                      onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
-                      className="input-field bg-neutral-800/50 text-[length:var(--font-size-base)]"
-                      required
-                    />
+              <div className="flex justify-between items-center px-1">
+                <label className="text-lg font-bold text-white">Items</label>
+                <button
+                  type="button"
+                  onClick={addItem}
+                  className="text-sm font-bold text-primary-400 hover:text-primary-300 flex items-center gap-1 transition-colors bg-primary-500/10 px-3 py-1.5 rounded-lg border border-primary-500/20 hover:bg-primary-500/20"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
+                  Add Item
+                </button>
+              </div>
+              
+              <div className="space-y-3">
+                {items.map((item, index) => (
+                  <div key={index} className="flex gap-3 items-start group">
+                    <div className="flex-grow space-y-1">
+                      <input
+                        type="text"
+                        value={item.itemName}
+                        onChange={(e) => handleItemChange(index, "itemName", e.target.value)}
+                        className="input-field"
+                        placeholder="Item name (e.g., Rice)"
+                        required
+                      />
+                    </div>
+                    <div className="w-32 space-y-1">
+                      <input
+                        type="number"
+                        value={item.price}
+                        onChange={(e) => handleItemChange(index, "price", e.target.value)}
+                        className="input-field text-right"
+                        placeholder="0.00"
+                        required
+                        min="0"
+                        step="0.01"
+                      />
+                    </div>
+                    {items.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removeItem(index)}
+                        className="mt-1 p-3 text-neutral-500 hover:text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all border border-transparent hover:border-rose-500/20"
+                        title="Remove item"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                      </button>
+                    )}
                   </div>
-                  <div className="w-32">
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={item.price}
-                      onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                      className="input-field bg-neutral-800/50 text-[length:var(--font-size-base)]"
-                      required
-                      min="0"
-                      step="0.01"
-                    />
-                  </div>
-                  {items.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => removeItem(index)}
-                      className="p-3.5 text-rose-400 hover:bg-rose-900/20 rounded-xl transition-colors border border-transparent hover:border-rose-500/30"
-                    >
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                    </button>
-                  )}
+                ))}
+              </div>
+              
+              <div className="flex justify-end items-center pt-4 border-t border-white/10 mt-4">
+                <div className="text-right">
+                  <span className="text-neutral-400 text-sm mr-3 font-medium">Total Amount</span>
+                  <span className="text-[length:var(--font-size-2xl)] font-bold text-accent-cyan drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]">
+                    {items.reduce((acc, item) => acc + parseFloat(item.price || 0), 0).toFixed(2)} <span className="text-sm text-neutral-500 font-normal">tk</span>
+                  </span>
                 </div>
-              ))}
-              <button
-                type="button"
-                onClick={addItem}
-                className="w-full py-3 border border-dashed border-neutral-700 rounded-xl text-neutral-400 font-medium hover:border-primary-500 hover:text-primary-400 hover:bg-primary-500/5 transition-all flex items-center justify-center gap-2"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" /></svg>
-                Add Another Item
-              </button>
-            </div>
-          ) : (
-            <div className="animate-in fade-in">
-              <label className="block text-sm font-medium text-neutral-300 mb-2">
-                Amount to {isBalanceAddition ? "Add" : "Remove"}
-              </label>
-              <div className="relative">
-                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 font-medium">tk</span>
-                <input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  className="input-field pl-10 text-lg font-medium"
-                  placeholder="0.00"
-                  required
-                  min="0"
-                  step="0.01"
-                />
               </div>
             </div>
-          )}
+          </div>
 
-          <div className="pt-6 flex gap-4">
+          <div className="pt-6 border-t border-white/10 flex gap-4">
             <button
               type="button"
               onClick={() => navigate("/shopping-details")}

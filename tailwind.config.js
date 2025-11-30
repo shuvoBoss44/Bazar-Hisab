@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary - Deep Navy/Black (Backgrounds)
+        // Primary - Deep Space (Backgrounds)
         primary: {
           50: '#f5f3ff',
           100: '#ede9fe',
@@ -19,31 +19,32 @@ export default {
           700: '#6d28d9',
           800: '#5b21b6',
           900: '#4c1d95',
-          950: '#020617', // Main background
+          950: '#000000', // Pure Black for Deep Space
         },
-        // Secondary - Electric Violet (Primary Brand Color)
+        // Secondary - Electric Violet/Blue (Brand)
         secondary: {
-          50: '#f0fdfa',
-          100: '#ccfbf1',
-          200: '#99f6e4',
-          300: '#5eead4',
-          400: '#2dd4bf',
-          500: '#14b8a6',
-          600: '#0d9488',
-          700: '#0f766e',
-          800: '#115e59',
-          900: '#134e4a',
-          950: '#042f2e',
+          50: '#f0f9ff',
+          100: '#e0f2fe',
+          200: '#bae6fd',
+          300: '#7dd3fc',
+          400: '#38bdf8',
+          500: '#0ea5e9',
+          600: '#0284c7',
+          700: '#0369a1',
+          800: '#075985',
+          900: '#0c4a6e',
+          950: '#082f49',
         },
-        // Accents - Neon Colors
+        // Accents - Neon & Deep Space Glows
         accent: {
-          cyan: '#06b6d4',
-          magenta: '#d946ef',
-          lime: '#84cc16',
-          orange: '#f97316',
-          pink: '#ec4899',
+          cyan: '#22d3ee',    // Electric Cyan
+          magenta: '#e879f9', // Neon Purple
+          lime: '#a3e635',    // Alien Green
+          orange: '#fb923c',  // Solar Flare
+          pink: '#f472b6',    // Nebula Pink
+          purple: '#c084fc',  // Deep Void Purple
         },
-        // Neutral - Slate for text
+        // Neutral - Cool Greys for text
         neutral: {
           50: '#f8fafc',
           100: '#f1f5f9',

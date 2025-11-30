@@ -90,7 +90,7 @@ function Profile() {
   return (
     <div className="w-full">
       <div className="mb-10">
-        <h2 className="text-[length:var(--font-size-4xl)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400 tracking-tight animate-in slide-in-from-bottom">
+        <h2 className="text-[length:var(--font-size-4xl)] font-extrabold text-white tracking-tight animate-in slide-in-from-bottom drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
           My Profile
         </h2>
         <p className="text-neutral-400 mt-2 text-[length:var(--font-size-lg)]">Manage your account settings and preferences.</p>
@@ -101,8 +101,8 @@ function Profile() {
         <div className="lg:w-1/4">
           <div className="glass-card p-6 sticky top-24">
             <div className="flex flex-col items-center mb-8">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-600 to-secondary-600 p-1 mb-4 shadow-lg shadow-primary-600/20">
-                <div className="w-full h-full rounded-full bg-neutral-900 flex items-center justify-center border border-white/10">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-600 to-secondary-600 p-1 mb-4 shadow-[0_0_25px_rgba(124,58,237,0.4)]">
+                <div className="w-full h-full rounded-full bg-black flex items-center justify-center border border-white/10">
                   <span className="text-3xl font-bold text-white">{user.name.charAt(0)}</span>
                 </div>
               </div>
@@ -113,9 +113,9 @@ function Profile() {
             <nav className="space-y-2">
               <button
                 onClick={() => setActiveTab("overview")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium transition-all ${
                   activeTab === "overview"
-                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20"
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20 shadow-[0_0_15px_rgba(124,58,237,0.1)]"
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -124,9 +124,9 @@ function Profile() {
               </button>
               <button
                 onClick={() => setActiveTab("security")}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all ${
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-[length:var(--font-size-base)] font-medium transition-all ${
                   activeTab === "security"
-                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20"
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20 shadow-[0_0_15px_rgba(124,58,237,0.1)]"
                     : "text-neutral-400 hover:text-white hover:bg-white/5"
                 }`}
               >
@@ -142,12 +142,16 @@ function Profile() {
           {activeTab === "overview" && (
             <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
               {/* Balance Card */}
-              <div className="glass-liquid p-8 relative overflow-hidden group">
+              <div className="glass-liquid p-8 relative overflow-hidden group bg-gradient-to-br from-white/5 to-transparent">
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-primary-500/20 transition-all duration-700"></div>
                 <div className="relative z-10">
                   <h3 className="text-[length:var(--font-size-lg)] font-medium text-neutral-300 mb-2">Current Balance</h3>
                   <div className="flex items-baseline gap-2">
-                    <span className={`text-[length:var(--font-size-5xl)] font-bold tracking-tight ${balance < 0 ? "text-accent-pink" : "text-accent-lime"}`}>
+                    <span className={`text-[length:var(--font-size-5xl)] font-bold tracking-tight ${
+                      balance < 0 
+                        ? "text-accent-pink drop-shadow-[0_0_15px_rgba(236,72,153,0.4)]" 
+                        : "text-accent-lime drop-shadow-[0_0_15px_rgba(132,204,22,0.4)]"
+                    }`}>
                       {balance.toFixed(2)}
                     </span>
                     <span className="text-[length:var(--font-size-xl)] text-neutral-500">tk</span>
@@ -166,19 +170,19 @@ function Profile() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-neutral-400">Full Name</label>
-                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                    <div className="p-4 rounded-2xl bg-neutral-900/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
                       {user.name}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-neutral-400">Email Address</label>
-                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                    <div className="p-4 rounded-2xl bg-neutral-900/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
                       {user.email}
                     </div>
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-neutral-400">Member Since</label>
-                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                    <div className="p-4 rounded-2xl bg-neutral-900/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
                       {new Date(user.createdAt || Date.now()).toLocaleDateString(undefined, {
                         year: 'numeric',
                         month: 'long',
@@ -188,8 +192,8 @@ function Profile() {
                   </div>
                   <div className="space-y-2">
                     <label className="text-sm font-medium text-neutral-400">Account Status</label>
-                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-emerald-400 flex items-center gap-2 text-[length:var(--font-size-base)]">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                    <div className="p-4 rounded-2xl bg-neutral-900/50 border border-white/5 text-emerald-400 flex items-center gap-2 text-[length:var(--font-size-base)]">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></span>
                       Active
                     </div>
                   </div>
@@ -203,14 +207,14 @@ function Profile() {
               <h3 className="text-[length:var(--font-size-xl)] font-bold text-white mb-6">Change Password</h3>
               
               {error && (
-                <div className="bg-rose-900/20 border-l-4 border-rose-500 text-rose-300 p-4 mb-6 rounded-r-lg flex items-center">
+                <div className="bg-rose-900/20 border-l-4 border-rose-500 text-rose-300 p-4 mb-6 rounded-r-2xl flex items-center shadow-[0_0_15px_rgba(244,63,94,0.1)]">
                   <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                   {error}
                 </div>
               )}
               
               {success && (
-                <div className="bg-emerald-900/20 border-l-4 border-emerald-500 text-emerald-300 p-4 mb-6 rounded-r-lg flex items-center">
+                <div className="bg-emerald-900/20 border-l-4 border-emerald-500 text-emerald-300 p-4 mb-6 rounded-r-2xl flex items-center shadow-[0_0_15px_rgba(16,185,129,0.1)]">
                   <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
                   {success}
                 </div>

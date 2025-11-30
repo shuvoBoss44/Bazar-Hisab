@@ -66,27 +66,27 @@ function Register() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center relative overflow-hidden">
+    <div className="min-h-[80vh] flex items-center justify-center relative overflow-hidden py-10">
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-96 h-96 bg-secondary-600/20 rounded-full blur-[100px] animate-float"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px] animate-float delay-1000"></div>
-        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-accent-purple/10 rounded-full blur-[80px] animate-float delay-2000"></div>
+        <div className="absolute top-20 left-20 w-96 h-96 bg-primary-600/10 rounded-full blur-[120px] animate-float"></div>
+        <div className="absolute bottom-20 right-20 w-96 h-96 bg-secondary-500/10 rounded-full blur-[120px] animate-float delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-accent-magenta/5 rounded-full blur-[100px] animate-float delay-2000"></div>
       </div>
 
-      <div className="glass-card p-8 md:p-12 w-full max-w-md relative z-10 animate-in slide-in-from-bottom duration-700 hover:shadow-neon-purple transition-all border-white/10">
+      <div className="glass-card p-8 md:p-12 w-full max-w-md relative z-10 animate-in slide-in-from-bottom duration-700 hover:shadow-[0_0_40px_rgba(124,58,237,0.2)] transition-all border-white/10">
         {/* Header */}
         <div className="text-center mb-10">
-          <h1 className="text-[length:var(--font-size-4xl)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-secondary-200 to-primary-200 mb-3 tracking-tight">
+          <h1 className="text-[length:var(--font-size-4xl)] font-extrabold text-white mb-3 tracking-tight drop-shadow-[0_0_10px_rgba(255,255,255,0.3)]">
             Create Account
           </h1>
-          <p className="text-neutral-400 text-sm">Join us to manage your transactions</p>
+          <p className="text-neutral-400 text-sm">Join BazarHisab to manage shared expenses</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Error Message */}
           {error && (
-            <div className="glass-liquid border-l-4 border-rose-500 text-rose-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+            <div className="glass-liquid border-l-4 border-rose-500 text-rose-300 p-4 rounded-2xl text-sm flex items-center gap-3 animate-in fade-in shadow-[0_0_15px_rgba(244,63,94,0.1)]">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -95,12 +95,12 @@ function Register() {
           )}
 
           {/* Success Message */}
-          {success && (
-            <div className="glass-liquid border-l-4 border-emerald-500 text-emerald-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+          {successMessage && (
+            <div className="glass-liquid border-l-4 border-emerald-500 text-emerald-300 p-4 rounded-2xl text-sm flex items-center gap-3 animate-in fade-in shadow-[0_0_15px_rgba(16,185,129,0.1)]">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
-              <span>{success}</span>
+              <span>{successMessage}</span>
             </div>
           )}
 
@@ -116,10 +116,10 @@ function Register() {
                 </svg>
               </div>
               <input
-                id="name"
                 type="text"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                id="name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
                 className="input-field pl-12"
                 placeholder="John Doe"
@@ -139,10 +139,10 @@ function Register() {
                 </svg>
               </div>
               <input
-                id="email"
                 type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="input-field pl-12"
                 placeholder="you@example.com"
@@ -162,13 +162,13 @@ function Register() {
                 </svg>
               </div>
               <input
-                id="password"
                 type={showPassword ? "text" : "password"}
-                value={formData.password}
-                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                id="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="input-field pl-12 pr-12"
-                placeholder="At least 6 characters"
+                placeholder="Create a password"
               />
               <button
                 type="button"
@@ -190,7 +190,7 @@ function Register() {
             </div>
             
             {/* Password Strength Indicator */}
-            {formData.password && (
+            {password && (
               <div className="space-y-1 animate-in fade-in">
                 <div className="flex justify-between items-center text-xs text-neutral-400">
                   <span>Password Strength</span>
@@ -218,7 +218,7 @@ function Register() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Creating account...
+                Creating Account...
               </>
             ) : (
               <>

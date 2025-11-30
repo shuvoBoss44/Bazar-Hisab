@@ -134,28 +134,28 @@ function ShoppingDetails() {
     <div className="w-full">
       <div className="flex flex-col md:flex-row justify-between items-end mb-10 gap-6">
         <div>
-          <h2 className="text-[length:var(--font-size-4xl)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400 tracking-tight animate-in slide-in-from-bottom">
+          <h2 className="text-[length:var(--font-size-4xl)] font-extrabold text-white tracking-tight animate-in slide-in-from-bottom drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
             Transaction History
           </h2>
           <p className="text-neutral-400 mt-2 text-[length:var(--font-size-lg)]">Manage your shared expenses and balances.</p>
         </div>
         
-        <div className="glass-liquid px-8 py-6 flex flex-col items-end min-w-[280px] animate-in slide-in-from-right">
-          <span className="text-sm font-medium text-neutral-400 uppercase tracking-wider mb-1">Central Balance</span>
-          <p className="text-[length:var(--font-size-4xl)] font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white via-secondary-200 to-primary-200">
+        <div className="glass-liquid px-8 py-6 flex flex-col items-end min-w-[280px] animate-in slide-in-from-right bg-gradient-to-br from-white/5 to-transparent">
+          <span className="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-1">Central Balance</span>
+          <p className="text-[length:var(--font-size-4xl)] font-bold tracking-tight text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
             {centralBalance?.toFixed(2) ?? "0.00"} <span className="text-[length:var(--font-size-xl)] text-neutral-500 font-normal">tk</span>
           </p>
         </div>
       </div>
 
       {error && (
-        <div className="glass-liquid border-l-4 border-rose-500 text-rose-200 p-4 mb-8 flex items-center backdrop-blur-sm">
+        <div className="glass-liquid border-l-4 border-rose-500 text-rose-200 p-4 mb-8 flex items-center backdrop-blur-sm shadow-[0_0_20px_rgba(244,63,94,0.2)]">
           <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
           {error}
         </div>
       )}
       {success && (
-        <div className="glass-liquid border-l-4 border-emerald-500 text-emerald-200 p-4 mb-8 flex items-center backdrop-blur-sm">
+        <div className="glass-liquid border-l-4 border-accent-lime text-lime-200 p-4 mb-8 flex items-center backdrop-blur-sm shadow-[0_0_20px_rgba(132,204,22,0.2)]">
           <svg className="w-6 h-6 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
           {success}
         </div>
@@ -163,8 +163,8 @@ function ShoppingDetails() {
 
       {!loadingTransactions && transactions.length === 0 && (
         <div className="glass-card p-16 text-center">
-          <div className="w-24 h-24 bg-neutral-800/50 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5">
-            <svg className="w-12 h-12 text-neutral-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
+          <div className="w-24 h-24 bg-neutral-900/80 rounded-full flex items-center justify-center mx-auto mb-6 border border-white/5 shadow-[0_0_30px_rgba(255,255,255,0.05)]">
+            <svg className="w-12 h-12 text-neutral-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
           </div>
           <h3 className="text-[length:var(--font-size-2xl)] font-bold text-white mb-2">No Transactions Yet</h3>
           <p className="text-neutral-400 text-[length:var(--font-size-lg)]">
@@ -173,7 +173,7 @@ function ShoppingDetails() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 gap-6">
+      <div className="grid grid-cols-1 gap-8">
         {transactions.map((transaction) => {
           const isBalanceAddition = transaction.items[0]?.itemName === "Balance Addition";
           const isBalanceRemoval = transaction.items[0]?.itemName === "Balance Removal";
@@ -182,17 +182,17 @@ function ShoppingDetails() {
           return (
             <div
               key={transaction._id}
-              className={`glass-card overflow-hidden hover:shadow-neon-cyan transition-all duration-500 group ${getBorderClass(transaction)}`}
+              className={`glass-card overflow-hidden hover:shadow-[0_0_40px_rgba(124,58,237,0.15)] transition-all duration-500 group ${getBorderClass(transaction)}`}
             >
               <div className="p-6 md:p-8 flex flex-col lg:flex-row gap-8">
                 {/* Header Section */}
                 <div className="lg:w-1/4 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5 pb-6 lg:pb-0 lg:pr-8">
                   <div>
                     <div className="flex items-center gap-4 mb-4">
-                      <div className={`p-3.5 rounded-2xl ${
-                        isBalanceAddition ? "bg-accent-lime/10 text-accent-lime" :
-                        isBalanceRemoval ? "bg-accent-pink/10 text-accent-pink" :
-                        "bg-accent-cyan/10 text-accent-cyan"
+                      <div className={`p-4 rounded-2xl shadow-lg ${
+                        isBalanceAddition ? "bg-accent-lime/10 text-accent-lime shadow-lime-900/20" :
+                        isBalanceRemoval ? "bg-accent-pink/10 text-accent-pink shadow-pink-900/20" :
+                        "bg-accent-cyan/10 text-accent-cyan shadow-cyan-900/20"
                       }`}>
                         {isBalanceAddition && <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>}
                         {isBalanceRemoval && <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 12H4" /></svg>}
@@ -202,7 +202,7 @@ function ShoppingDetails() {
                         <h3 className="text-[length:var(--font-size-xl)] font-bold text-white leading-tight">
                           {getTransactionTitle(transaction)}
                         </h3>
-                        <p className="text-sm text-neutral-400 mt-1">
+                        <p className="text-sm text-neutral-400 mt-1 font-medium">
                           {new Date(transaction.createdAt).toLocaleString(undefined, {
                             dateStyle: 'medium',
                             timeStyle: 'short'
@@ -212,10 +212,10 @@ function ShoppingDetails() {
                     </div>
                     
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="h-8 w-8 rounded-full bg-neutral-800 flex items-center justify-center text-xs font-bold text-neutral-400 border border-white/10">
+                      <div className="h-10 w-10 rounded-full bg-neutral-800 flex items-center justify-center text-sm font-bold text-neutral-300 border border-white/10 shadow-inner">
                         {transaction.createdBy.name.charAt(0)}
                       </div>
-                      <span className="text-neutral-300 font-medium">{transaction.createdBy.name}</span>
+                      <span className="text-neutral-200 font-semibold">{transaction.createdBy.name}</span>
                     </div>
                   </div>
 
@@ -223,13 +223,13 @@ function ShoppingDetails() {
                     <div className="flex gap-3 mt-auto">
                       <button
                         onClick={() => navigate(`/edit-transaction/${transaction._id}`)}
-                        className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-semibold text-neutral-300 transition-all"
+                        className="flex-1 px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 rounded-xl text-sm font-bold text-neutral-300 transition-all hover:text-white"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDelete(transaction._id)}
-                        className="flex-1 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-xl text-sm font-semibold text-rose-400 transition-all"
+                        className="flex-1 px-4 py-2 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 rounded-xl text-sm font-bold text-rose-400 transition-all hover:text-rose-300"
                       >
                         Delete
                       </button>
@@ -240,23 +240,23 @@ function ShoppingDetails() {
                 {/* Content Section */}
                 <div className="lg:w-3/4 flex flex-col gap-8">
                   {(isBalanceAddition || isBalanceRemoval) ? (
-                    <div className="glass-liquid p-6 md:p-8">
+                    <div className="glass-liquid p-8 bg-gradient-to-br from-white/5 to-transparent">
                       <div className="flex flex-col md:flex-row justify-between items-center gap-6">
                         <div className="text-center md:text-left">
-                          <p className="text-neutral-400 text-sm uppercase tracking-wider font-medium mb-2">Amount</p>
-                          <p className={`text-[length:var(--font-size-4xl)] md:text-[length:var(--font-size-5xl)] font-bold ${isBalanceAddition ? "text-accent-lime" : "text-accent-pink"}`}>
+                          <p className="text-neutral-400 text-sm uppercase tracking-widest font-bold mb-2">Amount</p>
+                          <p className={`text-[length:var(--font-size-4xl)] md:text-[length:var(--font-size-5xl)] font-bold ${isBalanceAddition ? "text-accent-lime drop-shadow-[0_0_10px_rgba(132,204,22,0.4)]" : "text-accent-pink drop-shadow-[0_0_10px_rgba(236,72,153,0.4)]"}`}>
                             {isBalanceAddition ? "+" : "−"}{Math.abs(transaction.totalPrice ?? 0).toFixed(2)} <span className="text-[length:var(--font-size-2xl)] text-neutral-500 font-normal">tk</span>
                           </p>
                         </div>
-                        <div className="w-full md:w-auto bg-neutral-950/30 rounded-2xl p-6 min-w-[250px]">
+                        <div className="w-full md:w-auto bg-black/40 rounded-2xl p-6 min-w-[280px] border border-white/5">
                           <div className="flex justify-between items-center mb-2">
-                            <span className="text-neutral-400 text-sm">Previous Balance</span>
-                            <span className="text-neutral-300 font-mono">{transaction.userBalanceBeforeTransaction?.toFixed(2)}</span>
+                            <span className="text-neutral-400 text-sm font-medium">Previous Balance</span>
+                            <span className="text-neutral-300 font-mono font-bold">{transaction.userBalanceBeforeTransaction?.toFixed(2)}</span>
                           </div>
                           <div className="w-full h-px bg-white/10 my-3"></div>
                           <div className="flex justify-between items-center">
-                            <span className="text-white font-medium">New Balance</span>
-                            <span className={`font-bold font-mono ${
+                            <span className="text-white font-bold">New Balance</span>
+                            <span className={`font-bold font-mono text-lg ${
                               (transaction.createdBy?.balance ?? 0) < 0 ? "text-accent-pink" : "text-accent-lime"
                             }`}>
                               {transaction.createdBy?.balance?.toFixed(2)}
@@ -268,29 +268,29 @@ function ShoppingDetails() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {/* Items List */}
-                      <div className="glass-liquid p-6">
-                        <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-accent-cyan"></span>
+                      <div className="glass-liquid p-6 bg-gradient-to-br from-white/5 to-transparent">
+                        <h4 className="font-bold text-white mb-4 flex items-center gap-2 text-lg">
+                          <span className="w-2 h-2 rounded-full bg-accent-cyan shadow-[0_0_10px_rgba(34,211,238,0.8)]"></span>
                           Purchased Items
                         </h4>
                         <div className="space-y-3">
                           {transaction.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
-                              <span className="text-neutral-300 text-[length:var(--font-size-base)]">{item.itemName}</span>
-                              <span className="text-white font-mono font-medium">{item.price?.toFixed(2)}</span>
+                              <span className="text-neutral-300 text-[length:var(--font-size-base)] font-medium">{item.itemName}</span>
+                              <span className="text-white font-mono font-bold">{item.price?.toFixed(2)}</span>
                             </div>
                           ))}
                         </div>
                         <div className="mt-4 pt-4 border-t border-white/10 flex justify-between items-center">
-                          <span className="text-neutral-400 font-medium">Total</span>
-                          <span className="text-[length:var(--font-size-xl)] font-bold text-accent-cyan">{transaction.totalPrice?.toFixed(2)} tk</span>
+                          <span className="text-neutral-400 font-bold">Total</span>
+                          <span className="text-[length:var(--font-size-xl)] font-bold text-accent-cyan drop-shadow-[0_0_8px_rgba(34,211,238,0.5)]">{transaction.totalPrice?.toFixed(2)} tk</span>
                         </div>
                       </div>
 
                       {/* Split Details */}
-                      <div className="glass-liquid p-6">
-                        <h4 className="font-semibold text-white mb-4 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-accent-pink"></span>
+                      <div className="glass-liquid p-6 bg-gradient-to-br from-white/5 to-transparent">
+                        <h4 className="font-bold text-white mb-4 flex items-center gap-2 text-lg">
+                          <span className="w-2 h-2 rounded-full bg-accent-pink shadow-[0_0_10px_rgba(236,72,153,0.8)]"></span>
                           Split Details
                         </h4>
                         <div className="space-y-3">
@@ -310,12 +310,12 @@ function ShoppingDetails() {
                             return (
                               <div key={sharedUserObj._id} className="flex justify-between items-center py-2 border-b border-white/5 last:border-0">
                                 <div>
-                                  <div className="text-neutral-300 text-[length:var(--font-size-base)]">{sharedUserObj.name}</div>
-                                  <div className="text-xs text-neutral-500">
+                                  <div className="text-neutral-300 text-[length:var(--font-size-base)] font-medium">{sharedUserObj.name}</div>
+                                  <div className="text-xs text-neutral-500 font-mono mt-0.5">
                                     {displayBalanceBefore?.toFixed(2)} → <span className={afterBalance < 0 ? "text-accent-pink" : "text-accent-lime"}>{afterBalance?.toFixed(2)}</span>
                                   </div>
                                 </div>
-                                <span className="text-accent-pink font-mono font-medium">−{transaction.individualDeduction?.toFixed(2)}</span>
+                                <span className="text-accent-pink font-mono font-bold">−{transaction.individualDeduction?.toFixed(2)}</span>
                               </div>
                             );
                           })}
@@ -335,18 +335,18 @@ function ShoppingDetails() {
           <button
             onClick={() => setPage(prev => Math.max(prev - 1, 1))}
             disabled={page === 1}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
+            className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" /></svg>
             Previous
           </button>
-          <span className="text-neutral-300 font-medium bg-neutral-900/50 px-6 py-3 rounded-xl border border-white/10">
+          <span className="text-white font-bold bg-white/5 px-6 py-3 rounded-xl border border-white/10 backdrop-blur-md">
             Page {page} of {totalPages}
           </span>
           <button
             onClick={() => setPage(prev => Math.min(prev + 1, totalPages))}
             disabled={page === totalPages}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-50"
+            className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" /></svg>
