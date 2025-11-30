@@ -291,40 +291,54 @@ function UploadTransaction() {
 
                 {/* User Selection */}
                 {users.length > 0 && (
-                  <div className="space-y-4 pt-4 border-t border-white/10">
-                    <label className="text-lg font-semibold">Share with Users (Optional)</label>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div className="space-y-4 pt-6 border-t border-white/10">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <label className="text-lg font-semibold text-white">Split Expense With</label>
+                        <p className="text-sm text-slate-400">Select users to share this cost</p>
+                      </div>
+                      {selectedUsers.length > 0 && (
+                        <span className="text-sm font-medium text-primary-400 bg-primary-500/10 px-3 py-1 rounded-full">
+                          {selectedUsers.length} selected
+                        </span>
+                      )}
+                    </div>
+                    
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                       {users.map((u) => (
                         <button
                           key={u._id}
                           type="button"
                           onClick={() => toggleUserSelection(u._id)}
-                          className={`flex items-center gap-3 p-3 rounded-lg border-2 transition-all ${
+                          className={`group flex items-center gap-3 p-3 rounded-xl border-2 transition-all duration-200 text-left relative overflow-hidden ${
                             selectedUsers.includes(u._id)
-                              ? "border-primary-500 bg-primary-500/10"
-                              : "border-white/10 hover:border-white/20"
+                              ? "border-primary-500 bg-primary-500/10 shadow-[0_0_15px_rgba(59,130,246,0.15)]"
+                              : "border-white/5 bg-neutral-900/40 hover:border-white/20 hover:bg-white/5"
                           }`}
                         >
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-white font-bold">
+                          <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white transition-transform group-hover:scale-110 ${
+                            selectedUsers.includes(u._id)
+                              ? "bg-gradient-to-br from-primary-500 to-secondary-500"
+                              : "bg-neutral-800"
+                          }`}>
                             {u.name.charAt(0).toUpperCase()}
                           </div>
-                          <div className="flex-1 text-left">
-                            <p className="font-medium text-sm">{u.name}</p>
-                            <p className="text-xs text-slate-400">{u.email}</p>
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-medium text-sm truncate ${
+                              selectedUsers.includes(u._id) ? "text-white" : "text-slate-300"
+                            }`}>
+                              {u.name}
+                            </p>
+                            <p className="text-xs text-slate-500 truncate">{u.email}</p>
                           </div>
                           {selectedUsers.includes(u._id) && (
-                            <svg className="w-5 h-5 text-primary-400" fill="currentColor" viewBox="0 0 20 20">
-                              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                            </svg>
+                            <div className="absolute top-2 right-2">
+                              <div className="w-2 h-2 rounded-full bg-primary-500 shadow-[0_0_8px_rgba(59,130,246,0.8)] animate-pulse"></div>
+                            </div>
                           )}
                         </button>
                       ))}
                     </div>
-                    {selectedUsers.length > 0 && (
-                      <p className="text-sm text-slate-400">
-                        {selectedUsers.length} user(s) selected for sharing
-                      </p>
-                    )}
                   </div>
                 )}
               </div>
