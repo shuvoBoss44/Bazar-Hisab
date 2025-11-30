@@ -176,7 +176,7 @@ function ShoppingDetails() {
             </div>
           ) : (
             <div className="space-y-4">
-              {transactions.map((transaction) => {
+              {transactions.map((transaction, idx) => {
                 const isBalanceTransaction = 
                   transaction.items[0]?.itemName === "Balance Addition" || 
                   transaction.items[0]?.itemName === "Balance Removal";
