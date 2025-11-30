@@ -83,7 +83,7 @@ function UploadTransaction() {
             itemName: item.itemName,
             price: parseFloat(item.price),
           })),
-          sharedUsers: selectedUsers.length > 0 ? selectedUsers : undefined,
+          sharedUserIds: selectedUsers.length > 0 ? selectedUsers : undefined,
         };
       } else {
         const amount = parseFloat(items[0].price);

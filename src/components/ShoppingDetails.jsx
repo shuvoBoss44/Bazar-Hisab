@@ -241,21 +241,27 @@ function ShoppingDetails() {
                                     </div>
                                   </div>
 
-                                  {/* User Splits */}
+                                   {/* User Splits */}
                                   {transaction.sharedUsers && transaction.sharedUsers.length > 0 && (
                                     <div>
                                       <h4 className="text-sm font-semibold text-slate-300 mb-2">Split Among Users</h4>
                                       <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                         {transaction.sharedUsers.map((sharedUser, idx) => (
                                           <div key={idx} className="bg-neutral-900/60 rounded px-3 py-2 flex items-center justify-between">
-                                            <span className="text-sm text-slate-300">{sharedUser.userId?.name || 'Unknown'}</span>
-                                            <span className={`text-sm font-semibold ${
-                                              (sharedUser.balance ?? 0) >= 0 ? 'text-success-500' : 'text-error-500'
-                                            }`}>
-                                              {(sharedUser.balance ?? 0) >= 0 ? '+' : ''}৳{(sharedUser.balance ?? 0).toFixed(2)}
+                                            <div className="flex items-center gap-2">
+                                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-xs font-bold">
+                                                {(sharedUser?.name || sharedUser?.userId?.name || 'U').charAt(0).toUpperCase()}
+                                              </div>
+                                              <span className="text-sm text-slate-300">{sharedUser?.name || sharedUser?.userId?.name || 'Unknown'}</span>
+                                            </div>
+                                            <span className="text-sm text-slate-400">
+                                              ৳{(transaction.individualDeduction || 0).toFixed(2)}
                                             </span>
                                           </div>
                                         ))}
+                                      </div>
+                                      <div className="mt-2 text-xs text-slate-500">
+                                        Each user pays: ৳{(transaction.individualDeduction || 0).toFixed(2)}
                                       </div>
                                     </div>
                                   )}
