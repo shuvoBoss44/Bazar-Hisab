@@ -239,52 +239,61 @@ function ShoppingDetails() {
                       {/* User Balance Changes */}
                       {!isBalanceTransaction && transaction.sharedUsers && transaction.sharedUsers.length > 0 && (
                         <div className="space-y-2">
-                          <h3 className="font-semibold text-sm text-slate-300">Expense Split & Balance Changes</h3>
+                          <h3 className="font-semibold text-sm text-slate-300">Expense Split & Balance History</h3>
                           <div className="overflow-x-auto">
                             <table className="w-full text-sm">
                               <thead className="bg-neutral-900/60">
                                 <tr>
                                   <th className="px-3 py-2 text-left text-xs font-semibold text-slate-400">User</th>
-                                  <th className="px-3 py-2 text-center text-xs font-semibold text-slate-400">Share Amount</th>
-                                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-400">Balance Impact</th>
+                                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-400">Balance Before</th>
+                                  <th className="px-3 py-2 text-center text-xs font-semibold text-slate-400">Share</th>
+                                  <th className="px-3 py-2 text-right text-xs font-semibold text-slate-400">Balance After</th>
                                 </tr>
                               </thead>
                               <tbody className="divide-y divide-white/5">
-                                {transaction.sharedUsers.map((sharedUser, idx) => (
-                                  <tr key={idx} className="hover:bg-white/5">
-                                    <td className="px-3 py-2">
-                                      <div className="flex items-center gap-2">
-                                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                                          {(sharedUser?.name || 'U').charAt(0).toUpperCase()}
+                                {transaction.sharedUsers.map((sharedUser, idx) => {
+                                  // Find historical balance if available
+                                  const historicalData = transaction.usersBalancesAtTransactionTime?.find(
+                                    u => u._id === sharedUser._id || u._id === sharedUser.userId?._id
+                                  );
+                                  
+                                  const balanceAfter = historicalData ? historicalData.balanceAtTime : (sharedUser.balance ?? 0);
+                                  const deduction = transaction.individualDeduction || 0;
+                                  const balanceBefore = balanceAfter + deduction;
+
+                                  return (
+                                    <tr key={idx} className="hover:bg-white/5">
+                                      <td className="px-3 py-2">
+                                        <div className="flex items-center gap-2">
+                                          <div className="w-6 h-6 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-xs font-bold flex-shrink-0">
+                                            {(sharedUser?.name || 'U').charAt(0).toUpperCase()}
+                                          </div>
+                                          <span className="text-slate-300">{sharedUser?.name || 'Unknown'}</span>
                                         </div>
-                                        <span className="text-slate-300">{sharedUser?.name || 'Unknown'}</span>
-                                      </div>
-                                    </td>
-                                    <td className="px-3 py-2 text-center font-medium text-slate-300">
-                                      ৳{(transaction.individualDeduction || 0).toFixed(2)}
-                                    </td>
-                                    <td className="px-3 py-2 text-right">
-                                      <span className="text-error-500 font-semibold">
-                                        -৳{(transaction.individualDeduction || 0).toFixed(2)}
-                                      </span>
-                                    </td>
-                                  </tr>
-                                ))}
+                                      </td>
+                                      <td className="px-3 py-2 text-right font-medium text-slate-400">
+                                        ৳{balanceBefore.toFixed(2)}
+                                      </td>
+                                      <td className="px-3 py-2 text-center font-medium text-error-400">
+                                        -৳{deduction.toFixed(2)}
+                                      </td>
+                                      <td className="px-3 py-2 text-right font-bold text-slate-200">
+                                        ৳{balanceAfter.toFixed(2)}
+                                      </td>
+                                    </tr>
+                                  );
+                                })}
                                 <tr className="bg-neutral-900/40">
-                                  <td className="px-3 py-2 font-semibold">Total Deducted</td>
-                                  <td className="px-3 py-2 text-center font-semibold text-slate-300">
-                                    {transaction.sharedUsers.length} user(s)
-                                  </td>
-                                  <td className="px-3 py-2 text-right font-semibold text-error-500">
+                                  <td className="px-3 py-2 font-semibold">Total</td>
+                                  <td className="px-3 py-2"></td>
+                                  <td className="px-3 py-2 text-center font-semibold text-error-500">
                                     -৳{transaction.totalPrice?.toFixed(2)}
                                   </td>
+                                  <td className="px-3 py-2"></td>
                                 </tr>
                               </tbody>
                             </table>
                           </div>
-                          <p className="text-xs text-slate-500 mt-2">
-                            ℹ️ Each user pays ৳{(transaction.individualDeduction || 0).toFixed(2)} from their balance
-                          </p>
                         </div>
                       )}
 
