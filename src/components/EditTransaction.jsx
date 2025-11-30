@@ -40,7 +40,7 @@ function EditTransaction() {
         );
       } catch (err) {
         setError(err.response?.data?.message || err.message);
-        setTimeout(() => navigate("/shopping-details"), 2000);
+        setTimeout(() => navigate("/"), 2000);
       } finally {
         setLoading(false);
       }
@@ -78,7 +78,7 @@ function EditTransaction() {
         { withCredentials: true }
       );
 
-      navigate("/shopping-details");
+      navigate("/");
     } catch (err) {
       setError(err.response?.data?.message || "Error updating transaction");
       setSubmitting(false);
@@ -178,7 +178,7 @@ function EditTransaction() {
             <div className="flex gap-3 pt-4">
               <button
                 type="button"
-                onClick={() => navigate("/shopping-details")}
+                onClick={() => navigate("/")}
                 className="flex-1 btn-secondary"
               >
                 Cancel

@@ -52,9 +52,9 @@ function Navbar() {
             {user ? (
               <>
                 <Link
-                  to="/shopping-details"
+                  to="/"
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
-                    isActive("/shopping-details")
+                    isActive("/")
                       ? "bg-white/10 text-white"
                       : "text-slate-300 hover:text-white hover:bg-white/5"
                   }`}
@@ -146,9 +146,9 @@ function Navbar() {
             {user ? (
               <>
                 <Link
-                  to="/shopping-details"
+                  to="/"
                   className={`block px-4 py-3 rounded-lg font-medium text-sm transition-all ${
-                    isActive("/shopping-details")
+                    isActive("/")
                       ? "bg-white/10 text-white"
                       : "text-slate-300"
                   }`}

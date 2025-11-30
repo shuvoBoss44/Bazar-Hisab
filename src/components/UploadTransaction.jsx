@@ -117,7 +117,7 @@ function UploadTransaction() {
       setSuccess("Transaction uploaded successfully!");
       setItems([{ itemName: "", price: "" }]);
       setSelectedUsers([]);
-      setTimeout(() => navigate("/shopping-details"), 1500);
+      setTimeout(() => navigate("/"), 1500);
     } catch (err) {
       setError(err.response?.data?.message || "Error uploading transaction");
     } finally {

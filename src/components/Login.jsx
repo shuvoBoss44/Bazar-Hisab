@@ -26,7 +26,7 @@ function Login() {
 
       if (res.data.status === "success") {
         login(res.data.data.user);
-        navigate("/shopping-details");
+        navigate("/");
       }
     } catch (err) {
       setError(err.response?.data?.message || "Login failed. Please try again.");

@@ -23,10 +23,9 @@ function App() {
           <Navbar />
           <main className="flex-grow pt-20 w-full">
             <Routes>
-              <Route path="/" element={<Navigate to="/shopping-details" />} />
+              <Route path="/" element={<ShoppingDetails />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              <Route path="/shopping-details" element={<ShoppingDetails />} />
               <Route path="/upload-transaction" element={<UploadTransaction />} />
               <Route path="/edit-transaction/:id" element={<EditTransaction />} />
               <Route path="/profile" element={<Profile />} />

@@ -33,7 +33,7 @@ function Footer() {
                 Quick Links
               </h4>
               <div className="flex flex-col space-y-3">
-                <a href="/shopping-details" className="text-neutral-400 hover:text-secondary-400 transition-colors text-sm flex items-center justify-center gap-2 group">
+                <a href="/" className="text-neutral-400 hover:text-secondary-400 transition-colors text-sm flex items-center justify-center gap-2 group">
                   <span className="w-1.5 h-1.5 rounded-full bg-neutral-700 group-hover:bg-secondary-400 transition-colors"></span>
                   Transactions
                 </a>

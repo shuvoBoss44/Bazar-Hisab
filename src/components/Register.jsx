@@ -36,7 +36,7 @@ function Register() {
       if (res.data.status === "success") {
         setSuccess("Account created successfully! Redirecting...");
         login(res.data.data.user);
-        setTimeout(() => navigate("/shopping-details"), 1500);
+        setTimeout(() => navigate("/"), 1500);
       }
     } catch (err) {
       setError(err.response?.data?.message || "Registration failed. Please try again.");
