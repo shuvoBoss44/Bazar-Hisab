@@ -80,7 +80,7 @@
   .btn-primary {
     @apply relative inline-flex items-center justify-center px-8 py-3.5 rounded-xl font-semibold text-sm
     transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
-    overflow-hidden group;
+    overflow-hidden;
     background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
     box-shadow: 
       0 4px 6px -1px rgba(59, 130, 246, 0.3),
