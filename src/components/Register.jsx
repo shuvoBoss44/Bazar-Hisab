@@ -16,9 +16,9 @@ function Register() {
 
   const getPasswordStrength = (password) => {
     if (!password) return { strength: 0, label: "", color: "" };
-    if (password.length < 6) return { strength: 33, label: "Weak", color: "bg-accent-rose" };
-    if (password.length < 10) return { strength: 66, label: "Medium", color: "bg-accent-amber" };
-    return { strength: 100, label: "Strong", color: "bg-accent-emerald" };
+    if (password.length < 6) return { strength: 33, label: "Weak", color: "bg-rose-500" };
+    if (password.length < 10) return { strength: 66, label: "Medium", color: "bg-amber-500" };
+    return { strength: 100, label: "Strong", color: "bg-emerald-500" };
   };
 
   const passwordStrength = getPasswordStrength(formData.password);
@@ -66,27 +66,27 @@ function Register() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-primary-950 to-neutral-900 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-950 p-4 relative overflow-hidden">
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-10 left-10 w-96 h-96 bg-secondary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow" style={{ animationDelay: '1.5s' }}></div>
-        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-primary-400 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '3s' }}></div>
+        <div className="absolute top-10 left-10 w-96 h-96 bg-secondary-600/20 rounded-full blur-[100px] animate-float"></div>
+        <div className="absolute bottom-10 right-10 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px] animate-float delay-1000"></div>
+        <div className="absolute top-1/3 right-1/3 w-80 h-80 bg-accent-purple/10 rounded-full blur-[80px] animate-float delay-2000"></div>
       </div>
 
-      <div className="glass-indigo rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-primary relative z-10 animate-in slide-in-from-bottom">
+      <div className="glass-card p-8 md:p-12 w-full max-w-md relative z-10 animate-in slide-in-from-bottom duration-700 hover:shadow-neon-purple transition-all">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-blue mb-3 tracking-tight">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-secondary-200 to-primary-200 mb-3 tracking-tight">
             Create Account
           </h1>
-          <p className="text-neutral-300 text-sm">Join us to manage your transactions</p>
+          <p className="text-neutral-400 text-sm">Join us to manage your transactions</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Error Message */}
           {error && (
-            <div className="bg-accent-rose/10 backdrop-blur-sm border border-accent-rose/30 text-accent-rose p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+            <div className="bg-rose-900/20 backdrop-blur-sm border border-rose-500/30 text-rose-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -96,7 +96,7 @@ function Register() {
 
           {/* Success Message */}
           {success && (
-            <div className="bg-accent-emerald/10 backdrop-blur-sm border border-accent-emerald/30 text-accent-emerald p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+            <div className="bg-emerald-900/20 backdrop-blur-sm border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -106,12 +106,12 @@ function Register() {
 
           {/* Name Input */}
           <div className="space-y-2">
-            <label htmlFor="name" className="block text-neutral-200 font-medium text-sm">
+            <label htmlFor="name" className="block text-neutral-300 font-medium text-sm ml-1">
               Full Name
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-secondary-400 group-focus-within:text-secondary-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-500 group-focus-within:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
               </div>
@@ -121,7 +121,7 @@ function Register() {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="w-full pl-12 pr-4 py-3.5 bg-neutral-800/40 backdrop-blur-sm border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+                className="input-field pl-12"
                 placeholder="John Doe"
               />
             </div>
@@ -129,12 +129,12 @@ function Register() {
 
           {/* Email Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-neutral-200 font-medium text-sm">
+            <label htmlFor="email" className="block text-neutral-300 font-medium text-sm ml-1">
               Email Address
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-secondary-400 group-focus-within:text-secondary-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-500 group-focus-within:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
               </div>
@@ -144,7 +144,7 @@ function Register() {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="w-full pl-12 pr-4 py-3.5 bg-neutral-800/40 backdrop-blur-sm border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+                className="input-field pl-12"
                 placeholder="you@example.com"
               />
             </div>
@@ -152,12 +152,12 @@ function Register() {
 
           {/* Password Input */}
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-neutral-200 font-medium text-sm">
+            <label htmlFor="password" className="block text-neutral-300 font-medium text-sm ml-1">
               Password
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-secondary-400 group-focus-within:text-secondary-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-500 group-focus-within:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -167,13 +167,13 @@ function Register() {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="w-full pl-12 pr-12 py-3.5 bg-neutral-800/40 backdrop-blur-sm border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+                className="input-field pl-12 pr-12"
                 placeholder="At least 6 characters"
               />
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-secondary-300 transition-colors"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-500 hover:text-primary-400 transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -192,11 +192,11 @@ function Register() {
             {/* Password Strength Indicator */}
             {formData.password && (
               <div className="space-y-1 animate-in fade-in">
-                <div className="flex justify-between items-center text-xs text-neutral-300">
+                <div className="flex justify-between items-center text-xs text-neutral-400">
                   <span>Password Strength</span>
-                  <span className="font-medium">{passwordStrength.label}</span>
+                  <span className="font-medium text-neutral-300">{passwordStrength.label}</span>
                 </div>
-                <div className="w-full bg-neutral-700/50 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-neutral-800 rounded-full h-1.5 overflow-hidden">
                   <div 
                     className={`h-full ${passwordStrength.color} transition-all duration-300 rounded-full`}
                     style={{ width: `${passwordStrength.strength}%` }}
@@ -210,7 +210,7 @@ function Register() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-secondary-500 to-primary-600 text-white font-bold py-4 rounded-xl hover:from-secondary-400 hover:to-primary-500 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 focus:ring-offset-neutral-900 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-secondary-900/50 flex items-center justify-center gap-2"
+            className="w-full btn-primary flex items-center justify-center gap-2 group"
           >
             {loading ? (
               <>
@@ -223,7 +223,7 @@ function Register() {
             ) : (
               <>
                 <span>Create Account</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </>
@@ -237,7 +237,7 @@ function Register() {
             Already have an account?{" "}
             <button
               onClick={() => navigate("/login")}
-              className="font-semibold text-secondary-400 hover:text-secondary-300 underline-offset-2 transition-colors"
+              className="font-semibold text-primary-400 hover:text-primary-300 underline-offset-2 transition-colors hover:underline"
             >
               Sign in
             </button>

@@ -59,27 +59,27 @@ function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-neutral-950 via-neutral-900 to-primary-950 p-4 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center bg-neutral-950 p-4 relative overflow-hidden">
       {/* Animated background orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-20 right-20 w-96 h-96 bg-primary-600 rounded-full opacity-20 blur-3xl animate-pulse-slow"></div>
-        <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary-500 rounded-full opacity-20 blur-3xl animate-pulse-slow" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary-400 rounded-full opacity-10 blur-3xl animate-pulse-slow" style={{ animationDelay: '2s' }}></div>
+        <div className="absolute top-20 right-20 w-96 h-96 bg-primary-600/20 rounded-full blur-[100px] animate-float"></div>
+        <div className="absolute bottom-20 left-20 w-96 h-96 bg-secondary-500/20 rounded-full blur-[100px] animate-float delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-accent-cyan/10 rounded-full blur-[80px] animate-float delay-2000"></div>
       </div>
 
-      <div className="glass-indigo rounded-3xl p-8 md:p-12 w-full max-w-md transform transition-all duration-300 hover:shadow-glow-primary relative z-10 animate-in slide-in-from-bottom">
+      <div className="glass-card p-8 md:p-12 w-full max-w-md relative z-10 animate-in slide-in-from-bottom duration-700 hover:shadow-neon-blue transition-all">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-gradient-primary mb-3 tracking-tight">
+        <div className="text-center mb-10">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-primary-200 to-secondary-200 mb-3 tracking-tight">
             Welcome Back
           </h1>
-          <p className="text-neutral-300 text-sm">Sign in to access your account</p>
+          <p className="text-neutral-400 text-sm">Sign in to access your account</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Error Message */}
           {error && (
-            <div className="bg-accent-rose/10 backdrop-blur-sm border border-accent-rose/30 text-accent-rose p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+            <div className="bg-rose-900/20 backdrop-blur-sm border border-rose-500/30 text-rose-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -89,7 +89,7 @@ function Login() {
 
           {/* Success Message */}
           {successMessage && (
-            <div className="bg-accent-emerald/10 backdrop-blur-sm border border-accent-emerald/30 text-accent-emerald p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
+            <div className="bg-emerald-900/20 backdrop-blur-sm border border-emerald-500/30 text-emerald-300 p-4 rounded-xl text-sm flex items-center gap-3 animate-in fade-in">
               <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
               </svg>
@@ -99,12 +99,12 @@ function Login() {
 
           {/* Email Input */}
           <div className="space-y-2">
-            <label htmlFor="email" className="block text-neutral-200 font-medium text-sm">
+            <label htmlFor="email" className="block text-neutral-300 font-medium text-sm ml-1">
               Email Address
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-secondary-400 group-focus-within:text-secondary-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-500 group-focus-within:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
                 </svg>
               </div>
@@ -114,7 +114,7 @@ function Login() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full pl-12 pr-4 py-3.5 bg-neutral-800/40 backdrop-blur-sm border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+                className="input-field pl-12"
                 placeholder="you@example.com"
               />
             </div>
@@ -122,12 +122,12 @@ function Login() {
 
           {/* Password Input */}
           <div className="space-y-2">
-            <label htmlFor="password" className="block text-neutral-200 font-medium text-sm">
+            <label htmlFor="password" className="block text-neutral-300 font-medium text-sm ml-1">
               Password
             </label>
             <div className="relative group">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <svg className="w-5 h-5 text-secondary-400 group-focus-within:text-secondary-300 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-neutral-500 group-focus-within:text-primary-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                 </svg>
               </div>
@@ -137,13 +137,13 @@ function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full pl-12 pr-12 py-3.5 bg-neutral-800/40 backdrop-blur-sm border border-neutral-700 rounded-xl text-neutral-100 placeholder-neutral-500 focus:ring-2 focus:ring-secondary-500 focus:border-transparent transition-all"
+                className="input-field pl-12 pr-12"
                 placeholder="Enter your password"
               />
               <button
                 type="button"
                 onClick={togglePasswordVisibility}
-                className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-400 hover:text-secondary-300 transition-colors"
+                className="absolute inset-y-0 right-0 pr-4 flex items-center text-neutral-500 hover:text-primary-400 transition-colors"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
@@ -164,7 +164,7 @@ function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-primary-600 to-secondary-500 text-white font-bold py-4 rounded-xl hover:from-primary-500 hover:to-secondary-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 focus:ring-offset-neutral-900 transition-all transform hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg shadow-primary-900/50 flex items-center justify-center gap-2"
+            className="w-full btn-primary flex items-center justify-center gap-2 group"
           >
             {loading ? (
               <>
@@ -177,7 +177,7 @@ function Login() {
             ) : (
               <>
                 <span>Sign In</span>
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </>
@@ -191,7 +191,7 @@ function Login() {
             Don't have an account?{" "}
             <button
               onClick={() => navigate("/register")}
-              className="font-semibold text-secondary-400 hover:text-secondary-300 underline-offset-2 transition-colors"
+              className="font-semibold text-primary-400 hover:text-primary-300 underline-offset-2 transition-colors hover:underline"
             >
               Sign up
             </button>

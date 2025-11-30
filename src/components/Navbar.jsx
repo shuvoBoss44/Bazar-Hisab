@@ -51,68 +51,81 @@ function Navbar() {
 
   return (
     <nav 
-      className={`fixed w-full top-0 left-0 z-50 transition-all duration-300 ${
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-500 ${
         scrolled 
-          ? "glass-dark shadow-glow-primary border-b border-neutral-700" 
-          : "glass-dark shadow-glass-dark"
+          ? "bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-glass-sm" 
+          : "bg-transparent"
       }`}
     >
       <div className="container mx-auto px-4 lg:px-8">
-        <div className="flex justify-between items-center h-16 md:h-18">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link
             to="/"
-            className="text-2xl md:text-3xl font-extrabold text-gradient-primary transition-all hover:scale-105"
+            className="group flex items-center gap-2"
           >
-            Bazar<span className="text-gradient-blue">Hisab</span>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-neon-purple group-hover:shadow-neon-cyan transition-all duration-500">
+              <span className="text-xl font-bold text-white">B</span>
+            </div>
+            <span className="text-2xl font-display font-bold text-white tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-secondary-400 transition-all duration-300">
+              Bazar<span className="text-secondary-400">Hisab</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-6">
+          <div className="hidden lg:flex items-center gap-2">
             {loading ? (
-              <div className="h-10 w-32 bg-neutral-700/50 animate-pulse rounded-lg"></div>
+              <div className="h-10 w-32 bg-white/5 animate-pulse rounded-lg"></div>
             ) : isAuthenticated ? (
-              <>
+              <div className="flex items-center p-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md">
                 {navLinks.map((link) => (
                   <Link
                     key={link.path}
                     to={link.path}
-                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 ${
+                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 relative overflow-hidden group ${
                       location.pathname === link.path
-                        ? "bg-primary-600/20 text-primary-400 border border-primary-500/30"
-                        : "text-neutral-300 hover:bg-neutral-700/50 hover:text-secondary-400"
+                        ? "text-white bg-white/10 shadow-inner"
+                        : "text-neutral-400 hover:text-white hover:bg-white/5"
                     }`}
                   >
-                    {link.icon}
-                    {link.name}
+                    <span className={`relative z-10 transition-transform duration-300 group-hover:scale-110 ${location.pathname === link.path ? "text-secondary-400" : ""}`}>
+                      {link.icon}
+                    </span>
+                    <span className="relative z-10">{link.name}</span>
+                    {location.pathname === link.path && (
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 opacity-100"></div>
+                    )}
                   </Link>
                 ))}
                 
-                <div className="w-px h-6 bg-neutral-700 mx-2"></div>
+                <div className="w-px h-6 bg-white/10 mx-2"></div>
                 
                 <button
                   onClick={handleLogout}
-                  className="px-4 py-2.5 rounded-xl text-sm font-semibold text-accent-coral hover:bg-accent-coral/10 border border-transparent hover:border-accent-coral/30 transition-all duration-200 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-accent-pink hover:bg-accent-pink/10 border border-transparent hover:border-accent-pink/20 transition-all duration-300 flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                   Logout
                 </button>
-              </>
+              </div>
             ) : (
               <Link
                 to="/login"
-                className="px-6 py-2.5 rounded-full text-sm font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all duration-300 shadow-lg shadow-primary-900/30 transform hover:-translate-y-0.5"
+                className="btn-primary flex items-center gap-2 group"
               >
-                Sign In
+                <span>Sign In</span>
+                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
               </Link>
             )}
           </div>
 
           {/* Mobile menu button */}
           <button
-            className="lg:hidden p-2 rounded-xl text-neutral-300 hover:bg-neutral-700/50 transition-colors"
+            className="lg:hidden p-3 rounded-xl text-neutral-300 hover:bg-white/10 hover:text-white transition-colors border border-transparent hover:border-white/10"
             onClick={toggleMobileMenu}
             aria-label="Toggle menu"
           >
@@ -128,53 +141,53 @@ function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      {isMobileMenuOpen && (
-        <div className="lg:hidden border-t border-neutral-700 glass-dark animate-in slide-in-from-right">
-          <div className="container mx-auto px-4 py-4 space-y-2">
-            {loading ? (
-              <div className="h-12 w-full bg-neutral-700/50 animate-pulse rounded-xl"></div>
-            ) : isAuthenticated ? (
-              <>
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-all ${
-                      location.pathname === link.path
-                        ? "bg-primary-600/20 text-primary-400 border border-primary-500/30"
-                        : "text-neutral-300 hover:bg-neutral-700/50 hover:text-secondary-400"
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.icon}
-                    {link.name}
-                  </Link>
-                ))}
-                
-                <div className="h-px bg-neutral-700 my-2"></div>
-                
-                <button
-                  onClick={handleLogout}
-                  className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-accent-coral hover:bg-accent-coral/10 border border-transparent hover:border-accent-coral/30 transition-all"
+      <div className={`lg:hidden fixed inset-x-0 top-20 bg-neutral-950/95 backdrop-blur-2xl border-b border-white/10 transition-all duration-500 ease-in-out transform origin-top ${isMobileMenuOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"}`}>
+        <div className="container mx-auto px-4 py-6 space-y-3">
+          {loading ? (
+            <div className="h-12 w-full bg-white/5 animate-pulse rounded-xl"></div>
+          ) : isAuthenticated ? (
+            <>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  to={link.path}
+                  className={`flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium transition-all duration-300 ${
+                    location.pathname === link.path
+                      ? "bg-gradient-to-r from-primary-900/40 to-secondary-900/40 text-white border border-primary-500/30 shadow-lg shadow-primary-900/20"
+                      : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                to="/login"
-                className="block w-full text-center px-6 py-3 rounded-full text-sm font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all shadow-lg"
-                onClick={() => setIsMobileMenuOpen(false)}
+                  <span className={`${location.pathname === link.path ? "text-secondary-400" : "text-neutral-500"}`}>
+                    {link.icon}
+                  </span>
+                  {link.name}
+                </Link>
+              ))}
+              
+              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-4"></div>
+              
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium text-accent-pink hover:bg-accent-pink/10 border border-transparent hover:border-accent-pink/20 transition-all"
               >
-                Sign In
-              </Link>
-            )}
-          </div>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Logout
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              className="block w-full text-center px-6 py-4 rounded-xl text-base font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all shadow-lg shadow-primary-900/30"
+              onClick={() => setIsMobileMenuOpen(false)}
+            >
+              Sign In
+            </Link>
+          )}
         </div>
-      )}
+      </div>
     </nav>
   );
 }

@@ -7,44 +7,43 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary - Indigo (Professional, trustworthy)
+        // Primary - Deep Navy/Black (Backgrounds)
         primary: {
-          50: '#eef2ff',
-          100: '#e0e7ff',
-          200: '#c7d2fe',
-          300: '#a5b4fc',
-          400: '#818cf8',
-          500: '#6366f1',
-          600: '#4f46e5',
-          700: '#4338ca',
-          800: '#3730a3',
-          900: '#312e81',
-          950: '#1e1b4b',
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+          950: '#020617', // Main background
         },
-        // Secondary - Sky Blue (Modern, clean)
+        // Secondary - Electric Violet (Primary Brand Color)
         secondary: {
-          50: '#f0f9ff',
-          100: '#e0f2fe',
-          200: '#bae6fd',
-          300: '#7dd3fc',
-          400: '#38bdf8',
-          500: '#0ea5e9',
-          600: '#0284c7',
-          700: '#0369a1',
-          800: '#075985',
-          900: '#0c4a6e',
-          950: '#082f49',
+          50: '#f0fdfa',
+          100: '#ccfbf1',
+          200: '#99f6e4',
+          300: '#5eead4',
+          400: '#2dd4bf',
+          500: '#14b8a6',
+          600: '#0d9488',
+          700: '#0f766e',
+          800: '#115e59',
+          900: '#134e4a',
+          950: '#042f2e',
         },
-        // Accents - Professional palette
+        // Accents - Neon Colors
         accent: {
-          blue: '#3b82f6',
           cyan: '#06b6d4',
-          violet: '#8b5cf6',
-          purple: '#a855f7',
-          emerald: '#10b981',
-          green: '#22c55e',
+          magenta: '#d946ef',
+          lime: '#84cc16',
+          orange: '#f97316',
+          pink: '#ec4899',
         },
-        // Neutral - Softer slate
+        // Neutral - Slate for text
         neutral: {
           50: '#f8fafc',
           100: '#f1f5f9',
@@ -64,35 +63,26 @@ export default {
         display: ['Outfit', 'system-ui', 'sans-serif'],
       },
       boxShadow: {
-        'soft': '0 2px 15px rgba(0, 0, 0, 0.08)',
+        'neon-blue': '0 0 5px theme("colors.blue.400"), 0 0 20px theme("colors.blue.700")',
+        'neon-purple': '0 0 5px theme("colors.purple.400"), 0 0 20px theme("colors.purple.700")',
+        'neon-cyan': '0 0 5px theme("colors.cyan.400"), 0 0 20px theme("colors.cyan.700")',
         'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.37)',
-        'glass-dark': '0 8px 32px 0 rgba(0, 0, 0, 0.5)',
-        'glow-primary': '0 0 30px rgba(99, 102, 241, 0.4)',
-        'glow-secondary': '0 0 30px rgba(14, 165, 233, 0.4)',
-        'glow-blue': '0 0 25px rgba(59, 130, 246, 0.35)',
+        'glass-sm': '0 4px 16px 0 rgba(31, 38, 135, 0.37)',
       },
       animation: {
-        'fade-in': 'fadeIn 0.5s ease-out',
-        'slide-up': 'slideUp 0.5s ease-out',
-        'slide-in-right': 'slideInRight 0.3s ease-out',
-        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'float': 'float 6s ease-in-out infinite',
+        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'spin-slow': 'spin 8s linear infinite',
       },
       keyframes: {
-        fadeIn: {
-          '0%': { opacity: '0' },
-          '100%': { opacity: '1' },
-        },
-        slideUp: {
-          '0%': { transform: 'translateY(20px)', opacity: '0' },
-          '100%': { transform: 'translateY(0)', opacity: '1' },
-        },
-        slideInRight: {
-          '0%': { transform: 'translateX(100%)', opacity: '0' },
-          '100%': { transform: 'translateX(0)', opacity: '1' },
+        float: {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-20px)' },
         },
       },
-      backdropBlur: {
-        xs: '2px',
+      backgroundImage: {
+        'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
+        'hero-pattern': "url('/assets/grid.svg')", // Assuming you might add a grid pattern later
       },
     },
   },
