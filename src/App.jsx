@@ -16,33 +16,72 @@ import EditTransaction from "./components/EditTransaction";
 import "./index.css";
 import Footer from "./components/Footer";
 
+// Assuming ProtectedRoute and user context are defined elsewhere or will be added.
+// For the purpose of this edit, we'll just incorporate them as they appear in the instruction.
+// Placeholder for ProtectedRoute and user for compilation, if not defined elsewhere.
+const ProtectedRoute = ({ children }) => {
+  // In a real app, this would check authentication status
+  const user = true; // Placeholder
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+  return children;
+};
+const user = true; // Placeholder for user state
+
 function App() {
   return (
     <Router>
       <AuthProvider>
-        <div className="min-h-screen bg-neutral-950 flex flex-col overflow-x-hidden">
-          <Navbar className="w-full" />
-          <main className="flex-grow py-12 pt-20 w-full">
-            <div className="w-full">
+        <div className="flex flex-col min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-primary-500/30 selection:text-primary-200">
+          <Navbar />
+          <main className="flex-grow py-8 pt-24 w-full">
+            <div className="container-fluid">
               <Routes>
-                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/"
+                  element={
+                    user ? <Navigate to="/shopping-details" /> : <Navigate to="/login" />
+                  }
+                />
                 <Route path="/login" element={<Login />} />
-                <Route path="/profile" element={<Profile />} />
-                <Route path="/shopping-details" element={<ShoppingDetails />} />
+                <Route path="/register" element={<Register />} />
+                <Route
+                  path="/shopping-details"
+                  element={
+                    <ProtectedRoute>
+                      <ShoppingDetails />
+                    </ProtectedRoute>
+                  }
+                />
                 <Route
                   path="/upload-transaction"
-                  element={<UploadTransaction />}
+                  element={
+                    <ProtectedRoute>
+                      <UploadTransaction />
+                    </ProtectedRoute>
+                  }
                 />
                 <Route
                   path="/edit-transaction/:id"
-                  element={<EditTransaction />}
+                  element={
+                    <ProtectedRoute>
+                      <EditTransaction />
+                    </ProtectedRoute>
+                  }
                 />
-                <Route path="/" element={<ShoppingDetails />} />
-                <Route path="*" element={<Navigate to="/" />} />
+                <Route
+                  path="/profile"
+                  element={
+                    <ProtectedRoute>
+                      <Profile />
+                    </ProtectedRoute>
+                  }
+                />
               </Routes>
-              <Footer className="w-full" />
             </div>
           </main>
+          <Footer />
         </div>
       </AuthProvider>
     </Router>

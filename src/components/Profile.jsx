@@ -1,360 +1,264 @@
-import React, { useState, useEffect } from "react";
+import { useState, useContext, useEffect } from "react";
 import axios from "axios";
+import { AuthContext } from "../AuthContext";
+import { useNavigate } from "react-router-dom";
 
-const Profile = () => {
-  const [user, setUser] = useState(null);
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [balanceAmount, setBalanceAmount] = useState("");
-  const [message, setMessage] = useState("");
+function Profile() {
+  const { user, setUser, loading: authLoading } = useContext(AuthContext);
+  const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [isEditing, setIsEditing] = useState(false);
-  // Separate states for each balance operation
-  const [addingBalance, setAddingBalance] = useState(false);
-  const [removingBalance, setRemovingBalance] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const [activeTab, setActiveTab] = useState("overview"); // overview, security, settings
+
+  const [passwordData, setPasswordData] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+
+  const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const userRes = await axios.get(
-          "https://bazar-hisab-backend.onrender.com/api/users/me",
-          {
-            withCredentials: true,
-          }
-        );
-        setUser(userRes.data.data.user);
-        setName(userRes.data.data.user.name);
-        setEmail(userRes.data.data.user.email);
-        setLoading(false);
-      } catch (err) {
-        setMessage("Failed to load data");
-        setLoading(false);
+    if (!authLoading && !user) {
+      navigate("/login");
+    }
+  }, [authLoading, user, navigate]);
+
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (user) {
+        try {
+          const response = await axios.get(
+            "https://bazar-hisab-backend.onrender.com/api/users/me",
+            { withCredentials: true }
+          );
+          setBalance(response.data.data.balance);
+        } catch (err) {
+          console.error("Error fetching balance:", err);
+        } finally {
+          setLoading(false);
+        }
       }
     };
-    fetchData();
-  }, []);
+    fetchBalance();
+  }, [user]);
 
-  const handleUpdateProfile = async () => {
-    try {
-      const res = await axios.put(
-        "https://bazar-hisab-backend.onrender.com/api/users/me",
-        { name, email },
-        { withCredentials: true }
-      );
-      setUser(res.data.data.user);
-      setMessage("Profile updated successfully");
-      setIsEditing(false);
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to update profile");
+  const handlePasswordChange = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+
+    if (passwordData.newPassword !== passwordData.confirmPassword) {
+      setError("New passwords do not match");
+      return;
     }
-  };
 
-  const handleChangePassword = async () => {
     try {
       await axios.put(
-        "https://bazar-hisab-backend.onrender.com/api/users/change-password",
-        { currentPassword, newPassword },
+        "https://bazar-hisab-backend.onrender.com/api/users/update-password",
+        {
+          currentPassword: passwordData.currentPassword,
+          newPassword: passwordData.newPassword,
+        },
         { withCredentials: true }
       );
-      setMessage("Password changed successfully");
-      setCurrentPassword("");
-      setNewPassword("");
+      setSuccess("Password updated successfully");
+      setPasswordData({
+        currentPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      });
     } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to change password");
+      setError(err.response?.data?.message || "Failed to update password");
     }
   };
 
-  const handleAddBalance = async () => {
-    try {
-      setAddingBalance(true); // Start loading for add balance
-      const res = await axios.patch(
-        `https://bazar-hisab-backend.onrender.com/api/users/add-balance/${user?.id}`,
-        { amount: balanceAmount },
-        { withCredentials: true }
-      );
-      setUser(res.data.data.user);
-      setMessage("Balance added successfully");
-      setBalanceAmount("");
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to add balance");
-    } finally {
-      setAddingBalance(false); // End loading for add balance
-    }
-  };
-
-  const handleRemoveBalance = async () => {
-    try {
-      setRemovingBalance(true); // Start loading for remove balance
-      const res = await axios.patch(
-        `https://bazar-hisab-backend.onrender.com/api/users/remove-balance/${user?.id}`,
-        { amount: balanceAmount },
-        { withCredentials: true }
-      );
-      setUser(res.data.data.user);
-      setMessage("Balance removed successfully");
-      setBalanceAmount("");
-    } catch (err) {
-      setMessage(err.response?.data?.message || "Failed to remove balance");
-    } finally {
-      setRemovingBalance(false); // End loading for remove balance
-    }
-  };
-
-  if (loading)
+  if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-neutral-950 flex items-center justify-center">
+      <div className="min-h-[60vh] flex items-center justify-center">
         <div className="flex flex-col items-center p-8 glass-card">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-primary-500 mb-4"></div>
-          <p className="text-neutral-300 text-lg font-medium animate-pulse">
-            Loading profile...
-          </p>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-b-4 border-primary-500 mb-4"></div>
+          <p className="text-neutral-300 text-[length:var(--font-size-lg)] font-medium animate-pulse">Loading profile...</p>
         </div>
       </div>
     );
+  }
+
+  if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-neutral-950 py-24 px-4">
-      <div className="max-w-2xl mx-auto">
-        <div className="glass-card p-8 md:p-10 shadow-neon-purple animate-in fade-in relative overflow-hidden">
-          {/* Background Glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[100px] rounded-full pointer-events-none"></div>
-          
-          <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-primary-300 mb-8 relative z-10">Profile</h1>
+    <div className="w-full">
+      <div className="mb-10">
+        <h2 className="text-[length:var(--font-size-4xl)] font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white to-neutral-400 tracking-tight animate-in slide-in-from-bottom">
+          My Profile
+        </h2>
+        <p className="text-neutral-400 mt-2 text-[length:var(--font-size-lg)]">Manage your account settings and preferences.</p>
+      </div>
 
-          <div className="mb-8 flex items-center justify-between border-b border-white/10 pb-6 relative z-10">
-            <div>
-              <p className="text-lg font-semibold text-white mb-1">
-                Name: <span className="text-neutral-300 font-normal">{user?.name}</span>
-              </p>
-              <p className="text-lg font-semibold text-white">
-                Email: <span className="text-neutral-300 font-normal">{user?.email}</span>
-              </p>
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Sidebar / Tabs */}
+        <div className="lg:w-1/4">
+          <div className="glass-card p-6 sticky top-24">
+            <div className="flex flex-col items-center mb-8">
+              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary-600 to-secondary-600 p-1 mb-4 shadow-lg shadow-primary-600/20">
+                <div className="w-full h-full rounded-full bg-neutral-900 flex items-center justify-center border border-white/10">
+                  <span className="text-3xl font-bold text-white">{user.name.charAt(0)}</span>
+                </div>
+              </div>
+              <h3 className="text-[length:var(--font-size-xl)] font-bold text-white">{user.name}</h3>
+              <p className="text-sm text-neutral-400">{user.email}</p>
             </div>
-            <button
-              onClick={() => setIsEditing(!isEditing)}
-              className="text-primary-400 hover:text-white p-3 rounded-xl hover:bg-white/10 transition-all duration-300"
-              aria-label={isEditing ? "Cancel editing" : "Edit profile"}  
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth="2"
-                  d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.536L16.732 3.732z"
-                ></path>
-              </svg>
-            </button>
-          </div>
 
-          {isEditing && (
-            <div className="animate-in slide-in-from-bottom relative z-10">
-              <div className="mb-6">
-                <label
-                  htmlFor="name-input"
-                  className="block text-sm font-medium text-neutral-300 mb-2"
-                >
-                  Name
-                </label>
-                <input
-                  id="name-input"
-                  type="text"
-                  value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="input-field"
-                />
-              </div>
-
-              <div className="mb-6">
-                <label
-                  htmlFor="email-input"
-                  className="block text-sm font-medium text-neutral-300 mb-2"
-                >
-                  Email
-                </label>
-                <input
-                  id="email-input"
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  className="input-field"
-                />
-              </div>
-
+            <nav className="space-y-2">
               <button
-                onClick={handleUpdateProfile}
-                className="w-full btn-primary mb-8"
+                onClick={() => setActiveTab("overview")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all ${
+                  activeTab === "overview"
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20"
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
               >
-                Update Profile
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                Overview
               </button>
+              <button
+                onClick={() => setActiveTab("security")}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all ${
+                  activeTab === "security"
+                    ? "bg-primary-600/20 text-primary-400 border border-primary-500/20"
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                Security
+              </button>
+            </nav>
+          </div>
+        </div>
+
+        {/* Content Area */}
+        <div className="lg:w-3/4">
+          {activeTab === "overview" && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Balance Card */}
+              <div className="glass-liquid p-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 w-64 h-64 bg-primary-500/10 blur-[80px] rounded-full pointer-events-none group-hover:bg-primary-500/20 transition-all duration-700"></div>
+                <div className="relative z-10">
+                  <h3 className="text-[length:var(--font-size-lg)] font-medium text-neutral-300 mb-2">Current Balance</h3>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`text-[length:var(--font-size-5xl)] font-bold tracking-tight ${balance < 0 ? "text-accent-pink" : "text-accent-lime"}`}>
+                      {balance.toFixed(2)}
+                    </span>
+                    <span className="text-[length:var(--font-size-xl)] text-neutral-500">tk</span>
+                  </div>
+                  <p className="text-[length:var(--font-size-base)] text-neutral-400 mt-4">
+                    {balance < 0 
+                      ? "You owe this amount to the central pool." 
+                      : "You have a positive balance in the central pool."}
+                  </p>
+                </div>
+              </div>
+
+              {/* Account Details */}
+              <div className="glass-card p-8">
+                <h3 className="text-[length:var(--font-size-xl)] font-bold text-white mb-6">Account Details</h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-neutral-400">Full Name</label>
+                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                      {user.name}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-neutral-400">Email Address</label>
+                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                      {user.email}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-neutral-400">Member Since</label>
+                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-white text-[length:var(--font-size-base)]">
+                      {new Date(user.createdAt || Date.now()).toLocaleDateString(undefined, {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium text-neutral-400">Account Status</label>
+                    <div className="p-4 rounded-xl bg-neutral-950/50 border border-white/5 text-emerald-400 flex items-center gap-2 text-[length:var(--font-size-base)]">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                      Active
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
-          <h2 className="text-2xl font-bold mb-6 mt-8 text-transparent bg-clip-text bg-gradient-to-r from-secondary-300 to-secondary-500 border-b border-white/10 pb-3 relative z-10">
-            Change Password
-          </h2>
-
-          <div className="mb-6 relative z-10">
-            <label
-              htmlFor="current-password-input"
-              className="block text-sm font-medium text-neutral-300 mb-2"
-            >
-              Current Password
-            </label>
-            <input
-              id="current-password-input"
-              type="password"
-              value={currentPassword}
-              onChange={e => setCurrentPassword(e.target.value)}
-              className="input-field"
-            />
-          </div>
-
-          <div className="mb-6 relative z-10">
-            <label
-              htmlFor="new-password-input"
-              className="block text-sm font-medium text-neutral-300 mb-2"
-            >
-              New Password
-            </label>
-            <input
-              id="new-password-input"
-              type="password"
-              value={newPassword}
-              onChange={e => setNewPassword(e.target.value)}
-              className="input-field"
-            />
-          </div>
-
-          <button
-            onClick={handleChangePassword}
-            className="w-full btn-secondary mb-8 relative z-10"
-          >
-            Change Password
-          </button>
-
-          <h2 className="text-2xl font-bold mb-6 mt-8 text-transparent bg-clip-text bg-gradient-to-r from-primary-300 to-primary-500 border-b border-white/10 pb-3 relative z-10">
-            Manage Balance
-          </h2>
-          <div className="mb-6 text-center p-6 rounded-2xl bg-white/5 border border-white/10 relative z-10">
-            <p
-              className={`text-3xl font-extrabold ${
-                (user?.balance ?? 0) >= 0 ? "text-accent-lime" : "text-accent-pink"
-              }`}
-            >
-              Your Current Balance: {(user?.balance ?? 0).toFixed(2)} tk
-            </p>
-          </div>
-
-          <div className="mb-6 relative z-10">
-            <label
-              htmlFor="balance-amount-input"
-              className="block text-sm font-medium text-neutral-300 mb-2"
-            >
-              Amount
-            </label>
-            <input
-              id="balance-amount-input"
-              type="number"
-              value={balanceAmount}
-              onChange={e => setBalanceAmount(e.target.value)}
-              className="input-field"
-              min="0"
-              step="0.01"
-            />
-          </div>
-
-          <div className="flex gap-4 relative z-10">
-            <button
-              onClick={handleAddBalance}
-              disabled={addingBalance || removingBalance}
-              className="flex-1 bg-gradient-to-r from-accent-lime to-green-600 text-white font-semibold py-3.5 rounded-xl hover:from-green-500 hover:to-accent-lime transition-all shadow-lg shadow-green-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {addingBalance ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5 text-white mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Adding...
-                </>
-              ) : (
-                "Add Balance"
+          {activeTab === "security" && (
+            <div className="glass-card p-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <h3 className="text-[length:var(--font-size-xl)] font-bold text-white mb-6">Change Password</h3>
+              
+              {error && (
+                <div className="bg-rose-900/20 border-l-4 border-rose-500 text-rose-300 p-4 mb-6 rounded-r-lg flex items-center">
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  {error}
+                </div>
               )}
-            </button>
-            <button
-              onClick={handleRemoveBalance}
-              disabled={addingBalance || removingBalance}
-              className="flex-1 bg-gradient-to-r from-rose-600 to-pink-600 text-white font-semibold py-3.5 rounded-xl hover:from-rose-500 hover:to-pink-500 transition-all shadow-lg shadow-rose-900/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
-            >
-              {removingBalance ? (
-                <>
-                  <svg
-                    className="animate-spin h-5 w-5 text-white mr-2"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                    ></path>
-                  </svg>
-                  Removing...
-                </>
-              ) : (
-                "Remove Balance"
+              
+              {success && (
+                <div className="bg-emerald-900/20 border-l-4 border-emerald-500 text-emerald-300 p-4 mb-6 rounded-r-lg flex items-center">
+                  <svg className="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" /></svg>
+                  {success}
+                </div>
               )}
-            </button>
-          </div>
 
-          {message && (
-            <div
-              className={`mt-6 text-center font-medium p-4 rounded-xl animate-in fade-in relative z-10 backdrop-blur-md ${
-                message.includes("Failed")
-                  ? "bg-rose-500/10 border border-rose-500/30 text-rose-400"
-                  : "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400"
-              }`}
-            >
-              {message}
+              <form onSubmit={handlePasswordChange} className="space-y-6 max-w-lg">
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-neutral-300">Current Password</label>
+                  <input
+                    type="password"
+                    value={passwordData.currentPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                    className="input-field"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-neutral-300">New Password</label>
+                  <input
+                    type="password"
+                    value={passwordData.newPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                    className="input-field"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-neutral-300">Confirm New Password</label>
+                  <input
+                    type="password"
+                    value={passwordData.confirmPassword}
+                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                    className="input-field"
+                    required
+                    minLength={6}
+                  />
+                </div>
+                <button type="submit" className="btn-primary w-full sm:w-auto">
+                  Update Password
+                </button>
+              </form>
             </div>
           )}
         </div>
       </div>
     </div>
   );
-};
+}
 
 export default Profile;

@@ -1,23 +1,14 @@
-import { useState, useContext, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useState, useEffect, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { AuthContext } from "../AuthContext";
 
 function Navbar() {
-  const { isAuthenticated, user, loading, logout } = useContext(AuthContext);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const navigate = useNavigate();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useContext(AuthContext);
 
-  const toggleMobileMenu = () => setIsMobileMenuOpen(prev => !prev);
-
-  const handleLogout = () => {
-    logout();
-    setIsMobileMenuOpen(false);
-    navigate("/login");
-  };
-
-  // Handle scroll effect
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
@@ -26,165 +17,181 @@ function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [location]);
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
 
-  const navLinks = [
-    { name: "Transactions", path: "/shopping-details", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-      </svg>
-    )},
-    { name: "Upload", path: "/upload-transaction", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-      </svg>
-    )},
-    { name: "Profile", path: "/profile", icon: (
-      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-      </svg>
-    )},
-  ];
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
+  const isActive = (path) => location.pathname === path;
 
   return (
     <nav 
-      className={`fixed w-full top-0 left-0 z-50 transition-all duration-500 ${
+      className={`fixed w-full top-0 left-0 z-50 transition-all duration-500 border-b ${
         scrolled 
-          ? "bg-neutral-950/80 backdrop-blur-xl border-b border-white/5 shadow-glass-sm" 
-          : "bg-transparent"
+          ? "bg-neutral-950/60 backdrop-blur-3xl border-white/5 shadow-lg" 
+          : "bg-transparent border-transparent"
       }`}
     >
-      <div className="container mx-auto px-4 lg:px-8">
+      <div className="container-fluid">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link
-            to="/"
-            className="group flex items-center gap-2"
-          >
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-neon-purple group-hover:shadow-neon-cyan transition-all duration-500">
-              <span className="text-xl font-bold text-white">B</span>
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center shadow-lg shadow-primary-500/20 group-hover:scale-105 transition-transform duration-300">
+              <span className="text-white font-bold text-xl">B</span>
             </div>
-            <span className="text-2xl font-display font-bold text-white tracking-tight group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-secondary-400 transition-all duration-300">
-              Bazar<span className="text-secondary-400">Hisab</span>
+            <span className="text-2xl font-bold tracking-tight text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-secondary-200 transition-all">
+              Bazar<span className="text-primary-400">Hisab</span>
             </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden lg:flex items-center gap-2">
-            {loading ? (
-              <div className="h-10 w-32 bg-white/5 animate-pulse rounded-lg"></div>
-            ) : isAuthenticated ? (
-              <div className="flex items-center p-1.5 rounded-2xl bg-white/5 border border-white/5 backdrop-blur-md">
-                {navLinks.map((link) => (
-                  <Link
-                    key={link.path}
-                    to={link.path}
-                    className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 flex items-center gap-2 relative overflow-hidden group ${
-                      location.pathname === link.path
-                        ? "text-white bg-white/10 shadow-inner"
-                        : "text-neutral-400 hover:text-white hover:bg-white/5"
-                    }`}
-                  >
-                    <span className={`relative z-10 transition-transform duration-300 group-hover:scale-110 ${location.pathname === link.path ? "text-secondary-400" : ""}`}>
-                      {link.icon}
-                    </span>
-                    <span className="relative z-10">{link.name}</span>
-                    {location.pathname === link.path && (
-                      <div className="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-secondary-500/10 opacity-100"></div>
-                    )}
-                  </Link>
-                ))}
-                
-                <div className="w-px h-6 bg-white/10 mx-2"></div>
-                
-                <button
+          {user && (
+            <div className="hidden md:flex items-center gap-2">
+              <Link 
+                to="/shopping-details" 
+                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                  isActive("/shopping-details") || isActive("/") 
+                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Dashboard
+              </Link>
+              <Link 
+                to="/upload-transaction" 
+                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                  isActive("/upload-transaction") 
+                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Upload
+              </Link>
+              <Link 
+                to="/profile" 
+                className={`px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium transition-all duration-300 ${
+                  isActive("/profile") 
+                    ? "bg-white/10 text-white shadow-inner shadow-white/5 backdrop-blur-md" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Profile
+              </Link>
+            </div>
+          )}
+
+          {/* User Actions */}
+          <div className="hidden md:flex items-center gap-4">
+            {user ? (
+              <div className="flex items-center gap-4">
+                <div className="text-right hidden lg:block">
+                  <p className="text-[length:var(--font-size-base)] font-medium text-white">{user.name}</p>
+                  <p className="text-xs text-neutral-400">{user.email}</p>
+                </div>
+                <button 
                   onClick={handleLogout}
-                  className="px-5 py-2.5 rounded-xl text-sm font-semibold text-accent-pink hover:bg-accent-pink/10 border border-transparent hover:border-accent-pink/20 transition-all duration-300 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 transition-all hover:shadow-lg hover:shadow-rose-900/20 backdrop-blur-sm"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                  </svg>
                   Logout
                 </button>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="btn-primary flex items-center gap-2 group"
-              >
-                <span>Sign In</span>
-                <svg className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                </svg>
-              </Link>
+              <div className="flex items-center gap-3">
+                <Link 
+                  to="/login"
+                  className="px-6 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium text-white hover:bg-white/5 transition-all"
+                >
+                  Login
+                </Link>
+                <Link 
+                  to="/register"
+                  className="px-6 py-2.5 rounded-xl text-[length:var(--font-size-base)] font-medium bg-white text-neutral-950 hover:bg-neutral-200 transition-all shadow-lg shadow-white/10"
+                >
+                  Sign Up
+                </Link>
+              </div>
             )}
           </div>
 
-          {/* Mobile menu button */}
-          <button
-            className="lg:hidden p-3 rounded-xl text-neutral-300 hover:bg-white/10 hover:text-white transition-colors border border-transparent hover:border-white/10"
-            onClick={toggleMobileMenu}
-            aria-label="Toggle menu"
+          {/* Mobile Menu Button */}
+          <button 
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            className="md:hidden p-2 rounded-xl text-neutral-400 hover:text-white hover:bg-white/10 transition-colors"
           >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            {mobileMenuOpen ? (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            ) : (
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+            )}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div className={`lg:hidden fixed inset-x-0 top-20 bg-neutral-950/95 backdrop-blur-2xl border-b border-white/10 transition-all duration-500 ease-in-out transform origin-top ${isMobileMenuOpen ? "scale-y-100 opacity-100" : "scale-y-0 opacity-0 pointer-events-none"}`}>
-        <div className="container mx-auto px-4 py-6 space-y-3">
-          {loading ? (
-            <div className="h-12 w-full bg-white/5 animate-pulse rounded-xl"></div>
-          ) : isAuthenticated ? (
+      <div className={`md:hidden absolute top-20 left-0 w-full glass-panel transition-all duration-300 overflow-hidden ${mobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"}`}>
+        <div className="p-4 space-y-2">
+          {user ? (
             <>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.path}
-                  to={link.path}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium transition-all duration-300 ${
-                    location.pathname === link.path
-                      ? "bg-gradient-to-r from-primary-900/40 to-secondary-900/40 text-white border border-primary-500/30 shadow-lg shadow-primary-900/20"
-                      : "text-neutral-400 hover:bg-white/5 hover:text-white border border-transparent"
-                  }`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span className={`${location.pathname === link.path ? "text-secondary-400" : "text-neutral-500"}`}>
-                    {link.icon}
-                  </span>
-                  {link.name}
-                </Link>
-              ))}
-              
-              <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent my-4"></div>
-              
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium text-accent-pink hover:bg-accent-pink/10 border border-transparent hover:border-accent-pink/20 transition-all"
+              <div className="p-4 rounded-xl bg-white/5 mb-4 border border-white/5">
+                <p className="text-[length:var(--font-size-base)] font-medium text-white">{user.name}</p>
+                <p className="text-xs text-neutral-400">{user.email}</p>
+              </div>
+              <Link 
+                to="/shopping-details" 
+                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                  isActive("/shopping-details") || isActive("/") 
+                    ? "bg-primary-600/20 text-primary-400" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
               >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                Dashboard
+              </Link>
+              <Link 
+                to="/upload-transaction" 
+                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                  isActive("/upload-transaction") 
+                    ? "bg-primary-600/20 text-primary-400" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Upload Transaction
+              </Link>
+              <Link 
+                to="/profile" 
+                className={`block px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium ${
+                  isActive("/profile") 
+                    ? "bg-primary-600/20 text-primary-400" 
+                    : "text-neutral-400 hover:text-white hover:bg-white/5"
+                }`}
+              >
+                Profile
+              </Link>
+              <button 
+                onClick={handleLogout}
+                className="w-full text-left px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium text-rose-400 hover:bg-rose-500/10 transition-colors"
+              >
                 Logout
               </button>
             </>
           ) : (
-            <Link
-              to="/login"
-              className="block w-full text-center px-6 py-4 rounded-xl text-base font-bold bg-gradient-to-r from-primary-600 to-secondary-500 text-white hover:from-primary-500 hover:to-secondary-400 transition-all shadow-lg shadow-primary-900/30"
-              onClick={() => setIsMobileMenuOpen(false)}
-            >
-              Sign In
-            </Link>
+            <div className="grid grid-cols-2 gap-4 p-2">
+              <Link 
+                to="/login"
+                className="flex justify-center px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium text-white bg-white/5 border border-white/10"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/register"
+                className="flex justify-center px-4 py-3 rounded-xl text-[length:var(--font-size-base)] font-medium bg-primary-600 text-white shadow-lg shadow-primary-900/50"
+              >
+                Sign Up
+              </Link>
+            </div>
           )}
         </div>
       </div>
