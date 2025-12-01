@@ -27,8 +27,9 @@ function Register() {
     }
 
     try {
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       const res = await axios.post(
-        "https://bazar-hisab-backend.onrender.com/api/users/register",
+        `${API_URL}/api/users/signup`,
         { name, email, password },
         { withCredentials: true }
       );

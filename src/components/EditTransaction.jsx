@@ -21,8 +21,9 @@ function EditTransaction() {
 
     const fetchData = async () => {
       try {
+        const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
         const res = await axios.get(
-          `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
+          `${API_URL}/api/transactions/${transactionId}`,
           { withCredentials: true }
         );
 
@@ -67,8 +68,9 @@ function EditTransaction() {
     setSubmitting(true);
 
     try {
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       await axios.put(
-        `https://bazar-hisab-backend.onrender.com/api/transactions/${transactionId}`,
+        `${API_URL}/api/transactions/${transactionId}`,
         {
           items: items.map(item => ({
             itemName: item.itemName,

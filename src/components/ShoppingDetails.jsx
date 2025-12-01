@@ -28,8 +28,9 @@ function ShoppingDetails() {
       setLoadingTransactions(true);
       
       // Fetch transactions
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       const transactionResponse = await axios.get(
-        `https://bazar-hisab-backend.onrender.com/api/transactions?page=${page}&limit=${limit}`,
+        `${API_URL}/api/transactions?page=${page}&limit=${limit}`,
         { withCredentials: true }
       );
       const data = transactionResponse.data.data || {};
@@ -39,7 +40,7 @@ function ShoppingDetails() {
 
       // Fetch all users for balance display
       const usersResponse = await axios.get(
-        "https://bazar-hisab-backend.onrender.com/api/users",
+        `${API_URL}/api/users`,
         { withCredentials: true }
       );
       // Handle different response structures (array direct or inside data object)
@@ -70,8 +71,9 @@ function ShoppingDetails() {
     if (!confirm("Are you sure you want to delete this transaction?")) return;
     
     try {
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       await axios.delete(
-        `https://bazar-hisab-backend.onrender.com/api/transactions/${id}`,
+        `${API_URL}/api/transactions/${id}`,
         { withCredentials: true }
       );
       setSuccess("Transaction deleted successfully!");

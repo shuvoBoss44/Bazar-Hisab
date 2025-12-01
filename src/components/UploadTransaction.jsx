@@ -20,8 +20,9 @@ function UploadTransaction() {
       try {
         // Backend returns data as an array directly or wrapped in data object depending on controller
         // Based on UserController.getAllUsers: res.status(200).json({ status: "success", data: [...] })
+        const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
         const response = await axios.get(
-          "https://bazar-hisab-backend.onrender.com/api/users",
+          `${API_URL}/api/users`,
           { withCredentials: true }
         );
         const usersData = response.data.data;
@@ -108,8 +109,9 @@ function UploadTransaction() {
         };
       }
 
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       await axios.post(
-        "https://bazar-hisab-backend.onrender.com/api/transactions",
+        `${API_URL}/api/transactions`,
         payload,
         { withCredentials: true }
       );

@@ -27,8 +27,9 @@ function Profile() {
     const fetchBalance = async () => {
       if (user) {
         try {
+          const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
           const response = await axios.get(
-            "https://bazar-hisab-backend.onrender.com/api/users/me",
+            `${API_URL}/api/users/me`,
             { withCredentials: true }
           );
           // Balance should be from response.data.data.user.balance
@@ -55,8 +56,9 @@ function Profile() {
     }
 
     try {
+      const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
       await axios.put(
-        "https://bazar-hisab-backend.onrender.com/api/users/update-password",
+        `${API_URL}/api/users/update-password`,
         {
           currentPassword: passwordData.currentPassword,
           newPassword: passwordData.newPassword,
