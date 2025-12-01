@@ -143,7 +143,7 @@ function ShoppingDetails() {
 
           {/* Individual User Balances */}
           {users.map((u) => (
-            <div key={u._id} className="glass-card p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
+            <div key={u.id || u._id} className="glass-card p-4 flex items-center gap-4 hover:bg-white/5 transition-colors">
               <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary-500 to-secondary-500 flex items-center justify-center text-lg font-bold text-white flex-shrink-0">
                 {u.name.charAt(0).toUpperCase()}
               </div>

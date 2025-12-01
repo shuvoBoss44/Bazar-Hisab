@@ -24,7 +24,6 @@ function Login() {
         { email, password },
         { withCredentials: true }
       );
-
       if (res.data.status === "success") {
         login(res.data.data.user);
         navigate("/");

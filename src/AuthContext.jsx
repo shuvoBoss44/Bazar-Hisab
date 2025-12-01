@@ -40,6 +40,12 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, [checkAuth]);
 
+  const login = useCallback((userData) => {
+    setIsAuthenticated(true);
+    setUser(userData);
+    setError(null);
+  }, []);
+
   const logout = useCallback(async () => {
     try {
       await axios.post(
@@ -67,8 +73,9 @@ export const AuthProvider = ({ children }) => {
       logout,
       checkAuth,
       setUser,
+      login,
     }),
-    [isAuthenticated, user, loading, error, logout, checkAuth]
+    [isAuthenticated, user, loading, error, logout, checkAuth, login]
   );
 
   return (
