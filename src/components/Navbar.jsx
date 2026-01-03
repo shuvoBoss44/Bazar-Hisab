@@ -31,14 +31,14 @@ function Navbar() {
     <nav 
       className={`glass-nav ${scrolled ? 'glass-nav-scrolled' : ''}`}
     >
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex justify-between items-center h-20">
+      <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <div className="flex justify-between items-center h-16 md:h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-3 group">
+          <Link to="/" className="flex items-center gap-2 group">
             <div className="relative">
               <div className="absolute inset-0 bg-blue-500/10 rounded-xl blur-lg group-hover:bg-blue-500/20 transition-all duration-700"></div>
-              <div className="relative w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
-                <span className="text-white font-bold text-xl italic">B</span>
+              <div className="relative w-8 h-8 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg group-hover:rotate-6 transition-transform duration-500">
+                <span className="text-white font-bold text-lg md:text-xl italic">B</span>
               </div>
             </div>
             <div className="flex flex-col -space-y-0.5">
@@ -127,7 +127,7 @@ function Navbar() {
       />
 
       {/* Mobile Menu Content */}
-      <div className={`lg:hidden fixed top-24 left-4 right-4 bg-neutral-900/95 backdrop-blur-3xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 transform origin-top ${
+      <div className={`lg:hidden fixed top-[4.5rem] left-4 right-4 bg-black/90 backdrop-blur-3xl border border-white/10 rounded-3xl overflow-hidden shadow-2xl transition-all duration-500 transform origin-top ${
         mobileMenuOpen ? 'scale-100 opacity-100 translate-y-0' : 'scale-95 opacity-0 -translate-y-4 pointer-events-none'
       }`}>
         <div className="p-4 space-y-2">

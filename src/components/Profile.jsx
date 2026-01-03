@@ -94,11 +94,11 @@ function Profile() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-6 md:space-y-10">
+    <div className="min-h-screen py-6 md:py-12 px-4">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
         {/* Header */}
-        <div className="space-y-1">
-          <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+        <div className="space-y-1 text-center md:text-left">
+          <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
             User Profile
           </h1>
           <p className="text-slate-400 font-medium text-sm">
@@ -132,32 +132,32 @@ function Profile() {
         </div>
 
         {/* Navigation Tabs */}
-        <div className="flex gap-2 p-1 bg-neutral-900/40 rounded-xl border border-white/5 backdrop-blur-xl">
+        <div className="flex gap-2 p-1.5 bg-neutral-900/40 rounded-2xl border border-white/5 backdrop-blur-xl">
           <button
             onClick={() => setActiveTab("overview")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-xs transition-all duration-300 transform active:scale-95 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-[11px] md:text-xs uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
               activeTab === "overview"
-                ? "bg-blue-600 text-white shadow-md shadow-blue-500/10"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-500/20"
                 : "text-slate-500 hover:text-white hover:bg-white/5"
             }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
             </svg>
-            Account Overview
+            Overview
           </button>
           <button
             onClick={() => setActiveTab("security")}
-            className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg font-bold text-xs transition-all duration-300 transform active:scale-95 ${
+            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-xl font-bold text-[11px] md:text-xs uppercase tracking-wider transition-all duration-300 transform active:scale-95 ${
               activeTab === "security"
-                ? "bg-indigo-600 text-white shadow-md shadow-indigo-500/10"
+                ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
                 : "text-slate-500 hover:text-white hover:bg-white/5"
             }`}
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
-            Security Settings
+            Security
           </button>
         </div>
 

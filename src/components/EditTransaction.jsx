@@ -29,7 +29,19 @@ function EditTransaction() {
 
         const transaction = res.data.data?.transaction;
         if (!transaction) throw new Error("Transaction not found");
-        if (transaction.createdBy._id?.toString() !== user.id) {
+        
+        // Also fetch latest transaction to verify
+        const listRes = await axios.get(
+          `${API_URL}/api/transactions?page=1&limit=1`,
+          { withCredentials: true }
+        );
+        const latestId = listRes.data.data?.transactions?.[0]?._id;
+
+        if (latestId && String(transaction._id) !== String(latestId)) {
+          throw new Error("Only the most recent transaction can be edited");
+        }
+
+        if (transaction.createdBy._id?.toString() !== user.id && transaction.createdBy?.toString() !== user.id) {
           throw new Error("Not authorized");
         }
 
@@ -99,8 +111,8 @@ function EditTransaction() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
-      <div className="max-w-3xl mx-auto space-y-10">
+    <div className="min-h-screen py-6 md:py-12 px-4">
+      <div className="max-w-3xl mx-auto space-y-6 md:space-y-10">
         {/* Header */}
         <div className="space-y-2">
           <div className="flex items-center gap-3 mb-2">
@@ -123,7 +135,7 @@ function EditTransaction() {
         </div>
 
         {/* Main Card */}
-        <div className="glass-card p-8 md:p-12 space-y-10 animate-in slide-in-from-bottom duration-500">
+        <div className="glass-card p-5 md:p-12 space-y-8 md:space-y-10 animate-in slide-in-from-bottom duration-500">
           {error && (
             <div className="alert-error animate-in flex items-center gap-4 bg-red-500/10 border-red-500/20">
               <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
@@ -153,7 +165,7 @@ function EditTransaction() {
               
               <div className="space-y-4">
                 {items.map((item, index) => (
-                  <div key={index} className="flex gap-4 group/item scale-100 hover:scale-[1.01] transition-transform">
+                  <div key={index} className="flex flex-col md:flex-row gap-4 group/item scale-100 md:hover:scale-[1.01] transition-transform">
                     <div className="relative flex-1">
                       <input
                         type="text"
@@ -164,30 +176,32 @@ function EditTransaction() {
                         required
                       />
                     </div>
-                    <div className="relative w-40">
-                      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-black">৳</span>
-                      <input
-                        type="number"
-                        placeholder="0.00"
-                        value={item.price}
-                        onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                        className="input-field pl-8 font-black"
-                        required
-                        min="0"
-                        step="0.01"
-                      />
+                    <div className="flex gap-2">
+                      <div className="relative flex-1 md:w-40">
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
+                        <input
+                          type="number"
+                          placeholder="0.00"
+                          value={item.price}
+                          onChange={(e) => handleItemChange(index, "price", e.target.value)}
+                          className="input-field pl-8 font-bold"
+                          required
+                          min="0"
+                          step="0.01"
+                        />
+                      </div>
+                      {items.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeItem(index)}
+                          className="w-[3.25rem] h-[3.25rem] md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      )}
                     </div>
-                    {items.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeItem(index)}
-                        className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
-                      >
-                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    )}
                   </div>
                 ))}
               </div>

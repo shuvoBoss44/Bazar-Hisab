@@ -150,8 +150,8 @@ function UploadTransaction() {
   }
 
   return (
-    <div className="min-h-screen py-8 md:py-12 px-4">
-      <div className="max-w-3xl mx-auto space-y-8">
+    <div className="min-h-screen py-6 md:py-12 px-4">
+      <div className="max-w-3xl mx-auto space-y-6 md:space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
           <h1 className="text-2xl md:text-4xl font-bold text-gradient-primary">
@@ -163,7 +163,7 @@ function UploadTransaction() {
         </div>
 
         {/* Main Card */}
-        <div className="glass-card p-6 md:p-10 space-y-8 animate-in slide-in-from-bottom">
+        <div className="glass-card p-5 md:p-10 space-y-8 animate-in slide-in-from-bottom">
           {/* Messages */}
           <div className="space-y-4">
             {error && (
@@ -246,7 +246,7 @@ function UploadTransaction() {
                   
                   <div className="space-y-3">
                     {items.map((item, index) => (
-                      <div key={index} className="flex gap-3 group/item scale-100 hover:scale-[1.01] transition-transform">
+                      <div key={index} className="flex flex-col md:flex-row gap-3 group/item scale-100 md:hover:scale-[1.01] transition-transform">
                         <div className="relative flex-1">
                            <input
                             type="text"
@@ -257,30 +257,32 @@ function UploadTransaction() {
                             required
                           />
                         </div>
-                        <div className="relative w-28 md:w-36">
-                          <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
-                          <input
-                            type="number"
-                            placeholder="0.00"
-                            value={item.price}
-                            onChange={(e) => handleItemChange(index, "price", e.target.value)}
-                            className="input-field pl-8 font-bold"
-                            required
-                            min="0"
-                            step="0.01"
-                          />
+                        <div className="flex gap-2">
+                          <div className="relative flex-1 md:w-36">
+                            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
+                            <input
+                              type="number"
+                              placeholder="0.00"
+                              value={item.price}
+                              onChange={(e) => handleItemChange(index, "price", e.target.value)}
+                              className="input-field pl-8 font-bold"
+                              required
+                              min="0"
+                              step="0.01"
+                            />
+                          </div>
+                          {items.length > 1 && (
+                            <button
+                              type="button"
+                              onClick={() => removeItem(index)}
+                              className="w-[3.25rem] h-[3.25rem] md:w-12 md:h-12 flex-shrink-0 flex items-center justify-center text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
+                            >
+                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                              </svg>
+                            </button>
+                          )}
                         </div>
-                        {items.length > 1 && (
-                          <button
-                            type="button"
-                            onClick={() => removeItem(index)}
-                            className="w-12 h-12 flex-shrink-0 flex items-center justify-center text-rose-500 bg-rose-500/10 hover:bg-rose-500 hover:text-white rounded-xl transition-all active:scale-90"
-                          >
-                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                            </svg>
-                          </button>
-                        )}
                       </div>
                     ))}
                   </div>

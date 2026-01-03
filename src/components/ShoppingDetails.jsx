@@ -136,15 +136,15 @@ function ShoppingDetails() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen py-10 px-6">
-      <div className="max-w-7xl mx-auto space-y-10">
+    <div className="min-h-screen py-6 md:py-10 px-4 md:px-6">
+      <div className="max-w-7xl mx-auto space-y-8 md:space-y-10">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 pb-2">
-          <div className="space-y-1">
-            <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
+          <div className="space-y-1 text-center md:text-left">
+            <h1 className="text-3xl md:text-5xl font-black text-white tracking-tight">
               Dashboard
             </h1>
-            <p className="text-slate-400 font-medium flex items-center gap-3 text-sm">
+            <p className="text-slate-400 font-medium flex items-center justify-center md:justify-start gap-3 text-sm">
               <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
@@ -262,7 +262,7 @@ function ShoppingDetails() {
         </div>
 
         {/* Balances Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {/* Central Pool Balance */}
           <div className="glass-card p-5 md:p-8 lg:col-span-4 bg-gradient-to-br from-blue-900/10 via-neutral-900/60 to-indigo-900/10 border-blue-500/20 group hover:border-blue-500/30 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -mr-32 -mt-32 transition-all duration-700 group-hover:bg-blue-500/10"></div>
@@ -413,53 +413,56 @@ function ShoppingDetails() {
                              }`}>
                                {isAddition ? 'Liquidity IN' : isRemoval ? 'Liquidity OUT' : 'Expense'}
                              </span>
-                             <span className="text-[10px] font-bold text-slate-500">{new Date(transaction.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                          </div>
-                          <h3 className={`text-sm font-bold text-white uppercase tracking-wider transition-colors ${
-                            isAddition ? 'group-hover:text-emerald-400' :
-                            isRemoval ? 'group-hover:text-rose-400' :
-                            'group-hover:text-blue-400'
-                          }`}>
-                            {isAddition ? 'Balance Addition' : isRemoval ? 'Balance Removal' : 'Shared Pool Expense'}
-                          </h3>
-                          <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
-                            By <span className="text-slate-300 font-bold">{transaction.createdBy?.name || 'Unknown'}</span>
-                          </p>
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between md:justify-end gap-6 text-right">
-                        <div className="flex flex-col items-end">
-                           <p className="text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact Amount</p>
-                           <div className={`flex items-baseline gap-1 font-bold ${
-                             isAddition ? 'text-emerald-400' : isRemoval ? 'text-rose-400' : 'text-white'
-                           }`}>
-                             <span className="text-xs">৳</span>
-                             <span className="text-xl tracking-tight">{(transaction.totalPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                              <span className="text-[10px] font-bold text-slate-500">{new Date(transaction.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                              {page === 1 && String(transaction._id) === String(transactions[0]?._id) && (
+                                <span className="text-[7px] font-black uppercase tracking-[0.2em] px-1.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 animate-pulse">Latest</span>
+                              )}
                            </div>
-                        </div>
-                        {/* Actions only for creator AND absolute latest transaction */}
-                        {(transaction.createdBy?._id === (user.id || user._id) || transaction.createdBy === (user.id || user._id)) && 
-                          page === 1 && 
-                          transaction._id === transactions[0]?._id && (
+                           <h3 className={`text-sm font-bold text-white uppercase tracking-wider transition-colors ${
+                             isAddition ? 'group-hover:text-emerald-400' :
+                             isRemoval ? 'group-hover:text-rose-400' :
+                             'group-hover:text-blue-400'
+                           }`}>
+                             {isAddition ? 'Balance Addition' : isRemoval ? 'Balance Removal' : 'Shared Pool Expense'}
+                           </h3>
+                           <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-0.5">
+                             By <span className="text-slate-300 font-bold">{transaction.createdBy?.name || 'Unknown'}</span>
+                           </p>
+                         </div>
+                       </div>
+                        <div className="flex items-center justify-between md:justify-end gap-3 md:gap-6 text-right">
+                          <div className="flex flex-col items-end">
+                             <p className="text-[8px] md:text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1">Impact</p>
+                             <div className={`flex items-baseline gap-1 font-bold ${
+                               isAddition ? 'text-emerald-400' : isRemoval ? 'text-rose-400' : 'text-white'
+                             }`}>
+                               <span className="text-[10px] md:text-xs">৳</span>
+                               <span className="text-lg md:text-xl tracking-tight">{(transaction.totalPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                             </div>
+                          </div>
+                         {/* Actions only for creator AND absolute latest transaction */}
+                         {(String(transaction.createdBy?._id || transaction.createdBy) === String(user.id || user._id)) && 
+                           page === 1 && 
+                           String(transaction._id) === String(transactions[0]?._id) && (
                           <div className="flex gap-2">
-                            <button
-                              onClick={(e) => { e.stopPropagation(); navigate(`/edit-transaction/${transaction._id}`); }}
-                              className="w-10 h-10 rounded-xl bg-white/5 hover:bg-blue-500/20 text-slate-500 hover:text-white flex items-center justify-center transition-all duration-300 border border-white/5 hover:border-blue-500/30"
-                              title="Edit Record"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                              </svg>
-                            </button>
-                            <button
-                              onClick={(e) => { e.stopPropagation(); handleDelete(transaction._id); }}
-                              className="w-10 h-10 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-white flex items-center justify-center transition-all duration-300 border border-white/5 hover:border-rose-500/30"
-                              title="Delete Record"
-                            >
-                              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
+                             <button
+                               onClick={(e) => { e.stopPropagation(); navigate(`/edit-transaction/${transaction._id}`); }}
+                               className="w-9 h-9 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/5 hover:bg-blue-500/20 text-slate-500 hover:text-white flex items-center justify-center transition-all duration-300 border border-white/5 hover:border-blue-500/30"
+                               title="Edit Record"
+                             >
+                               <svg className="w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                               </svg>
+                             </button>
+                             <button
+                               onClick={(e) => { e.stopPropagation(); handleDelete(transaction._id); }}
+                               className="w-9 h-9 md:w-10 md:h-10 rounded-lg md:rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-500 hover:text-white flex items-center justify-center transition-all duration-300 border border-white/5 hover:border-rose-500/30"
+                               title="Delete Record"
+                             >
+                               <svg className="w-4 h-4 md:text-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                               </svg>
+                             </button>
                           </div>
                         )}
                       </div>
