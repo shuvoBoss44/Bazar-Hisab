@@ -6,6 +6,7 @@ import { AuthContext } from "../AuthContext";
 function EditTransaction() {
   const { user, loading: authLoading } = useContext(AuthContext);
   const [items, setItems] = useState([{ itemName: "", price: "" }]);
+  const [originalTransaction, setOriginalTransaction] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -45,6 +46,7 @@ function EditTransaction() {
           throw new Error("Not authorized");
         }
 
+        setOriginalTransaction(transaction);
         setItems(
           transaction.items.map(item => ({
             itemName: item.itemName || "",
@@ -81,13 +83,21 @@ function EditTransaction() {
 
     try {
       const API_URL = import.meta.env.VITE_API_URL || "https://bazar-hisab-backend.onrender.com";
+      const newItems = items.filter(i => i.itemName.trim() !== "" && i.price !== "").map(item => ({
+        itemName: item.itemName,
+        price: parseFloat(item.price)
+      }));
+      const newTotalPrice = newItems.reduce((sum, i) => sum + i.price, 0);
+
       await axios.put(
         `${API_URL}/api/transactions/${transactionId}`,
         {
-          items: items.map(item => ({
-            itemName: item.itemName,
-            price: parseFloat(item.price)
-          }))
+          items: newItems,
+          sharedUsers: originalTransaction.sharedUsers.map(u => u._id || u),
+          totalPrice: newTotalPrice,
+          originalTotalPrice: originalTransaction.totalPrice,
+          userBalanceBeforeTransaction: originalTransaction.userBalanceBeforeTransaction,
+          usersBalancesAtTransactionTime: originalTransaction.usersBalancesAtTransactionTime
         },
         { withCredentials: true }
       );
