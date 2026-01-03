@@ -549,11 +549,13 @@ function ShoppingDetails() {
                               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {transaction.sharedUsers.map((sharedUser, idx) => {
                                   const historicalData = transaction.usersBalancesAtTransactionTime?.find(
-                                    u => u._id === sharedUser._id || u._id === sharedUser.userId?._id
+                                    u => String(u._id) === String(sharedUser._id || sharedUser)
                                   );
-                                  const balanceAfter = historicalData ? historicalData.balanceAtTime : (sharedUser.balance ?? 0);
+
+                                  const hasHistorical = !!historicalData;
+                                  const balanceAfter = hasHistorical ? historicalData.balanceAtTime : null;
                                   const deduction = transaction.individualDeduction || 0;
-                                  const balanceBefore = balanceAfter + deduction;
+                                  const balanceBefore = hasHistorical ? balanceAfter + deduction : null;
 
                                   return (
                                     <div key={idx} className="group/split p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-indigo-500/40 transition-all duration-300">
@@ -572,11 +574,15 @@ function ShoppingDetails() {
                                       <div className="flex items-center justify-between pt-3 border-t border-white/5">
                                         <div className="space-y-0.5">
                                           <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">Before</p>
-                                          <p className="text-[10px] font-bold text-slate-400">৳{balanceBefore.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                          <p className="text-[10px] font-bold text-slate-400">
+                                            {hasHistorical ? `৳${balanceBefore.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : 'N/A'}
+                                          </p>
                                         </div>
                                         <div className="space-y-0.5 text-right">
                                           <p className="text-[7px] font-bold text-slate-500 uppercase tracking-widest">After</p>
-                                          <p className="text-xs font-bold text-emerald-400">৳{balanceAfter.toLocaleString(undefined, { minimumFractionDigits: 2 })}</p>
+                                          <p className={`text-xs font-bold ${hasHistorical ? 'text-emerald-400' : 'text-slate-500 italic'}`}>
+                                            {hasHistorical ? `৳${balanceAfter.toLocaleString(undefined, { minimumFractionDigits: 2 })}` : 'Archived'}
+                                          </p>
                                         </div>
                                       </div>
                                     </div>
