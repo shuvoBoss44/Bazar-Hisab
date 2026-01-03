@@ -89,7 +89,7 @@ function EditTransaction() {
       }));
       const newTotalPrice = newItems.reduce((sum, i) => sum + i.price, 0);
 
-      await axios.put(
+      await axios.patch(
         `${API_URL}/api/transactions/${transactionId}`,
         {
           items: newItems,
