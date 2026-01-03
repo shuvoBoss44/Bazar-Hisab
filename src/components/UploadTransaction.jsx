@@ -150,11 +150,11 @@ function UploadTransaction() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-8 md:py-12 px-4">
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center space-y-2">
-          <h1 className="text-4xl font-bold text-gradient-primary">
+          <h1 className="text-2xl md:text-4xl font-bold text-gradient-primary">
             Upload Transaction
           </h1>
           <p className="text-slate-400">
@@ -257,7 +257,7 @@ function UploadTransaction() {
                             required
                           />
                         </div>
-                        <div className="relative w-36">
+                        <div className="relative w-28 md:w-36">
                           <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 font-bold">৳</span>
                           <input
                             type="number"

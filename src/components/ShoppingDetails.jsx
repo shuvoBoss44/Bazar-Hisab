@@ -117,8 +117,8 @@ function ShoppingDetails() {
 
   if (authLoading || loadingTransactions) {
     return (
-      <div className="min-h-screen py-10 px-6">
-        <div className="max-w-7xl mx-auto space-y-10">
+      <div className="min-h-screen py-6 px-4 md:py-10 md:px-6">
+        <div className="max-w-7xl mx-auto space-y-6 md:space-y-10">
           {/* Header Skeleton */}
           <div className="space-y-4">
             <div className="skeleton-title w-48" />
@@ -218,7 +218,7 @@ function ShoppingDetails() {
             </div>
             
             {/* Date Filter */}
-            <div className="flex gap-2 p-1.5 bg-neutral-900/60 rounded-xl border border-white/5">
+            <div className="flex gap-1 md:gap-2 p-1 md:p-1.5 bg-neutral-900/60 rounded-xl border border-white/5 overflow-x-auto no-scrollbar">
               {[
                 { id: 'all', label: 'All Time' },
                 { id: 'today', label: 'Today' },
@@ -228,7 +228,7 @@ function ShoppingDetails() {
                 <button
                   key={filter.id}
                   onClick={() => setDateFilter(filter.id)}
-                  className={`px-4 py-2 rounded-lg font-bold text-xs uppercase tracking-widest transition-all ${
+                  className={`px-3 md:px-4 py-2 rounded-lg font-bold text-[10px] md:text-xs uppercase tracking-widest transition-all whitespace-nowrap ${
                     dateFilter === filter.id
                       ? 'bg-blue-600 text-white shadow-lg'
                       : 'text-slate-500 hover:text-white hover:bg-white/5'
@@ -262,11 +262,11 @@ function ShoppingDetails() {
         </div>
 
         {/* Balances Section */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
           {/* Central Pool Balance */}
-          <div className="glass-card p-8 lg:col-span-4 bg-gradient-to-br from-blue-900/10 via-neutral-900/60 to-indigo-900/10 border-blue-500/20 group hover:border-blue-500/30 relative overflow-hidden">
+          <div className="glass-card p-5 md:p-8 lg:col-span-4 bg-gradient-to-br from-blue-900/10 via-neutral-900/60 to-indigo-900/10 border-blue-500/20 group hover:border-blue-500/30 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -mr-32 -mt-32 transition-all duration-700 group-hover:bg-blue-500/10"></div>
-            <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-8">
+            <div className="relative flex flex-col lg:flex-row lg:items-center justify-between gap-6 md:gap-8">
               <div className="space-y-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-blue-400 shadow-md group-hover:scale-110 transition-transform">
@@ -366,7 +366,7 @@ function ShoppingDetails() {
               }
             />
           ) : (
-            <div className="space-y-10">
+            <div className="space-y-6 md:space-y-10">
               {filteredTransactions.map((transaction, idx) => {
                 const isAddition = transaction.items?.[0]?.itemName === "Balance Addition";
                 const isRemoval = transaction.items?.[0]?.itemName === "Balance Removal";
@@ -375,7 +375,7 @@ function ShoppingDetails() {
                 return (
                   <div 
                     key={transaction._id}
-                    className={`group relative p-5 rounded-3xl border transition-all duration-500 hover:shadow-2xl cursor-pointer overflow-hidden ${
+                    className={`group relative p-4 md:p-5 rounded-3xl border transition-all duration-500 hover:shadow-2xl cursor-pointer overflow-hidden ${
                       expandedTransaction === transaction._id 
                         ? 'bg-neutral-900 border-white/10 shadow-glow' 
                         : 'bg-neutral-900/40 border-white/5 hover:border-white/10 hover:bg-neutral-900/60'
@@ -389,7 +389,7 @@ function ShoppingDetails() {
 
                     <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-6">
                       <div className="flex items-center gap-5">
-                        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg ${
+                        <div className={`w-10 h-10 md:w-12 md:h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-lg flex-shrink-0 ${
                           isAddition ? 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 group-hover:bg-emerald-500/20' :
                           isRemoval ? 'bg-rose-500/10 border border-rose-500/20 text-rose-400 group-hover:bg-rose-500/20' :
                           'bg-blue-500/10 border border-blue-500/20 text-blue-400 group-hover:bg-blue-500/20'
@@ -437,8 +437,10 @@ function ShoppingDetails() {
                              <span className="text-xl tracking-tight">{(transaction.totalPrice ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
                            </div>
                         </div>
-                        {/* Actions only for creator AND latest transaction */}
-                        {transaction.createdBy?._id === user._id && page === 1 && idx === 0 && (
+                        {/* Actions only for creator AND absolute latest transaction */}
+                        {(transaction.createdBy?._id === (user.id || user._id) || transaction.createdBy === (user.id || user._id)) && 
+                          page === 1 && 
+                          transaction._id === transactions[0]?._id && (
                           <div className="flex gap-2">
                             <button
                               onClick={(e) => { e.stopPropagation(); navigate(`/edit-transaction/${transaction._id}`); }}
@@ -465,11 +467,11 @@ function ShoppingDetails() {
 
                     {/* Expanded View */}
                     {expandedTransaction === transaction._id && (
-                      <div className="mt-8 animate-in slide-in-from-top-4 duration-500 pb-2">
-                        <div className="p-6 md:p-8 space-y-8 bg-neutral-900/20 border-t border-white/5 rounded-2xl overflow-hidden">
+                      <div className="mt-6 md:mt-8 animate-in slide-in-from-top-4 duration-500 pb-2">
+                        <div className="p-4 md:p-8 space-y-6 md:space-y-8 bg-neutral-900/20 border-t border-white/5 rounded-2xl overflow-hidden">
                           {/* Balance Info Single Box */}
                           {(isAddition || isRemoval) && (
-                            <div className={`p-6 rounded-[2rem] border flex flex-col md:flex-row md:items-center justify-between gap-6 ${
+                            <div className={`p-4 md:p-6 rounded-2xl md:rounded-[2rem] border flex flex-col md:flex-row md:items-center justify-between gap-4 md:gap-6 ${
                               isAddition ? 'bg-emerald-500/[0.03] border-emerald-500/10' : 'bg-rose-500/[0.03] border-rose-500/10'
                             }`}>
                               <div className="space-y-2">

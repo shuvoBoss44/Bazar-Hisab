@@ -95,7 +95,7 @@ function Profile() {
 
   return (
     <div className="min-h-screen py-8 px-4">
-      <div className="max-w-7xl mx-auto space-y-10">
+      <div className="max-w-7xl mx-auto space-y-6 md:space-y-10">
         {/* Header */}
         <div className="space-y-1">
           <h1 className="text-3xl md:text-4xl font-bold text-white tracking-tight">
@@ -164,10 +164,10 @@ function Profile() {
         {/* Tab Content */}
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
           {activeTab === "overview" ? (
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-8">
               {/* User Identity Card */}
               <div className="lg:col-span-2 space-y-8">
-                <div className="glass-card p-8 relative overflow-hidden group">
+                <div className="glass-card p-5 md:p-8 relative overflow-hidden group">
                   <div className="absolute top-0 right-0 w-48 h-48 bg-blue-500/5 rounded-full blur-[60px] -mr-24 -mt-24 group-hover:bg-blue-500/10 transition-colors duration-500"></div>
                   <div className="relative flex flex-col md:flex-row items-center md:items-start gap-8">
                     <div className="relative">
